@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PinPoint Studio — open-source golf swing analysis</title>
+<meta name="description" content="Off-the-shelf high-speed cameras, body-worn IMUs and force estimation, turned into the measurements tour analysts use — kinematic sequence, X-factor, wrist angles through P1–P8. Open source, no proprietary hardware.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#070A0B;
+    --ink-2:#0E1316;
+    --ink-3:#171F23;
+    --paper:#F2EDE2;
+    --text-2:#D7D2C7;
+    --paper-dim:#AAB4B2;
+    --line:rgba(242,237,226,.13);
+    --line-strong:rgba(242,237,226,.24);
+    --pelvis:#E6AC54;
+    --thorax:#E07E64;
+    --arm:#8AB389;
+    --club:#7BC0DB;
+    --accent:#E6AC54;
+    --font-display:'Fraunces',Georgia,serif;
+    --font-body:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
+    --font-mono:'DM Mono',ui-monospace,monospace;
+    --maxw:1140px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;background:var(--ink)}
+  .page{background:var(--ink);position:relative;min-height:100vh;overflow:hidden}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--font-body);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--accent);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+  .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:28px}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--paper-dim);
+  }
+
+  /* ---- top bar ---- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(7,10,11,.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .mark{font-family:var(--font-mono);font-size:14px;letter-spacing:.04em;display:flex;align-items:center;gap:9px}
+  .mark .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(230,172,84,.18)}
+  .mark b{font-weight:500}
+  .navlinks{display:flex;align-items:center;gap:26px;font-size:14px}
+  .navlinks a.muted{color:var(--paper-dim)}
+  .navlinks a.muted:hover{color:var(--paper)}
+  .btn{
+    font-family:var(--font-mono);font-size:13px;letter-spacing:.02em;
+    padding:9px 16px;border-radius:6px;border:1px solid var(--line-strong);
+    transition:border-color .18s,background .18s,color .18s;white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--paper)}
+  .btn.solid{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:500}
+  .btn.solid:hover{background:#efbd6e;border-color:#efbd6e}
+  @media(max-width:680px){.navlinks a.muted{display:none}}
+
+  /* ---- hero ---- */
+  .hero{padding-top:64px;padding-bottom:18px;position:relative}
+  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:48px;align-items:center}
+  h1{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(38px,5.6vw,68px);
+    line-height:1.02;
+    letter-spacing:-.015em;
+    margin:20px 0 22px;
+  }
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{font-size:clamp(16px,1.5vw,19px);color:var(--text-2);max-width:36ch}
+  .cta-row{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .cta-row .btn{padding:13px 20px;font-size:14px}
+  .credit{margin-top:26px;font-family:var(--font-mono);font-size:12.5px;color:var(--paper-dim);letter-spacing:.02em}
+  .credit b{color:var(--paper);font-weight:400}
+
+  /* ---- kinematic sequence panel ---- */
+  .scope{
+    background:linear-gradient(180deg,var(--ink-2),#0A0F12);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px 20px 16px;
+    position:relative;
+  }
+  .scope-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .scope-head .ttl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
+  .scope-head .rd{font-family:var(--font-mono);font-size:11.5px;color:var(--paper-dim)}
+  .scope svg{display:block;width:100%;height:auto}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+  .legend span{font-family:var(--font-mono);font-size:11px;color:var(--paper-dim);display:flex;align-items:center;gap:6px}
+  .legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+
+  /* ---- generic section ---- */
+  section{padding-block:84px}
+  .sec-tag{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+  .sec-tag .num{font-family:var(--font-mono);font-size:12px;color:var(--paper-dim)}
+  .sec-tag h2{font-family:var(--font-display);font-weight:500;font-size:clamp(26px,3.2vw,38px);letter-spacing:-.01em;line-height:1.05}
+  hr.rule{border:0;border-top:1px solid var(--line)}
+
+  /* ---- measures: three channels ---- */
+  .channels{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .channel{padding:30px 28px;border-right:1px solid var(--line)}
+  .channel:last-child{border-right:0}
+  .channel .ch-label{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .channel .ch-label i{width:8px;height:8px;border-radius:50%}
+  .channel p{font-size:15.5px;color:var(--text-2);line-height:1.55}
+  @media(max-width:760px){.channels{grid-template-columns:1fr}.channel{border-right:0;border-bottom:1px solid var(--line)}.channel:last-child{border-bottom:0}}
+
+  /* ---- four screens ---- */
+  .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .screen{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:12px;
+    padding:26px 26px 28px;transition:border-color .2s,transform .2s;
+  }
+  .screen:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .screen .glyph{width:38px;height:38px;margin-bottom:18px;color:var(--accent)}
+  .screen h3{font-family:var(--font-display);font-weight:500;font-size:21px;margin-bottom:9px;letter-spacing:-.005em}
+  .screen p{font-size:15px;color:var(--text-2);line-height:1.55}
+  @media(max-width:680px){.screens{grid-template-columns:1fr}}
+
+  /* ---- spec strip ---- */
+  .specwrap{background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:8px 4px}
+  .specrow{display:flex;justify-content:space-between;gap:20px;padding:15px 24px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:13.5px}
+  .specrow:last-child{border-bottom:0}
+  .specrow .k{color:var(--paper-dim);letter-spacing:.08em;text-transform:uppercase;font-size:11.5px}
+  .specrow .v{color:var(--paper);text-align:right}
+  @media(max-width:560px){.specrow{flex-direction:column;gap:3px}.specrow .v{text-align:left}}
+
+  /* ---- personas ---- */
+  .personas{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .persona{border-top:2px solid var(--accent);padding-top:18px}
+  .persona h4{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);margin-bottom:10px}
+  .persona p{font-size:15px;color:var(--text-2)}
+  @media(max-width:760px){.personas{grid-template-columns:1fr;gap:26px}}
+
+  /* ---- closing ---- */
+  .closing{text-align:center;padding-block:96px}
+  .closing h2{font-family:var(--font-display);font-weight:500;font-size:clamp(30px,4.4vw,52px);letter-spacing:-.015em;line-height:1.04;margin-bottom:18px}
+  .closing p{color:var(--text-2);max-width:46ch;margin:0 auto 30px}
+  .closing .cta-row{justify-content:center}
+
+  footer{border-top:1px solid var(--line);padding-block:36px;color:var(--paper-dim)}
+  .foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-family:var(--font-mono);font-size:12.5px;letter-spacing:.02em}
+  .foot a:hover{color:var(--paper)}
+
+  /* draw-on animation */
+  .trace{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .trace.anim{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.5s cubic-bezier(.4,.0,.2,1) forwards}
+  .trace.d1{animation-delay:.05s}.trace.d2{animation-delay:.28s}.trace.d3{animation-delay:.5s}.trace.d4{animation-delay:.72s}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .pmark{opacity:0;animation:fadein .5s ease forwards;animation-delay:1.4s}
+  @keyframes fadein{to{opacity:1}}
+  @media(prefers-reduced-motion:reduce){
+    .trace.anim{animation:none;stroke-dashoffset:0}
+    .pmark{animation:none;opacity:1}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="wrap bar">
+    <div class="mark"><span class="dot"></span><b>PinPoint Studio</b></div>
+    <nav class="navlinks">
+      <a class="muted" href="#measures">What it measures</a>
+      <a class="muted" href="#screens">Screens</a>
+      <a class="muted" href="#spec">Under the hood</a>
+      <a class="btn" href="https://github.com/" target="_blank" rel="noopener">GitHub &#8599;</a>
+      <a class="btn solid" href="#register">Register interest</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow">Open source &middot; No proprietary hardware</span>
+        <h1>Read your swing the way the <em>data</em> does.</h1>
+        <p class="lede">PinPoint Studio turns off-the-shelf high-speed cameras, a set of body-worn IMUs and force estimation into the measurements tour analysts actually use — kinematic sequence, X-factor, wrist angles through P1–P8. On your own desktop, with no proprietary rig and the source in the open.</p>
+        <div class="cta-row">
+          <a class="btn solid" href="https://github.com/" target="_blank" rel="noopener">View on GitHub</a>
+          <a class="btn" href="#register">Register interest</a>
+        </div>
+        <p class="credit">Built by the author of <b>GoldenCheetah</b>.</p>
+      </div>
+
+      <div class="scope" aria-label="Kinematic sequence — angular velocity of pelvis, thorax, lead arm and club through the downswing">
+        <div class="scope-head">
+          <span class="ttl">Kinematic sequence</span>
+          <span class="rd">deg/s &middot; downswing</span>
+        </div>
+        <svg id="kseq" viewBox="0 0 560 320" role="img" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="legend">
+          <span><i style="background:var(--pelvis)"></i>Pelvis</span>
+          <span><i style="background:var(--thorax)"></i>Thorax</span>
+          <span><i style="background:var(--arm)"></i>Lead arm</span>
+          <span><i style="background:var(--club)"></i>Club</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- what it measures -->
+  <section id="measures" class="wrap">
+    <div class="sec-tag"><span class="num">01</span><h2>Three things, measured at once.</h2></div>
+    <div class="channels">
+      <div class="channel">
+        <div class="ch-label"><i style="background:var(--club)"></i>Cameras</div>
+        <p>Off-the-shelf high-speed cameras — face-on and down-the-line, 150fps and up. ChArUco-calibrated and triangulated into true 3D. The cameras you can buy, not a sealed rig.</p>
+      </div>
+      <div class="channel">
+        <div class="ch-label"><i style="background:var(--pelvis)"></i>Motion</div>
+        <p>Two or more 200Hz IMUs — readily-available BLE sensors — track wrist flexion, extension and rotation plus the body-segment motion a camera can't see cleanly.</p>
+      </div>
+      <div class="channel">
+        <div class="ch-label"><i style="background:var(--arm)"></i>Force</div>
+        <p>Ground reaction force, estimated from motion, so you can see how the swing loads, shifts and unloads through the strike.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- four screens -->
+  <section id="screens" class="wrap">
+    <div class="sec-tag"><span class="num">02</span><h2>Four ways to see a swing.</h2></div>
+    <div class="screens">
+      <div class="screen">
+        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 28c6 0 7-16 12-16s6 10 10 10 5-12 12-12"/><circle cx="15" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <h3>Swing Analysis</h3>
+        <p>Full-body kinematics from the captured frames: kinematic sequence, X-factor, the timing of how speed builds up the chain.</p>
+      </div>
+      <div class="screen">
+        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 34V18"/><path d="M20 18a10 10 0 0 1 10-10"/><path d="M20 18a10 10 0 0 0-9 6"/><circle cx="20" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>
+        <h3>Wrist Motion</h3>
+        <p>Flexion, extension and rotation across P1–P8 — the wrist story that HackMotion and Dewiz users already look for, in one place.</p>
+      </div>
+      <div class="screen">
+        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 30h28"/><path d="M12 30V16"/><path d="M20 30V8"/><path d="M28 30V22"/></svg>
+        <h3>Ground Force</h3>
+        <p>Loading, weight shift and ground reaction force through the downswing — see where the power comes from, not just where it ends up.</p>
+      </div>
+      <div class="screen">
+        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h26a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H17l-8 6V11a2 2 0 0 1 2-2Z"/><path d="M14 17h2M20 17h2M26 17h2"/></svg>
+        <h3>AI Coach</h3>
+        <p>Ask about your swing out loud and get answers grounded in your own numbers — not a generic tip, the one your data supports.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- spec -->
+  <section id="spec" class="wrap">
+    <div class="sec-tag"><span class="num">03</span><h2>Built like an instrument.</h2></div>
+    <div class="specwrap">
+      <div class="specrow"><span class="k">Cameras</span><span class="v">Off-the-shelf &middot; stereo &middot; 150fps+</span></div>
+      <div class="specrow"><span class="k">Calibration</span><span class="v">ChArUco + DLT triangulation</span></div>
+      <div class="specrow"><span class="k">IMUs</span><span class="v">2+ &middot; 200Hz &middot; off-the-shelf BLE</span></div>
+      <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose++ (analysis)</span></div>
+      <div class="specrow"><span class="k">Biomechanics</span><span class="v">OpenSim inverse kinematics</span></div>
+      <div class="specrow"><span class="k">Positions</span><span class="v">P1 – P8</span></div>
+      <div class="specrow"><span class="k">Hardware</span><span class="v">Readily available — no proprietary kit</span></div>
+      <div class="specrow"><span class="k">Platforms</span><span class="v">Windows &middot; macOS &middot; Linux</span></div>
+      <div class="specrow"><span class="k">Licence</span><span class="v">GPL v2 &middot; source in the open</span></div>
+    </div>
+  </section>
+
+  <!-- personas -->
+  <section class="wrap">
+    <div class="sec-tag"><span class="num">04</span><h2>Who it's for.</h2></div>
+    <div class="personas">
+      <div class="persona"><h4>Teaching pros</h4><p>Numbers you can put in front of a student and defend — the same metrics as a studio bay, without the studio.</p></div>
+      <div class="persona"><h4>Serious amateurs</h4><p>The measurements you've read about for tour players, applied to your own swing, on hardware you choose.</p></div>
+      <div class="persona"><h4>Newcomers</h4><p>A clear, honest picture of what your swing is actually doing — and where the easy wins are.</p></div>
+    </div>
+  </section>
+
+  <!-- closing -->
+  <section id="register" class="closing wrap">
+    <span class="eyebrow">Pre-release</span>
+    <h2>It's early — and it's open.</h2>
+    <p>PinPoint Studio is in active development. Watch the repo, follow along, or tell us you want in and we'll let you know when there's something to put your hands on.</p>
+    <div class="cta-row">
+      <a class="btn solid" href="https://github.com/" target="_blank" rel="noopener">View on GitHub</a>
+      <a class="btn" href="mailto:hello@pinpointstudio.org?subject=PinPoint%20Studio%20%E2%80%94%20register%20interest">Register interest</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>PinPoint Studio &middot; open-source golf swing analysis</span>
+    <span><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
+  </div>
+</footer>
+</div><!-- /.page -->
+
+<script>
+(function(){
+  const svg = document.getElementById('kseq');
+  const W = 560, H = 320, x0 = 28, x1 = 532, yBase = 268, yTop = 26;
+  const NS = 'http://www.w3.org/2000/svg';
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const chans = [
+    {mu:.30, amp:.42, sig:.10, c:'var(--pelvis)', cls:'d1'},
+    {mu:.45, amp:.60, sig:.095,c:'var(--thorax)', cls:'d2'},
+    {mu:.60, amp:.80, sig:.085,c:'var(--arm)',    cls:'d3'},
+    {mu:.74, amp:1.0, sig:.075,c:'var(--club)',   cls:'d4'}
+  ];
+
+  function px(t){ return x0 + t*(x1-x0); }
+  function py(v){ return yBase - v*(yBase-yTop); }
+
+  const base = document.createElementNS(NS,'line');
+  base.setAttribute('x1',x0); base.setAttribute('x2',x1);
+  base.setAttribute('y1',yBase); base.setAttribute('y2',yBase);
+  base.setAttribute('stroke','var(--line-strong)'); base.setAttribute('stroke-width','1');
+  svg.appendChild(base);
+
+  const ps = ['P1','P2','P3','P4','P5','P6','P7','P8'];
+  ps.forEach(function(p,i){
+    const t = i/(ps.length-1);
+    const X = px(t);
+    const tick = document.createElementNS(NS,'line');
+    tick.setAttribute('x1',X); tick.setAttribute('x2',X);
+    tick.setAttribute('y1',yBase); tick.setAttribute('y2',yBase+5);
+    tick.setAttribute('stroke','var(--line-strong)'); tick.setAttribute('stroke-width','1');
+    tick.setAttribute('class','pmark');
+    svg.appendChild(tick);
+    const lab = document.createElementNS(NS,'text');
+    lab.setAttribute('x',X); lab.setAttribute('y',yBase+18);
+    lab.setAttribute('text-anchor','middle');
+    lab.setAttribute('fill','var(--paper-dim)');
+    lab.setAttribute('font-family','DM Mono, monospace');
+    lab.setAttribute('font-size','10');
+    lab.setAttribute('class','pmark');
+    lab.textContent = p;
+    svg.appendChild(lab);
+  });
+
+  const impactT = chans[3].mu;
+  const im = document.createElementNS(NS,'line');
+  im.setAttribute('x1',px(impactT)); im.setAttribute('x2',px(impactT));
+  im.setAttribute('y1',yTop-2); im.setAttribute('y2',yBase);
+  im.setAttribute('stroke','var(--line)'); im.setAttribute('stroke-width','1');
+  im.setAttribute('stroke-dasharray','3 4'); im.setAttribute('class','pmark');
+  svg.appendChild(im);
+  const imLab = document.createElementNS(NS,'text');
+  imLab.setAttribute('x',px(impactT)); imLab.setAttribute('y',yTop+2);
+  imLab.setAttribute('text-anchor','middle');
+  imLab.setAttribute('fill','var(--paper-dim)');
+  imLab.setAttribute('font-family','DM Mono, monospace');
+  imLab.setAttribute('font-size','9.5'); imLab.setAttribute('letter-spacing','1');
+  imLab.setAttribute('class','pmark');
+  imLab.textContent='IMPACT';
+  svg.appendChild(imLab);
+
+  chans.forEach(function(ch){
+    const N = 120;
+    let d = '';
+    for(let i=0;i<=N;i++){
+      const t = i/N;
+      const v = ch.amp * Math.exp(-Math.pow(t-ch.mu,2)/(2*ch.sig*ch.sig));
+      const X = px(t), Y = py(v);
+      d += (i===0?'M':'L') + X.toFixed(1) + ' ' + Y.toFixed(1) + ' ';
+    }
+    const path = document.createElementNS(NS,'path');
+    path.setAttribute('d',d);
+    path.setAttribute('stroke',ch.c);
+    path.setAttribute('class','trace ' + (reduce?'':'anim ') + ch.cls);
+    svg.appendChild(path);
+    const len = path.getTotalLength();
+    path.style.setProperty('--len', len);
+  });
+})();
+</script>
+</body>
+</html>
