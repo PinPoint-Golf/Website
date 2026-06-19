@@ -7,30 +7,30 @@
 <meta name="description" content="PinPoint Studio measures the golfer, not the club or the ball. An open-source desktop app for golf studios that turns the cameras and PC you already own into real body-movement measurement — kinematic sequence, wrist angles and more. A prototype under validation; first release targeted late 2026.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#070A0B;
-    --ink-2:#0E1316;
-    --ink-3:#171F23;
+    --ink:#05080A;
+    --ink-2:#0A1115;
+    --ink-3:#111B20;
     --paper:#F2EDE2;
-    --text-2:#D7D2C7;
-    --paper-dim:#AAB4B2;
-    --line:rgba(242,237,226,.13);
-    --line-strong:rgba(242,237,226,.24);
+    --text-2:#CFD3CC;
+    --paper-dim:#94A09E;
+    --line:rgba(242,237,226,.12);
+    --line-strong:rgba(242,237,226,.22);
     --pelvis:#E6AC54;
     --thorax:#E07E64;
     --arm:#8AB389;
     --club:#7BC0DB;
     --accent:#E6AC54;
+    --cool:#7BC0DB;
     --font-display:'Fraunces',Georgia,serif;
     --font-body:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
     --font-mono:'DM Mono',ui-monospace,monospace;
-    --maxw:1140px;
+    --maxw:1180px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth;background:var(--ink)}
-  .page{background:var(--ink);position:relative;min-height:100vh;overflow:hidden}
   body{
     background:var(--ink);
     color:var(--paper);
@@ -38,185 +38,244 @@
     font-size:17px;
     line-height:1.6;
     -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
     overflow-x:hidden;
   }
+  .page{
+    position:relative;min-height:100vh;
+    background:
+      radial-gradient(1100px 720px at 8% -10%, rgba(230,172,84,.11), transparent 58%),
+      radial-gradient(1000px 820px at 104% 4%, rgba(123,192,219,.10), transparent 54%),
+      radial-gradient(900px 900px at 50% 120%, rgba(224,126,100,.06), transparent 60%),
+      var(--ink);
+  }
+  /* faint motion-capture dot field */
+  .page::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:radial-gradient(rgba(242,237,226,.05) 1px, transparent 1.4px);
+    background-size:34px 34px;
+    -webkit-mask-image:radial-gradient(120% 90% at 50% 0%, #000 35%, transparent 78%);
+    mask-image:radial-gradient(120% 90% at 50% 0%, #000 35%, transparent 78%);
+    opacity:.6;
+  }
+  .page>*{position:relative;z-index:1}
   a{color:inherit;text-decoration:none}
   ::selection{background:var(--accent);color:var(--ink)}
-  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
 
-  .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:28px}
+  .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:30px}
   .eyebrow{
     font-family:var(--font-mono);
-    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-size:12px;letter-spacing:.2em;text-transform:uppercase;
     color:var(--paper-dim);
   }
 
+  /* ---- reveal-on-scroll ---- */
+  .reveal{opacity:0;transform:translateY(22px);
+    transition:opacity .8s cubic-bezier(.22,.7,.2,1),transform .8s cubic-bezier(.22,.7,.2,1);
+    transition-delay:calc(var(--d,0) * 70ms);will-change:opacity,transform}
+  .reveal.in{opacity:1;transform:none}
+
   /* ---- status badges ---- */
   .badge{
-    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-    padding:3px 9px 3px 8px;border-radius:999px;border:1px solid var(--line-strong);
-    color:var(--paper-dim);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 10px 3px 9px;border-radius:999px;border:1px solid var(--line-strong);
+    color:var(--paper-dim);display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
   }
-  .badge i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+  .badge i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;box-shadow:0 0 8px currentColor}
   .badge.now{color:var(--arm);border-color:rgba(138,179,137,.42)}
   .badge.dev{color:var(--accent);border-color:rgba(230,172,84,.42)}
   .badge.soon{color:var(--club);border-color:rgba(123,192,219,.40)}
+  .badge.dev i{animation:pulse 2.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
   /* ---- top bar ---- */
   header{
-    position:sticky;top:0;z-index:50;
-    background:rgba(7,10,11,.82);
-    backdrop-filter:blur(10px);
+    position:sticky;top:0;z-index:60;
+    background:rgba(5,8,10,.7);
+    backdrop-filter:blur(14px) saturate(1.2);
     border-bottom:1px solid var(--line);
   }
-  .bar{display:flex;align-items:center;justify-content:space-between;height:62px}
-  .mark{font-family:var(--font-mono);font-size:14px;letter-spacing:.04em;display:flex;align-items:center;gap:9px}
-  .mark .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(230,172,84,.18)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .mark{font-family:var(--font-mono);font-size:14px;letter-spacing:.04em;display:flex;align-items:center;gap:10px}
+  .mark .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 4px rgba(230,172,84,.16),0 0 14px rgba(230,172,84,.7)}
   .mark b{font-weight:500}
-  .navlinks{display:flex;align-items:center;gap:26px;font-size:14px}
-  .navlinks a.muted{color:var(--paper-dim)}
+  .navlinks{display:flex;align-items:center;gap:28px;font-size:14px}
+  .navlinks a.muted{color:var(--paper-dim);position:relative}
+  .navlinks a.muted::after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:var(--accent);transition:right .28s ease}
   .navlinks a.muted:hover{color:var(--paper)}
+  .navlinks a.muted:hover::after{right:0}
   .btn{
     font-family:var(--font-mono);font-size:13px;letter-spacing:.02em;
-    padding:9px 16px;border-radius:6px;border:1px solid var(--line-strong);
-    transition:border-color .18s,background .18s,color .18s;white-space:nowrap;
+    padding:9px 16px;border-radius:7px;border:1px solid var(--line-strong);
+    transition:border-color .2s,background .2s,color .2s,transform .2s,box-shadow .2s;white-space:nowrap;
   }
-  .btn:hover{border-color:var(--paper)}
-  .btn.solid{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:500}
-  .btn.solid:hover{background:#efbd6e;border-color:#efbd6e}
+  .btn:hover{border-color:var(--paper);transform:translateY(-1px)}
+  .btn.solid{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:500;
+    box-shadow:0 6px 22px -10px rgba(230,172,84,.9)}
+  .btn.solid:hover{background:#f0c279;border-color:#f0c279;box-shadow:0 10px 30px -10px rgba(230,172,84,1)}
   @media(max-width:760px){.navlinks a.muted{display:none}}
 
   /* ---- hero ---- */
-  .hero{padding-top:64px;padding-bottom:18px;position:relative}
-  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:48px;align-items:center}
+  .hero{padding-top:72px;padding-bottom:30px;position:relative}
+  .hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:54px;align-items:center}
   h1{
     font-family:var(--font-display);
-    font-weight:500;
-    font-size:clamp(38px,5.6vw,68px);
-    line-height:1.02;
-    letter-spacing:-.015em;
-    margin:20px 0 22px;
+    font-weight:480;
+    font-optical-sizing:auto;
+    font-size:clamp(42px,6vw,76px);
+    line-height:.99;
+    letter-spacing:-.02em;
+    margin:22px 0 24px;
   }
-  h1 em{font-style:italic;color:var(--accent)}
-  .lede{font-size:clamp(16px,1.5vw,19px);color:var(--text-2);max-width:46ch}
+  h1 .small{display:block;font-size:.46em;font-weight:500;letter-spacing:-.01em;color:var(--text-2);line-height:1.1;margin-bottom:.18em}
+  h1 em{font-style:italic;font-weight:500;
+    background:linear-gradient(96deg,var(--accent),#f3c987 55%,var(--cool));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lede{font-size:clamp(16px,1.45vw,19px);color:var(--text-2);max-width:48ch}
   .lede strong{color:var(--paper);font-weight:600}
   .status-line{
-    margin-top:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    margin-top:26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
     font-family:var(--font-mono);font-size:12.5px;color:var(--paper-dim);letter-spacing:.02em;
   }
-  .cta-row{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
-  .cta-row .btn{padding:13px 20px;font-size:14px}
-  .credit{margin-top:26px;font-family:var(--font-mono);font-size:12.5px;color:var(--paper-dim);letter-spacing:.02em}
+  .cta-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+  .cta-row .btn{padding:13px 22px;font-size:14px}
+  /* instrument readout */
+  .readout{display:flex;gap:0;margin-top:32px;border:1px solid var(--line);border-radius:11px;overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,.018),transparent)}
+  .readout .rd{flex:1;padding:13px 16px;border-right:1px solid var(--line)}
+  .readout .rd:last-child{border-right:0}
+  .readout .rk{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:5px}
+  .readout .rv{font-family:var(--font-mono);font-size:13.5px;color:var(--paper)}
+  .credit{margin-top:24px;font-family:var(--font-mono);font-size:12.5px;color:var(--paper-dim);letter-spacing:.02em}
   .credit b{color:var(--paper);font-weight:400}
-  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:36px}.lede{max-width:48ch}}
+  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:40px}.lede{max-width:54ch}}
 
-  /* ---- kinematic sequence panel ---- */
-  .scope{
-    background:linear-gradient(180deg,var(--ink-2),#0A0F12);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:20px 20px 16px;
+  /* ---- live capture panel ---- */
+  .capture{
+    background:linear-gradient(180deg,var(--ink-2),#060B0E);
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    padding:16px 16px 14px;
     position:relative;
+    box-shadow:0 40px 80px -50px rgba(0,0,0,.9),0 0 0 1px rgba(123,192,219,.04) inset;
   }
-  .scope-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-  .scope-head .ttl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
-  .scope-head .rd{font-family:var(--font-mono);font-size:11.5px;color:var(--paper-dim)}
-  .scope svg{display:block;width:100%;height:auto}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
-  .legend span{font-family:var(--font-mono);font-size:11px;color:var(--paper-dim);display:flex;align-items:center;gap:6px}
-  .legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
-  .scope-note{margin-top:12px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;color:var(--paper-dim);opacity:.8}
+  .cap-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 4px}
+  .rec{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);display:flex;align-items:center;gap:8px}
+  .rec i{width:7px;height:7px;border-radius:50%;background:var(--thorax);box-shadow:0 0 10px var(--thorax);animation:pulse 1.8s ease-in-out infinite}
+  .cap-meta{font-family:var(--font-mono);font-size:11px;color:var(--paper-dim);letter-spacing:.05em}
+  .cap-meta b{color:var(--cool);font-weight:500}
+  .scope{position:relative;width:100%;aspect-ratio:16/9.4;border-radius:11px;overflow:hidden;
+    background:radial-gradient(120% 95% at 50% 0%,rgba(123,192,219,.06),transparent 62%)}
+  .scope canvas{display:block;width:100%;height:100%}
+  .peaks{display:flex;flex-direction:column;gap:9px;margin:16px 4px 2px}
+  .peak{display:grid;grid-template-columns:9px 62px 1fr 58px;align-items:center;gap:11px;opacity:.38;transition:opacity .25s}
+  .peak.lit{opacity:1}
+  .pdot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 9px currentColor}
+  .pname{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.03em;color:var(--text-2)}
+  .pbar{position:relative;height:4px;border-radius:3px;background:rgba(242,237,226,.07);overflow:hidden}
+  .pbar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;box-shadow:0 0 10px currentColor}
+  .pval{font-family:var(--font-mono);font-size:12.5px;color:var(--paper);text-align:right;font-variant-numeric:tabular-nums}
+  .pval .u{color:var(--paper-dim);font-size:10px;margin-left:2px}
+  .scope-note{margin-top:12px;padding:0 4px;font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--paper-dim);opacity:.75}
 
-  /* ---- generic section ---- */
-  section{padding-block:84px}
-  .sec-tag{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;flex-wrap:wrap}
-  .sec-tag .num{font-family:var(--font-mono);font-size:12px;color:var(--paper-dim)}
-  .sec-tag h2{font-family:var(--font-display);font-weight:500;font-size:clamp(26px,3.2vw,38px);letter-spacing:-.01em;line-height:1.05}
-  .sec-lede{color:var(--text-2);max-width:60ch;margin-bottom:34px;font-size:16px}
-  hr.rule{border:0;border-top:1px solid var(--line)}
+  /* ---- section scaffold ---- */
+  section{padding-block:96px;position:relative}
+  .kicker{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:18px}
+  .kicker .sig{width:8px;height:8px;border-radius:50%;flex:none;box-shadow:0 0 10px currentColor}
+  .sig.amber{color:var(--pelvis);background:var(--pelvis)}
+  .sig.coral{color:var(--thorax);background:var(--thorax)}
+  .sig.green{color:var(--arm);background:var(--arm)}
+  .sig.cyan{color:var(--club);background:var(--club)}
+  .sig.paper{color:var(--paper);background:var(--paper)}
+  h2{font-family:var(--font-display);font-weight:480;font-optical-sizing:auto;font-size:clamp(28px,3.6vw,46px);letter-spacing:-.018em;line-height:1.04}
+  h2 em{font-style:italic;color:var(--accent)}
+  .sec-lede{color:var(--text-2);max-width:62ch;margin-top:16px;margin-bottom:38px;font-size:16.5px}
   .ulink{color:var(--paper);border-bottom:1px solid var(--line-strong);transition:color .18s,border-color .18s}
   .ulink:hover{color:var(--accent);border-color:var(--accent)}
 
   /* ---- guiding principle ---- */
-  .creed{padding-block:78px;border-top:1px solid var(--line)}
-  .creed .eyebrow{display:block;margin-bottom:18px}
-  .creed-statement{font-family:var(--font-display);font-weight:500;font-size:clamp(30px,4.6vw,54px);line-height:1.05;letter-spacing:-.015em;margin-bottom:18px;max-width:18ch}
-  .creed-statement em{font-style:italic;color:var(--accent)}
-  .creed-sub{font-size:clamp(16px,1.6vw,19px);color:var(--text-2);max-width:62ch}
-  .notice{margin-top:34px;border:1px solid var(--line-strong);border-left:3px solid var(--accent);border-radius:12px;background:var(--ink-2);padding:26px 30px}
+  .creed{padding-block:90px;border-top:1px solid var(--line)}
+  .creed-statement{font-family:var(--font-display);font-weight:480;font-optical-sizing:auto;font-size:clamp(32px,5vw,60px);line-height:1.03;letter-spacing:-.022em;margin:18px 0 18px;max-width:17ch}
+  .creed-statement em{font-style:italic;
+    background:linear-gradient(96deg,var(--accent),var(--cool));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .creed-sub{font-size:clamp(16px,1.5vw,19px);color:var(--text-2);max-width:64ch}
+  .notice{margin-top:38px;border:1px solid var(--line-strong);border-radius:14px;background:linear-gradient(180deg,var(--ink-2),transparent);padding:30px 32px;position:relative;overflow:hidden}
+  .notice::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--cool))}
   .notice .badge{margin-bottom:14px}
-  .notice h3{font-family:var(--font-display);font-weight:500;font-size:clamp(20px,2.3vw,27px);letter-spacing:-.008em;line-height:1.14;margin-bottom:12px}
-  .notice p{color:var(--text-2);max-width:70ch;font-size:15.5px;line-height:1.6}
+  .notice h3{font-family:var(--font-display);font-weight:500;font-size:clamp(21px,2.4vw,28px);letter-spacing:-.01em;line-height:1.13;margin-bottom:12px}
+  .notice p{color:var(--text-2);max-width:72ch;font-size:15.5px;line-height:1.62}
 
   /* ---- signals: three channels ---- */
-  .channels{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  .channel{padding:30px 28px;border-right:1px solid var(--line)}
-  .channel:last-child{border-right:0}
-  .ch-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .channels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .channel{padding:28px 26px;border:1px solid var(--line);border-radius:13px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,.014),transparent);transition:border-color .25s,transform .25s,box-shadow .25s}
+  .channel::after{content:'';position:absolute;inset:0;border-radius:13px;opacity:0;transition:opacity .3s;
+    background:radial-gradient(80% 60% at 50% 0%,var(--gw,rgba(255,255,255,.06)),transparent 70%);pointer-events:none}
+  .channel:hover{transform:translateY(-3px);border-color:var(--line-strong)}
+  .channel:hover::after{opacity:1}
+  .ch-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
   .channel .ch-label{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px}
-  .channel .ch-label i{width:8px;height:8px;border-radius:50%}
-  .channel p{font-size:15.5px;color:var(--text-2);line-height:1.55}
-  @media(max-width:760px){.channels{grid-template-columns:1fr}.channel{border-right:0;border-bottom:1px solid var(--line)}.channel:last-child{border-bottom:0}}
+  .channel .ch-label i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 9px currentColor}
+  .channel p{font-size:15px;color:var(--text-2);line-height:1.58}
+  @media(max-width:820px){.channels{grid-template-columns:1fr}}
 
   /* ---- four modes ---- */
-  .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
   .screen{
-    background:var(--ink-2);border:1px solid var(--line);border-radius:12px;
-    padding:26px 26px 28px;transition:border-color .2s,transform .2s;
+    background:linear-gradient(180deg,var(--ink-2),transparent);border:1px solid var(--line);border-radius:14px;
+    padding:28px 28px 30px;transition:border-color .25s,transform .25s,box-shadow .25s;position:relative;overflow:hidden;
   }
-  .screen:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .screen:hover{border-color:var(--line-strong);transform:translateY(-3px);box-shadow:0 26px 50px -40px rgba(0,0,0,.9)}
   .screen-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-  .screen .glyph{width:38px;height:38px;margin-bottom:18px;color:var(--accent)}
-  .screen h3{font-family:var(--font-display);font-weight:500;font-size:21px;margin-bottom:9px;letter-spacing:-.005em}
-  .screen p{font-size:15px;color:var(--text-2);line-height:1.55}
+  .screen .glyph{width:40px;height:40px;margin-bottom:18px;color:var(--accent);filter:drop-shadow(0 0 10px rgba(230,172,84,.35))}
+  .screen h3{font-family:var(--font-display);font-weight:500;font-size:22px;margin-bottom:9px;letter-spacing:-.008em}
+  .screen p{font-size:15px;color:var(--text-2);line-height:1.58}
   @media(max-width:680px){.screens{grid-template-columns:1fr}}
 
   /* ---- roadmap horizon ---- */
-  .horizon{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  .hzcol{padding:28px 26px;border-right:1px solid var(--line)}
-  .hzcol:last-child{border-right:0}
-  .hzcol .hz-head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .horizon{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .hzcol{padding:26px 26px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.012),transparent)}
+  .hzcol .hz-head{display:flex;align-items:center;gap:10px;margin-bottom:20px}
   .hzcol .hz-head h3{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);font-weight:500}
-  .hzcol ul{list-style:none;display:flex;flex-direction:column;gap:12px}
-  .hzcol li{font-size:14.5px;color:var(--text-2);line-height:1.5;padding-left:18px;position:relative}
-  .hzcol li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
-  @media(max-width:760px){.horizon{grid-template-columns:1fr}.hzcol{border-right:0;border-bottom:1px solid var(--line)}.hzcol:last-child{border-bottom:0}}
+  .hzcol ul{list-style:none;display:flex;flex-direction:column;gap:13px}
+  .hzcol li{font-size:14.5px;color:var(--text-2);line-height:1.5;padding-left:20px;position:relative}
+  .hzcol li::before{content:'';position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--line-strong)}
+  .hzcol.c-now li::before{background:var(--arm);box-shadow:0 0 8px rgba(138,179,137,.6)}
+  .hzcol.c-dev li::before{background:var(--accent);box-shadow:0 0 8px rgba(230,172,84,.6)}
+  .hzcol.c-soon li::before{background:var(--club);box-shadow:0 0 8px rgba(123,192,219,.6)}
+  @media(max-width:820px){.horizon{grid-template-columns:1fr}}
 
   /* ---- spec strip ---- */
-  .specwrap{background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:8px 4px}
-  .specrow{display:flex;justify-content:space-between;gap:20px;padding:15px 24px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:13.5px}
+  .specwrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--ink-2),transparent)}
+  .specrow{display:flex;justify-content:space-between;gap:20px;padding:16px 26px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:13.5px;transition:background .2s}
   .specrow:last-child{border-bottom:0}
+  .specrow:hover{background:rgba(255,255,255,.02)}
   .specrow .k{color:var(--paper-dim);letter-spacing:.08em;text-transform:uppercase;font-size:11.5px}
   .specrow .v{color:var(--paper);text-align:right}
-  @media(max-width:560px){.specrow{flex-direction:column;gap:3px}.specrow .v{text-align:left}}
+  @media(max-width:560px){.specrow{flex-direction:column;gap:4px}.specrow .v{text-align:left}}
 
   /* ---- personas ---- */
-  .personas{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .persona{border-top:2px solid var(--accent);padding-top:18px}
-  .persona h4{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);margin-bottom:10px}
+  .personas{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .persona{border-top:2px solid;border-image:linear-gradient(90deg,var(--accent),transparent) 1;padding-top:20px}
+  .persona h4{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);margin-bottom:11px}
   .persona p{font-size:15px;color:var(--text-2)}
-  @media(max-width:760px){.personas{grid-template-columns:1fr;gap:26px}}
+  @media(max-width:820px){.personas{grid-template-columns:1fr;gap:28px}}
 
   /* ---- closing ---- */
-  .closing{text-align:center;padding-block:96px}
-  .closing h2{font-family:var(--font-display);font-weight:500;font-size:clamp(30px,4.4vw,52px);letter-spacing:-.015em;line-height:1.04;margin-bottom:18px}
-  .closing p{color:var(--text-2);max-width:52ch;margin:0 auto 30px}
+  .closing{text-align:center;padding-block:110px;border-top:1px solid var(--line);position:relative}
+  .closing h2{font-size:clamp(32px,4.8vw,56px);margin-bottom:20px}
+  .closing p{color:var(--text-2);max-width:54ch;margin:0 auto 32px}
   .closing .cta-row{justify-content:center}
 
-  footer{border-top:1px solid var(--line);padding-block:36px;color:var(--paper-dim)}
+  footer{border-top:1px solid var(--line);padding-block:38px;color:var(--paper-dim)}
   .foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-family:var(--font-mono);font-size:12.5px;letter-spacing:.02em}
   .foot a:hover{color:var(--paper)}
 
-  /* draw-on animation */
-  .trace{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-  .trace.anim{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.5s cubic-bezier(.4,.0,.2,1) forwards}
-  .trace.d1{animation-delay:.05s}.trace.d2{animation-delay:.28s}.trace.d3{animation-delay:.5s}.trace.d4{animation-delay:.72s}
-  @keyframes draw{to{stroke-dashoffset:0}}
-  .pmark{opacity:0;animation:fadein .5s ease forwards;animation-delay:1.4s}
-  @keyframes fadein{to{opacity:1}}
   @media(prefers-reduced-motion:reduce){
-    .trace.anim{animation:none;stroke-dashoffset:0}
-    .pmark{animation:none;opacity:1}
+    .reveal{opacity:1;transform:none;transition:none}
+    .badge.dev i,.rec i{animation:none}
     html{scroll-behavior:auto}
   }
 </style>
@@ -241,43 +300,48 @@
   <section class="hero wrap">
     <div class="hero-grid">
       <div>
-        <span class="eyebrow">Built for the golf studio &middot; Open source &middot; Local-first</span>
-        <h1>Your launch monitor measures the ball. <em>We measure you.</em></h1>
-        <p class="lede">If you run a studio, you've already got the cameras, the PC and the launch monitor — so the outcome of every shot is no mystery. What's missing is what your <strong>body</strong> actually did to produce it, and whether you're really making the moves your coach asked for. That's the gap PinPoint Studio fills — and why it's named for the room it's built for.</p>
-        <p class="status-line">
+        <span class="eyebrow reveal">Built for the golf studio &middot; Open source &middot; Local-first</span>
+        <h1 class="reveal" style="--d:1"><span class="small">Your launch monitor measures the ball.</span><em>We measure you.</em></h1>
+        <p class="lede reveal" style="--d:2">If you run a studio, you've already got the cameras, the PC and the launch monitor — so the outcome of every shot is no mystery. What's missing is what your <strong>body</strong> actually did to produce it, and whether you're really making the moves your coach asked for. That's the gap PinPoint Studio fills — and why it's named for the room it's built for.</p>
+        <p class="status-line reveal" style="--d:3">
           <span class="badge dev"><i></i>In active development</span>
           <span>Prototyping &amp; validating now &middot; first release targeted late 2026</span>
         </p>
-        <div class="cta-row">
+        <div class="cta-row reveal" style="--d:4">
           <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
           <a class="btn" href="#register">Follow the build</a>
         </div>
-        <p class="credit">From the author of <a class="ulink" href="https://www.goldencheetah.org" target="_blank" rel="noopener">GoldenCheetah</a>.</p>
+        <div class="readout reveal" style="--d:5">
+          <div class="rd"><span class="rk">Sampling</span><span class="rv">up to 200 Hz</span></div>
+          <div class="rd"><span class="rk">Pose</span><span class="rv">on-device</span></div>
+          <div class="rd"><span class="rk">Source</span><span class="rv">open &middot; GPL v2</span></div>
+        </div>
+        <p class="credit reveal" style="--d:6">From the author of <a class="ulink" href="https://www.goldencheetah.org" target="_blank" rel="noopener">GoldenCheetah</a>.</p>
       </div>
 
-      <div class="scope" aria-label="Kinematic sequence concept — angular velocity of pelvis, thorax, lead arm and club through the downswing">
-        <div class="scope-head">
-          <span class="ttl">Kinematic sequence</span>
-          <span class="rd">deg/s &middot; concept</span>
+      <div class="capture reveal" style="--d:2" aria-label="Concept visualisation of the kinematic sequence — peak angular velocity of the pelvis, thorax, lead arm and club firing in order through the downswing into impact.">
+        <div class="cap-head">
+          <span class="rec"><i></i>Kinematic sequence</span>
+          <span class="cap-meta"><b id="pframe">P1</b> &middot; deg/s &middot; concept</span>
         </div>
-        <svg id="kseq" viewBox="0 0 560 320" role="img" preserveAspectRatio="xMidYMid meet"></svg>
-        <div class="legend">
-          <span><i style="background:var(--pelvis)"></i>Pelvis</span>
-          <span><i style="background:var(--thorax)"></i>Thorax</span>
-          <span><i style="background:var(--arm)"></i>Lead arm</span>
-          <span><i style="background:var(--club)"></i>Club</span>
+        <div class="scope"><canvas id="kseq"></canvas></div>
+        <div class="peaks">
+          <div class="peak" data-seg="pelvis"><span class="pdot" style="background:var(--pelvis);color:var(--pelvis)"></span><span class="pname">Pelvis</span><span class="pbar"><i style="background:var(--pelvis);color:var(--pelvis)"></i></span><span class="pval" data-max="430"><span class="n">0</span><span class="u">°/s</span></span></div>
+          <div class="peak" data-seg="thorax"><span class="pdot" style="background:var(--thorax);color:var(--thorax)"></span><span class="pname">Thorax</span><span class="pbar"><i style="background:var(--thorax);color:var(--thorax)"></i></span><span class="pval" data-max="610"><span class="n">0</span><span class="u">°/s</span></span></div>
+          <div class="peak" data-seg="arm"><span class="pdot" style="background:var(--arm);color:var(--arm)"></span><span class="pname">Lead arm</span><span class="pbar"><i style="background:var(--arm);color:var(--arm)"></i></span><span class="pval" data-max="840"><span class="n">0</span><span class="u">°/s</span></span></div>
+          <div class="peak" data-seg="club"><span class="pdot" style="background:var(--club);color:var(--club)"></span><span class="pname">Club</span><span class="pbar"><i style="background:var(--club);color:var(--club)"></i></span><span class="pval" data-max="1180"><span class="n">0</span><span class="u">°/s</span></span></div>
         </div>
-        <p class="scope-note">Illustrative — the kinematic sequence chart is in development.</p>
+        <p class="scope-note">Illustrative — peak values are indicative; the kinematic sequence chart is in development.</p>
       </div>
     </div>
   </section>
 
   <!-- guiding principle -->
   <section class="creed wrap">
-    <span class="eyebrow">What drives it</span>
-    <p class="creed-statement">Peer-reviewed science, <em>in your hands.</em></p>
-    <p class="creed-sub">PinPoint Studio exists to put the measurements the research actually supports into the hands of coaches, players and enthusiasts — methods drawn from the published literature, kept open for anyone to check, and led by the science rather than private interests.</p>
-    <div class="notice">
+    <span class="eyebrow reveal">What drives it</span>
+    <p class="creed-statement reveal" style="--d:1">Peer-reviewed science, <em>in your hands.</em></p>
+    <p class="creed-sub reveal" style="--d:2">PinPoint Studio exists to put the measurements the research actually supports into the hands of coaches, players and enthusiasts — methods drawn from the published literature, kept open for anyone to check, and led by the science rather than private interests.</p>
+    <div class="notice reveal" style="--d:3">
       <span class="badge dev"><i></i>Prototyping &amp; validating</span>
       <h3>We won't publish until the numbers can be trusted.</h3>
       <p>PinPoint Studio is an early prototype under active validation. Every measurement is being checked against ground truth before it goes anywhere near a release — because results you can't rely on are no use to anyone. There's nothing here to download or depend on yet, and there won't be until we're confident the figures hold up. That bar is deliberate, and getting the science right is the whole point.</p>
@@ -286,26 +350,27 @@
 
   <!-- how it works / signals -->
   <section id="signals" class="wrap">
-    <div class="sec-tag"><span class="num">01</span><h2>Ordinary kit, measured carefully.</h2></div>
-    <p class="sec-lede">PinPoint Studio reads the swing from hardware you can buy off the shelf — there's no sealed rig and no per-shot cloud round-trip. Two signals are capturing today; force estimation is on the way.</p>
+    <div class="kicker reveal"><span class="sig cyan"></span>Capture</div>
+    <h2 class="reveal" style="--d:1">Ordinary kit, measured carefully.</h2>
+    <p class="sec-lede reveal" style="--d:2">PinPoint Studio reads the swing from hardware you can buy off the shelf — there's no sealed rig and no per-shot cloud round-trip. Two signals are capturing today; force estimation is on the way.</p>
     <div class="channels">
-      <div class="channel">
+      <div class="channel reveal" style="--d:1;--gw:rgba(123,192,219,.10)">
         <div class="ch-top">
-          <div class="ch-label"><i style="background:var(--club)"></i>Cameras</div>
+          <div class="ch-label" style="color:var(--club)"><i style="background:var(--club)"></i>Cameras</div>
           <span class="badge now"><i></i>Built</span>
         </div>
         <p>USB webcams or GenICam / FLIR industrial cameras — face-on and down-the-line. Every live feed carries an on-device pose skeleton. The cameras you choose, not a locked box.</p>
       </div>
-      <div class="channel">
+      <div class="channel reveal" style="--d:2;--gw:rgba(230,172,84,.10)">
         <div class="ch-top">
-          <div class="ch-label"><i style="background:var(--pelvis)"></i>Motion</div>
+          <div class="ch-label" style="color:var(--pelvis)"><i style="background:var(--pelvis)"></i>Motion</div>
           <span class="badge now"><i></i>Built</span>
         </div>
         <p>Off-the-shelf BLE IMUs (Witmotion WT901BLE67) at up to 200 Hz capture the wrist flexion, deviation and rotation a camera can't see cleanly — fused into joint angles on-device.</p>
       </div>
-      <div class="channel">
+      <div class="channel reveal" style="--d:3;--gw:rgba(138,179,137,.10)">
         <div class="ch-top">
-          <div class="ch-label"><i style="background:var(--arm)"></i>Force</div>
+          <div class="ch-label" style="color:var(--arm)"><i style="background:var(--arm)"></i>Force</div>
           <span class="badge soon"><i></i>Planned</span>
         </div>
         <p>Ground reaction force, estimated from motion, so you can see how the swing loads, shifts and unloads through the strike. The science here is still young, so it's one we'll follow the research on rather than rush.</p>
@@ -315,10 +380,11 @@
 
   <!-- four modes -->
   <section id="modes" class="wrap">
-    <div class="sec-tag"><span class="num">02</span><h2>Four ways to see a swing.</h2></div>
-    <p class="sec-lede">PinPoint Studio is built around four analysis modes. Wrist Motion is the first to produce real output — now under validation; the rest are being built on the same capture pipeline.</p>
+    <div class="kicker reveal"><span class="sig coral"></span>Analysis</div>
+    <h2 class="reveal" style="--d:1">Four ways to see a swing.</h2>
+    <p class="sec-lede reveal" style="--d:2">PinPoint Studio is built around four analysis modes. Wrist Motion is the first to produce real output — now under validation; the rest are being built on the same capture pipeline.</p>
     <div class="screens">
-      <div class="screen">
+      <div class="screen reveal" style="--d:1">
         <div class="screen-top">
           <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 28c6 0 7-16 12-16s6 10 10 10 5-12 12-12"/><circle cx="15" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
           <span class="badge dev"><i></i>In dev</span>
@@ -326,7 +392,7 @@
         <h3>Swing Analysis</h3>
         <p>Full-body kinematics from the captured frames — the kinematic sequence, X-factor and how speed builds up the chain. Multi-camera capture and live pose are in place; the metric extraction is being built.</p>
       </div>
-      <div class="screen">
+      <div class="screen reveal" style="--d:2">
         <div class="screen-top">
           <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 34V18"/><path d="M20 18a10 10 0 0 1 10-10"/><path d="M20 18a10 10 0 0 0-9 6"/><circle cx="20" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>
           <span class="badge now"><i></i>Built</span>
@@ -334,7 +400,7 @@
         <h3>Wrist Motion</h3>
         <p>Lead-arm flexion/extension, radial/ulnar deviation and rotation read straight from the IMUs, segmented across the swing and scored against coaching bands — the cupping, cocking and flipping a coach watches for. The first full analyzer; its results are in validation now, not yet released.</p>
       </div>
-      <div class="screen">
+      <div class="screen reveal" style="--d:1">
         <div class="screen-top">
           <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 30h28"/><path d="M12 30V16"/><path d="M20 30V8"/><path d="M28 30V22"/></svg>
           <span class="badge soon"><i></i>Planned</span>
@@ -342,7 +408,7 @@
         <h3>Ground Force</h3>
         <p>Loading, weight shift and ground reaction force through the downswing — where the power comes from, not just where it ends up. The research on measuring this affordably is still emerging, so we'll let it lead and lean on inexpensive sensors if that's the honest way to do it. Realistically, something meaningful here is a late-2027 job.</p>
       </div>
-      <div class="screen">
+      <div class="screen reveal" style="--d:2">
         <div class="screen-top">
           <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h26a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H17l-8 6V11a2 2 0 0 1 2-2Z"/><path d="M14 17h2M20 17h2M26 17h2"/></svg>
           <span class="badge soon"><i></i>Planned</span>
@@ -355,10 +421,11 @@
 
   <!-- roadmap -->
   <section id="roadmap" class="wrap">
-    <div class="sec-tag"><span class="num">03</span><h2>Where it is, and where it's going.</h2></div>
-    <p class="sec-lede">PinPoint Studio is in active prototyping and validation. The capture and shot pipeline is functional and the wrist analyzer is the first to produce real output; the broader kinematic, force and coaching layers come next. None of it is released yet — we're proving the numbers first.</p>
+    <div class="kicker reveal"><span class="sig green"></span>Timeline</div>
+    <h2 class="reveal" style="--d:1">Where it is, and where it's going.</h2>
+    <p class="sec-lede reveal" style="--d:2">PinPoint Studio is in active prototyping and validation. The capture and shot pipeline is functional and the wrist analyzer is the first to produce real output; the broader kinematic, force and coaching layers come next. None of it is released yet — we're proving the numbers first.</p>
     <div class="horizon">
-      <div class="hzcol">
+      <div class="hzcol c-now reveal" style="--d:1">
         <div class="hz-head"><span class="badge now"><i></i>Now</span><h3>Working</h3></div>
         <ul>
           <li>Multi-camera capture with live on-device pose overlay</li>
@@ -368,7 +435,7 @@
           <li>Local speech in &amp; out (Whisper + Kokoro)</li>
         </ul>
       </div>
-      <div class="hzcol">
+      <div class="hzcol c-dev reveal" style="--d:2">
         <div class="hz-head"><span class="badge dev"><i></i>Next</span><h3>In development</h3></div>
         <ul>
           <li>Full swing analysis — kinematic sequence &amp; X-factor</li>
@@ -377,7 +444,7 @@
           <li>Normative reference ranges &amp; swing comparison</li>
         </ul>
       </div>
-      <div class="hzcol">
+      <div class="hzcol c-soon reveal" style="--d:3">
         <div class="hz-head"><span class="badge soon"><i></i>Later</span><h3>On the roadmap</h3></div>
         <ul>
           <li>Ground reaction force — following the research as it matures (likely 2027)</li>
@@ -391,8 +458,9 @@
 
   <!-- spec -->
   <section id="spec" class="wrap">
-    <div class="sec-tag"><span class="num">04</span><h2>Built like an instrument.</h2></div>
-    <div class="specwrap">
+    <div class="kicker reveal"><span class="sig amber"></span>Instrument</div>
+    <h2 class="reveal" style="--d:1">Built like an instrument.</h2>
+    <div class="specwrap reveal" style="--d:2">
       <div class="specrow"><span class="k">Cameras</span><span class="v">USB webcam &rarr; GenICam / FLIR industrial</span></div>
       <div class="specrow"><span class="k">IMUs</span><span class="v">Witmotion WT901BLE67 &middot; BLE &middot; up to 200 Hz</span></div>
       <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose-B (analysis)</span></div>
@@ -408,20 +476,21 @@
 
   <!-- personas -->
   <section class="wrap">
-    <div class="sec-tag"><span class="num">05</span><h2>Who it's for.</h2></div>
-    <div class="personas">
-      <div class="persona"><h4>Teaching pros</h4><p>Objective numbers to set beside what you already see — an evidence layer for a lesson, on hardware that fits a studio bay or a garage.</p></div>
-      <div class="persona"><h4>Serious amateurs</h4><p>The wrist and sequencing measurements you've read about for tour players, applied to your own swing and the kit you choose.</p></div>
-      <div class="persona"><h4>Coaches &amp; researchers</h4><p>An open, inspectable platform for understanding golf movement — every metric traceable to the source, the source in the open.</p></div>
+    <div class="kicker reveal"><span class="sig paper"></span>Who it's for</div>
+    <h2 class="reveal" style="--d:1">Made for the people in the bay.</h2>
+    <div class="personas" style="margin-top:34px">
+      <div class="persona reveal" style="--d:1"><h4>Teaching pros</h4><p>Objective numbers to set beside what you already see — an evidence layer for a lesson, on hardware that fits a studio bay or a garage.</p></div>
+      <div class="persona reveal" style="--d:2"><h4>Serious amateurs</h4><p>The wrist and sequencing measurements you've read about for tour players, applied to your own swing and the kit you choose.</p></div>
+      <div class="persona reveal" style="--d:3"><h4>Coaches &amp; researchers</h4><p>An open, inspectable platform for understanding golf movement — every metric traceable to the source, the source in the open.</p></div>
     </div>
   </section>
 
   <!-- closing -->
   <section id="register" class="closing wrap">
-    <span class="eyebrow">Pre-release</span>
-    <h2>It's early — and it's open.</h2>
-    <p>PinPoint Studio is in active development, with a first release targeted for late 2026 — once we're confident the measurements can be relied upon. It's GPL&nbsp;v2 and built in the open — for golfers, coaches and researchers alike. Watch the repo to follow along, or tell us you want in and we'll let you know when there's something to put your hands on.</p>
-    <div class="cta-row">
+    <span class="eyebrow reveal">Pre-release</span>
+    <h2 class="reveal" style="--d:1">It's early — and it's open.</h2>
+    <p class="reveal" style="--d:2">PinPoint Studio is in active development, with a first release targeted for late 2026 — once we're confident the measurements can be relied upon. It's GPL&nbsp;v2 and built in the open — for golfers, coaches and researchers alike. Watch the repo to follow along, or tell us you want in and we'll let you know when there's something to put your hands on.</p>
+    <div class="cta-row reveal" style="--d:3">
       <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
       <a class="btn" href="mailto:liversedge@gmail.com?subject=PinPoint%20Studio%20%E2%80%94%20register%20interest">Register interest</a>
     </div>
@@ -437,83 +506,206 @@
 </div><!-- /.page -->
 
 <script>
+/* ---------- reveal on scroll ---------- */
 (function(){
-  const svg = document.getElementById('kseq');
-  const W = 560, H = 320, x0 = 28, x1 = 532, yBase = 268, yTop = 26;
-  const NS = 'http://www.w3.org/2000/svg';
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nodes = document.querySelectorAll('.reveal');
+  if(reduce || !('IntersectionObserver' in window)){
+    nodes.forEach(function(n){ n.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {rootMargin:'0px 0px -8% 0px', threshold:0.12});
+  nodes.forEach(function(n){ io.observe(n); });
+})();
 
-  const chans = [
-    {mu:.30, amp:.42, sig:.10, c:'var(--pelvis)', cls:'d1'},
-    {mu:.45, amp:.60, sig:.095,c:'var(--thorax)', cls:'d2'},
-    {mu:.60, amp:.80, sig:.085,c:'var(--arm)',    cls:'d3'},
-    {mu:.74, amp:1.0, sig:.075,c:'var(--club)',   cls:'d4'}
+/* ---------- hero: the kinematic sequence as a live instrument ---------- */
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cv = document.getElementById('kseq');
+  if(!cv) return;
+  var ctx = cv.getContext('2d');
+  var frameLabel = document.getElementById('pframe');
+
+  var COL = { paper:'#F2EDE2', dim:'#94A09E', line:'rgba(242,237,226,.11)', strong:'rgba(242,237,226,.22)' };
+
+  /* four channels — peaks placed proximal -> distal across the downswing axis */
+  var TR = [
+    {key:'pelvis', col:'#E6AC54', mu:0.26, sg:0.105, amp:0.42, max:430},
+    {key:'thorax', col:'#E07E64', mu:0.43, sg:0.095, amp:0.62, max:610},
+    {key:'arm',    col:'#8AB389', mu:0.60, sg:0.085, amp:0.82, max:840},
+    {key:'club',   col:'#7BC0DB', mu:0.75, sg:0.072, amp:1.00, max:1180}
   ];
+  var IMPACT = 0.84; /* impact marker, just after the club peaks */
 
-  function px(t){ return x0 + t*(x1-x0); }
-  function py(v){ return yBase - v*(yBase-yTop); }
-
-  const base = document.createElementNS(NS,'line');
-  base.setAttribute('x1',x0); base.setAttribute('x2',x1);
-  base.setAttribute('y1',yBase); base.setAttribute('y2',yBase);
-  base.setAttribute('stroke','var(--line-strong)'); base.setAttribute('stroke-width','1');
-  svg.appendChild(base);
-
-  const ps = ['P1','P2','P3','P4','P5','P6','P7','P8'];
-  ps.forEach(function(p,i){
-    const t = i/(ps.length-1);
-    const X = px(t);
-    const tick = document.createElementNS(NS,'line');
-    tick.setAttribute('x1',X); tick.setAttribute('x2',X);
-    tick.setAttribute('y1',yBase); tick.setAttribute('y2',yBase+5);
-    tick.setAttribute('stroke','var(--line-strong)'); tick.setAttribute('stroke-width','1');
-    tick.setAttribute('class','pmark');
-    svg.appendChild(tick);
-    const lab = document.createElementNS(NS,'text');
-    lab.setAttribute('x',X); lab.setAttribute('y',yBase+18);
-    lab.setAttribute('text-anchor','middle');
-    lab.setAttribute('fill','var(--paper-dim)');
-    lab.setAttribute('font-family','DM Mono, monospace');
-    lab.setAttribute('font-size','10');
-    lab.setAttribute('class','pmark');
-    lab.textContent = p;
-    svg.appendChild(lab);
+  /* live readout rows */
+  var rows = {};
+  Array.prototype.forEach.call(document.querySelectorAll('.peak'), function(r){
+    rows[r.getAttribute('data-seg')] = {
+      el:r, bar:r.querySelector('.pbar i'), num:r.querySelector('.pval .n')
+    };
   });
 
-  const impactT = chans[3].mu;
-  const im = document.createElementNS(NS,'line');
-  im.setAttribute('x1',px(impactT)); im.setAttribute('x2',px(impactT));
-  im.setAttribute('y1',yTop-2); im.setAttribute('y2',yBase);
-  im.setAttribute('stroke','var(--line)'); im.setAttribute('stroke-width','1');
-  im.setAttribute('stroke-dasharray','3 4'); im.setAttribute('class','pmark');
-  svg.appendChild(im);
-  const imLab = document.createElementNS(NS,'text');
-  imLab.setAttribute('x',px(impactT)); imLab.setAttribute('y',yTop+2);
-  imLab.setAttribute('text-anchor','middle');
-  imLab.setAttribute('fill','var(--paper-dim)');
-  imLab.setAttribute('font-family','DM Mono, monospace');
-  imLab.setAttribute('font-size','9.5'); imLab.setAttribute('letter-spacing','1');
-  imLab.setAttribute('class','pmark');
-  imLab.textContent='IMPACT';
-  svg.appendChild(imLab);
+  function clamp(x,a,b){ return x<a?a:(x>b?b:x); }
+  function bell(t,mu,sg){ var d=(t-mu)/sg; return Math.exp(-0.5*d*d); }
+  function ease(x){ return x<=0?0:(x>=1?1:x*x*x*(x*(x*6-15)+10)); } /* smootherstep */
+  function rgba(hex,a){
+    var n=parseInt(hex.slice(1),16);
+    return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
+  }
 
-  chans.forEach(function(ch){
-    const N = 120;
-    let d = '';
-    for(let i=0;i<=N;i++){
-      const t = i/N;
-      const v = ch.amp * Math.exp(-Math.pow(t-ch.mu,2)/(2*ch.sig*ch.sig));
-      const X = px(t), Y = py(v);
-      d += (i===0?'M':'L') + X.toFixed(1) + ' ' + Y.toFixed(1) + ' ';
+  var W=0,H=0,dpr=1;
+  function size(){
+    dpr = Math.min(window.devicePixelRatio||1, 2);
+    var r = cv.getBoundingClientRect();
+    W=r.width; H=r.height;
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  /* precompute trace polylines for current geometry */
+  function geom(){
+    var padL=16,padR=16,padT=18,padB=22;
+    return {x0:padL, x1:W-padR, yB:H-padB, yT:padT};
+  }
+  function pathFor(tr,g){
+    var N=110, pts=[];
+    for(var k=0;k<=N;k++){
+      var t=k/N, v=tr.amp*bell(t,tr.mu,tr.sg);
+      pts.push({x:g.x0+t*(g.x1-g.x0), y:g.yB-v*(g.yB-g.yT)});
     }
-    const path = document.createElementNS(NS,'path');
-    path.setAttribute('d',d);
-    path.setAttribute('stroke',ch.c);
-    path.setAttribute('class','trace ' + (reduce?'':'anim ') + ch.cls);
-    svg.appendChild(path);
-    const len = path.getTotalLength();
-    path.style.setProperty('--len', len);
+    return pts;
+  }
+
+  function render(scan, alpha){
+    var g=geom(), x0=g.x0,x1=g.x1,yB=g.yB,yT=g.yT;
+    ctx.clearRect(0,0,W,H);
+    ctx.globalAlpha=alpha;
+    var scanX=x0+scan*(x1-x0);
+
+    /* horizontal grid */
+    ctx.strokeStyle='rgba(123,192,219,.05)'; ctx.lineWidth=1;
+    for(var gy=1;gy<=3;gy++){ var Y=yB-(yB-yT)*gy/4; ctx.beginPath(); ctx.moveTo(x0,Y); ctx.lineTo(x1,Y); ctx.stroke(); }
+
+    /* axis label */
+    ctx.fillStyle='rgba(148,160,158,.7)'; ctx.font='9px "DM Mono",monospace'; ctx.textAlign='left';
+    ctx.fillText('deg/s', x0, yT-6);
+
+    /* impact marker */
+    var impX=x0+IMPACT*(x1-x0);
+    ctx.save();
+    ctx.strokeStyle='rgba(242,237,226,.18)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(impX,yT-2); ctx.lineTo(impX,yB); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle='rgba(148,160,158,.85)'; ctx.font='8.5px "DM Mono",monospace'; ctx.textAlign='center';
+    ctx.fillText('IMPACT', impX, yT-6);
+
+    /* baseline */
+    ctx.strokeStyle=COL.strong; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x0,yB); ctx.lineTo(x1,yB); ctx.stroke();
+
+    /* P1..P8 ticks */
+    ctx.fillStyle=COL.dim; ctx.font='9px "DM Mono",monospace'; ctx.textAlign='center';
+    for(var i=0;i<8;i++){
+      var t=i/7, X=x0+t*(x1-x0);
+      ctx.strokeStyle=COL.line; ctx.beginPath(); ctx.moveTo(X,yB); ctx.lineTo(X,yB+4); ctx.stroke();
+      ctx.fillText('P'+(i+1), X, yB+15);
+    }
+
+    /* traces: dim full, then lit (clipped to scan), area fill, peak marker */
+    for(var d=0; d<TR.length; d++){
+      var tr=TR[d], pts=pathFor(tr,g), m;
+      /* dim full trace */
+      ctx.strokeStyle='rgba(242,237,226,.08)'; ctx.lineWidth=1.2; ctx.beginPath();
+      for(m=0;m<pts.length;m++){ if(m===0)ctx.moveTo(pts[m].x,pts[m].y); else ctx.lineTo(pts[m].x,pts[m].y); }
+      ctx.stroke();
+
+      /* lit portion */
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x0-1,0,Math.max(0,scanX-x0+1),H); ctx.clip();
+      /* area fill */
+      var grad=ctx.createLinearGradient(0,yT,0,yB);
+      grad.addColorStop(0,rgba(tr.col,0.22)); grad.addColorStop(1,rgba(tr.col,0));
+      ctx.fillStyle=grad; ctx.beginPath(); ctx.moveTo(pts[0].x,yB);
+      for(m=0;m<pts.length;m++) ctx.lineTo(pts[m].x,pts[m].y);
+      ctx.lineTo(pts[pts.length-1].x,yB); ctx.closePath(); ctx.fill();
+      /* lit stroke */
+      ctx.strokeStyle=tr.col; ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.shadowColor=tr.col; ctx.shadowBlur=10;
+      ctx.beginPath();
+      for(m=0;m<pts.length;m++){ if(m===0)ctx.moveTo(pts[m].x,pts[m].y); else ctx.lineTo(pts[m].x,pts[m].y); }
+      ctx.stroke();
+      ctx.restore();
+
+      /* peak marker — pops as the scan crosses it */
+      if(scan>=tr.mu-0.002){
+        var pulse=bell(scan,tr.mu,0.05);
+        var pkX=x0+tr.mu*(x1-x0), pkY=yB-tr.amp*(yB-yT), rad=2.6+2.6*pulse;
+        ctx.save(); ctx.shadowColor=tr.col; ctx.shadowBlur=10+20*pulse;
+        ctx.fillStyle=tr.col; ctx.beginPath(); ctx.arc(pkX,pkY,rad,0,6.2832); ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,'+(0.55+0.45*pulse)+')';
+        ctx.beginPath(); ctx.arc(pkX,pkY,rad*0.42,0,6.2832); ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    /* scan line */
+    if(scan>0 && scan<0.999){
+      ctx.save();
+      ctx.strokeStyle='rgba(242,237,226,.55)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+      ctx.shadowColor='rgba(242,237,226,.55)'; ctx.shadowBlur=6;
+      ctx.beginPath(); ctx.moveTo(scanX,yT-4); ctx.lineTo(scanX,yB); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  function readout(scan){
+    for(var d=0; d<TR.length; d++){
+      var tr=TR[d], r=rows[tr.key]; if(!r) continue;
+      var fill=ease(clamp(scan/tr.mu,0,1));         /* reaches full as scan crosses the peak */
+      if(r.bar) r.bar.style.width=(fill*100).toFixed(1)+'%';
+      if(r.num) r.num.textContent=Math.round(tr.max*fill);
+      if(scan>=tr.mu-0.06) r.el.classList.add('lit'); else r.el.classList.remove('lit');
+    }
+  }
+
+  var LOOP=4800, t0=null;
+  function tick(ts){
+    if(t0===null) t0=ts;
+    var p=((ts-t0)%LOOP)/LOOP;
+    var scan, alpha=1;
+    if(p<0.72) scan=ease(p/0.72); else scan=1;     /* sweep, then hold */
+    if(p<0.04) alpha=p/0.04;                        /* fade in */
+    else if(p>0.90) alpha=clamp((1-p)/0.10,0,1);    /* fade out before reset */
+    render(scan, alpha);
+    readout(scan);
+    if(frameLabel) frameLabel.textContent='P'+clamp(Math.floor(scan*7)+1,1,8);
+    requestAnimationFrame(tick);
+  }
+
+  function staticFrame(){
+    render(1,1); readout(1);
+    if(frameLabel) frameLabel.textContent='P8';
+  }
+
+  function start(){
+    size();
+    if(reduce) staticFrame();
+    else { t0=null; requestAnimationFrame(tick); }
+  }
+
+  var rt;
+  window.addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt=setTimeout(function(){ size(); if(reduce) staticFrame(); }, 150);
   });
+
+  if(document.readyState==='complete' || document.readyState==='interactive') start();
+  else window.addEventListener('DOMContentLoaded', start);
 })();
 </script>
 </body>
