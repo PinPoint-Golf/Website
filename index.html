@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PinPoint Studio — open-source golf swing analysis</title>
-<meta name="description" content="Off-the-shelf high-speed cameras, body-worn IMUs and force estimation, turned into the measurements tour analysts use — kinematic sequence, X-factor, wrist angles through P1–P8. Open source, no proprietary hardware.">
+<title>PinPoint Studio — measure the golfer, not the ball</title>
+<meta name="description" content="PinPoint Studio measures the golfer, not the club or the ball. An open-source desktop app for golf studios that turns the cameras and PC you already own into real body-movement measurement — kinematic sequence, wrist angles and more. A prototype under validation; first release targeted late 2026.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -51,6 +51,17 @@
     color:var(--paper-dim);
   }
 
+  /* ---- status badges ---- */
+  .badge{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:3px 9px 3px 8px;border-radius:999px;border:1px solid var(--line-strong);
+    color:var(--paper-dim);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .badge i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+  .badge.now{color:var(--arm);border-color:rgba(138,179,137,.42)}
+  .badge.dev{color:var(--accent);border-color:rgba(230,172,84,.42)}
+  .badge.soon{color:var(--club);border-color:rgba(123,192,219,.40)}
+
   /* ---- top bar ---- */
   header{
     position:sticky;top:0;z-index:50;
@@ -73,7 +84,7 @@
   .btn:hover{border-color:var(--paper)}
   .btn.solid{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:500}
   .btn.solid:hover{background:#efbd6e;border-color:#efbd6e}
-  @media(max-width:680px){.navlinks a.muted{display:none}}
+  @media(max-width:760px){.navlinks a.muted{display:none}}
 
   /* ---- hero ---- */
   .hero{padding-top:64px;padding-bottom:18px;position:relative}
@@ -87,11 +98,17 @@
     margin:20px 0 22px;
   }
   h1 em{font-style:italic;color:var(--accent)}
-  .lede{font-size:clamp(16px,1.5vw,19px);color:var(--text-2);max-width:36ch}
-  .cta-row{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .lede{font-size:clamp(16px,1.5vw,19px);color:var(--text-2);max-width:46ch}
+  .lede strong{color:var(--paper);font-weight:600}
+  .status-line{
+    margin-top:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    font-family:var(--font-mono);font-size:12.5px;color:var(--paper-dim);letter-spacing:.02em;
+  }
+  .cta-row{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
   .cta-row .btn{padding:13px 20px;font-size:14px}
   .credit{margin-top:26px;font-family:var(--font-mono);font-size:12.5px;color:var(--paper-dim);letter-spacing:.02em}
   .credit b{color:var(--paper);font-weight:400}
+  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:36px}.lede{max-width:48ch}}
 
   /* ---- kinematic sequence panel ---- */
   .scope{
@@ -108,34 +125,62 @@
   .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
   .legend span{font-family:var(--font-mono);font-size:11px;color:var(--paper-dim);display:flex;align-items:center;gap:6px}
   .legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .scope-note{margin-top:12px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;color:var(--paper-dim);opacity:.8}
 
   /* ---- generic section ---- */
   section{padding-block:84px}
-  .sec-tag{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+  .sec-tag{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;flex-wrap:wrap}
   .sec-tag .num{font-family:var(--font-mono);font-size:12px;color:var(--paper-dim)}
   .sec-tag h2{font-family:var(--font-display);font-weight:500;font-size:clamp(26px,3.2vw,38px);letter-spacing:-.01em;line-height:1.05}
+  .sec-lede{color:var(--text-2);max-width:60ch;margin-bottom:34px;font-size:16px}
   hr.rule{border:0;border-top:1px solid var(--line)}
+  .ulink{color:var(--paper);border-bottom:1px solid var(--line-strong);transition:color .18s,border-color .18s}
+  .ulink:hover{color:var(--accent);border-color:var(--accent)}
 
-  /* ---- measures: three channels ---- */
+  /* ---- guiding principle ---- */
+  .creed{padding-block:78px;border-top:1px solid var(--line)}
+  .creed .eyebrow{display:block;margin-bottom:18px}
+  .creed-statement{font-family:var(--font-display);font-weight:500;font-size:clamp(30px,4.6vw,54px);line-height:1.05;letter-spacing:-.015em;margin-bottom:18px;max-width:18ch}
+  .creed-statement em{font-style:italic;color:var(--accent)}
+  .creed-sub{font-size:clamp(16px,1.6vw,19px);color:var(--text-2);max-width:62ch}
+  .notice{margin-top:34px;border:1px solid var(--line-strong);border-left:3px solid var(--accent);border-radius:12px;background:var(--ink-2);padding:26px 30px}
+  .notice .badge{margin-bottom:14px}
+  .notice h3{font-family:var(--font-display);font-weight:500;font-size:clamp(20px,2.3vw,27px);letter-spacing:-.008em;line-height:1.14;margin-bottom:12px}
+  .notice p{color:var(--text-2);max-width:70ch;font-size:15.5px;line-height:1.6}
+
+  /* ---- signals: three channels ---- */
   .channels{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
   .channel{padding:30px 28px;border-right:1px solid var(--line)}
   .channel:last-child{border-right:0}
-  .channel .ch-label{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .ch-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .channel .ch-label{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px}
   .channel .ch-label i{width:8px;height:8px;border-radius:50%}
   .channel p{font-size:15.5px;color:var(--text-2);line-height:1.55}
   @media(max-width:760px){.channels{grid-template-columns:1fr}.channel{border-right:0;border-bottom:1px solid var(--line)}.channel:last-child{border-bottom:0}}
 
-  /* ---- four screens ---- */
+  /* ---- four modes ---- */
   .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
   .screen{
     background:var(--ink-2);border:1px solid var(--line);border-radius:12px;
     padding:26px 26px 28px;transition:border-color .2s,transform .2s;
   }
   .screen:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .screen-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
   .screen .glyph{width:38px;height:38px;margin-bottom:18px;color:var(--accent)}
   .screen h3{font-family:var(--font-display);font-weight:500;font-size:21px;margin-bottom:9px;letter-spacing:-.005em}
   .screen p{font-size:15px;color:var(--text-2);line-height:1.55}
   @media(max-width:680px){.screens{grid-template-columns:1fr}}
+
+  /* ---- roadmap horizon ---- */
+  .horizon{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .hzcol{padding:28px 26px;border-right:1px solid var(--line)}
+  .hzcol:last-child{border-right:0}
+  .hzcol .hz-head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .hzcol .hz-head h3{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);font-weight:500}
+  .hzcol ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .hzcol li{font-size:14.5px;color:var(--text-2);line-height:1.5;padding-left:18px;position:relative}
+  .hzcol li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
+  @media(max-width:760px){.horizon{grid-template-columns:1fr}.hzcol{border-right:0;border-bottom:1px solid var(--line)}.hzcol:last-child{border-bottom:0}}
 
   /* ---- spec strip ---- */
   .specwrap{background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:8px 4px}
@@ -155,7 +200,7 @@
   /* ---- closing ---- */
   .closing{text-align:center;padding-block:96px}
   .closing h2{font-family:var(--font-display);font-weight:500;font-size:clamp(30px,4.4vw,52px);letter-spacing:-.015em;line-height:1.04;margin-bottom:18px}
-  .closing p{color:var(--text-2);max-width:46ch;margin:0 auto 30px}
+  .closing p{color:var(--text-2);max-width:52ch;margin:0 auto 30px}
   .closing .cta-row{justify-content:center}
 
   footer{border-top:1px solid var(--line);padding-block:36px;color:var(--paper-dim)}
@@ -183,11 +228,11 @@
   <div class="wrap bar">
     <div class="mark"><span class="dot"></span><b>PinPoint Studio</b></div>
     <nav class="navlinks">
-      <a class="muted" href="#measures">What it measures</a>
-      <a class="muted" href="#screens">Screens</a>
-      <a class="muted" href="#spec">Under the hood</a>
-      <a class="btn" href="https://github.com/" target="_blank" rel="noopener">GitHub &#8599;</a>
-      <a class="btn solid" href="#register">Register interest</a>
+      <a class="muted" href="#signals">How it works</a>
+      <a class="muted" href="#modes">Modes</a>
+      <a class="muted" href="#roadmap">Roadmap</a>
+      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
+      <a class="btn solid" href="#register">Follow along</a>
     </nav>
   </div>
 </header>
@@ -196,20 +241,24 @@
   <section class="hero wrap">
     <div class="hero-grid">
       <div>
-        <span class="eyebrow">Open source &middot; No proprietary hardware</span>
-        <h1>Read your swing the way the <em>data</em> does.</h1>
-        <p class="lede">PinPoint Studio turns off-the-shelf high-speed cameras, a set of body-worn IMUs and force estimation into the measurements tour analysts actually use — kinematic sequence, X-factor, wrist angles through P1–P8. On your own desktop, with no proprietary rig and the source in the open.</p>
+        <span class="eyebrow">Built for the golf studio &middot; Open source &middot; Local-first</span>
+        <h1>Your launch monitor measures the ball. <em>We measure you.</em></h1>
+        <p class="lede">If you run a studio, you've already got the cameras, the PC and the launch monitor — so the outcome of every shot is no mystery. What's missing is what your <strong>body</strong> actually did to produce it, and whether you're really making the moves your coach asked for. That's the gap PinPoint Studio fills — and why it's named for the room it's built for.</p>
+        <p class="status-line">
+          <span class="badge dev"><i></i>In active development</span>
+          <span>Prototyping &amp; validating now &middot; first release targeted late 2026</span>
+        </p>
         <div class="cta-row">
-          <a class="btn solid" href="https://github.com/" target="_blank" rel="noopener">View on GitHub</a>
-          <a class="btn" href="#register">Register interest</a>
+          <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
+          <a class="btn" href="#register">Follow the build</a>
         </div>
-        <p class="credit">Built by the author of <b>GoldenCheetah</b>.</p>
+        <p class="credit">From the author of <a class="ulink" href="https://www.goldencheetah.org" target="_blank" rel="noopener">GoldenCheetah</a>.</p>
       </div>
 
-      <div class="scope" aria-label="Kinematic sequence — angular velocity of pelvis, thorax, lead arm and club through the downswing">
+      <div class="scope" aria-label="Kinematic sequence concept — angular velocity of pelvis, thorax, lead arm and club through the downswing">
         <div class="scope-head">
           <span class="ttl">Kinematic sequence</span>
-          <span class="rd">deg/s &middot; downswing</span>
+          <span class="rd">deg/s &middot; concept</span>
         </div>
         <svg id="kseq" viewBox="0 0 560 320" role="img" preserveAspectRatio="xMidYMid meet"></svg>
         <div class="legend">
@@ -218,69 +267,140 @@
           <span><i style="background:var(--arm)"></i>Lead arm</span>
           <span><i style="background:var(--club)"></i>Club</span>
         </div>
+        <p class="scope-note">Illustrative — the kinematic sequence chart is in development.</p>
       </div>
     </div>
   </section>
 
-  <hr class="rule">
+  <!-- guiding principle -->
+  <section class="creed wrap">
+    <span class="eyebrow">What drives it</span>
+    <p class="creed-statement">Peer-reviewed science, <em>in your hands.</em></p>
+    <p class="creed-sub">PinPoint Studio exists to put the measurements the research actually supports into the hands of coaches, players and enthusiasts — methods drawn from the published literature, kept open for anyone to check, and led by the science rather than private interests.</p>
+    <div class="notice">
+      <span class="badge dev"><i></i>Prototyping &amp; validating</span>
+      <h3>We won't publish until the numbers can be trusted.</h3>
+      <p>PinPoint Studio is an early prototype under active validation. Every measurement is being checked against ground truth before it goes anywhere near a release — because results you can't rely on are no use to anyone. There's nothing here to download or depend on yet, and there won't be until we're confident the figures hold up. That bar is deliberate, and getting the science right is the whole point.</p>
+    </div>
+  </section>
 
-  <!-- what it measures -->
-  <section id="measures" class="wrap">
-    <div class="sec-tag"><span class="num">01</span><h2>Three things, measured at once.</h2></div>
+  <!-- how it works / signals -->
+  <section id="signals" class="wrap">
+    <div class="sec-tag"><span class="num">01</span><h2>Ordinary kit, measured carefully.</h2></div>
+    <p class="sec-lede">PinPoint Studio reads the swing from hardware you can buy off the shelf — there's no sealed rig and no per-shot cloud round-trip. Two signals are capturing today; force estimation is on the way.</p>
     <div class="channels">
       <div class="channel">
-        <div class="ch-label"><i style="background:var(--club)"></i>Cameras</div>
-        <p>Off-the-shelf high-speed cameras — face-on and down-the-line, 150fps and up. ChArUco-calibrated and triangulated into true 3D. The cameras you can buy, not a sealed rig.</p>
+        <div class="ch-top">
+          <div class="ch-label"><i style="background:var(--club)"></i>Cameras</div>
+          <span class="badge now"><i></i>Built</span>
+        </div>
+        <p>USB webcams or GenICam / FLIR industrial cameras — face-on and down-the-line. Every live feed carries an on-device pose skeleton. The cameras you choose, not a locked box.</p>
       </div>
       <div class="channel">
-        <div class="ch-label"><i style="background:var(--pelvis)"></i>Motion</div>
-        <p>Two or more 200Hz IMUs — readily-available BLE sensors — track wrist flexion, extension and rotation plus the body-segment motion a camera can't see cleanly.</p>
+        <div class="ch-top">
+          <div class="ch-label"><i style="background:var(--pelvis)"></i>Motion</div>
+          <span class="badge now"><i></i>Built</span>
+        </div>
+        <p>Off-the-shelf BLE IMUs (Witmotion WT901BLE67) at up to 200 Hz capture the wrist flexion, deviation and rotation a camera can't see cleanly — fused into joint angles on-device.</p>
       </div>
       <div class="channel">
-        <div class="ch-label"><i style="background:var(--arm)"></i>Force</div>
-        <p>Ground reaction force, estimated from motion, so you can see how the swing loads, shifts and unloads through the strike.</p>
+        <div class="ch-top">
+          <div class="ch-label"><i style="background:var(--arm)"></i>Force</div>
+          <span class="badge soon"><i></i>Planned</span>
+        </div>
+        <p>Ground reaction force, estimated from motion, so you can see how the swing loads, shifts and unloads through the strike. The science here is still young, so it's one we'll follow the research on rather than rush.</p>
       </div>
     </div>
   </section>
 
-  <!-- four screens -->
-  <section id="screens" class="wrap">
+  <!-- four modes -->
+  <section id="modes" class="wrap">
     <div class="sec-tag"><span class="num">02</span><h2>Four ways to see a swing.</h2></div>
+    <p class="sec-lede">PinPoint Studio is built around four analysis modes. Wrist Motion is the first to produce real output — now under validation; the rest are being built on the same capture pipeline.</p>
     <div class="screens">
       <div class="screen">
-        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 28c6 0 7-16 12-16s6 10 10 10 5-12 12-12"/><circle cx="15" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <div class="screen-top">
+          <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 28c6 0 7-16 12-16s6 10 10 10 5-12 12-12"/><circle cx="15" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+          <span class="badge dev"><i></i>In dev</span>
+        </div>
         <h3>Swing Analysis</h3>
-        <p>Full-body kinematics from the captured frames: kinematic sequence, X-factor, the timing of how speed builds up the chain.</p>
+        <p>Full-body kinematics from the captured frames — the kinematic sequence, X-factor and how speed builds up the chain. Multi-camera capture and live pose are in place; the metric extraction is being built.</p>
       </div>
       <div class="screen">
-        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 34V18"/><path d="M20 18a10 10 0 0 1 10-10"/><path d="M20 18a10 10 0 0 0-9 6"/><circle cx="20" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>
+        <div class="screen-top">
+          <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 34V18"/><path d="M20 18a10 10 0 0 1 10-10"/><path d="M20 18a10 10 0 0 0-9 6"/><circle cx="20" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>
+          <span class="badge now"><i></i>Built</span>
+        </div>
         <h3>Wrist Motion</h3>
-        <p>Flexion, extension and rotation across P1–P8 — the wrist story that HackMotion and Dewiz users already look for, in one place.</p>
+        <p>Lead-arm flexion/extension, radial/ulnar deviation and rotation read straight from the IMUs, segmented across the swing and scored against coaching bands — the cupping, cocking and flipping a coach watches for. The first full analyzer; its results are in validation now, not yet released.</p>
       </div>
       <div class="screen">
-        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 30h28"/><path d="M12 30V16"/><path d="M20 30V8"/><path d="M28 30V22"/></svg>
+        <div class="screen-top">
+          <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 30h28"/><path d="M12 30V16"/><path d="M20 30V8"/><path d="M28 30V22"/></svg>
+          <span class="badge soon"><i></i>Planned</span>
+        </div>
         <h3>Ground Force</h3>
-        <p>Loading, weight shift and ground reaction force through the downswing — see where the power comes from, not just where it ends up.</p>
+        <p>Loading, weight shift and ground reaction force through the downswing — where the power comes from, not just where it ends up. The research on measuring this affordably is still emerging, so we'll let it lead and lean on inexpensive sensors if that's the honest way to do it. Realistically, something meaningful here is a late-2027 job.</p>
       </div>
       <div class="screen">
-        <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h26a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H17l-8 6V11a2 2 0 0 1 2-2Z"/><path d="M14 17h2M20 17h2M26 17h2"/></svg>
+        <div class="screen-top">
+          <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h26a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H17l-8 6V11a2 2 0 0 1 2-2Z"/><path d="M14 17h2M20 17h2M26 17h2"/></svg>
+          <span class="badge soon"><i></i>Planned</span>
+        </div>
         <h3>AI Coach</h3>
-        <p>Ask about your swing out loud and get answers grounded in your own numbers — not a generic tip, the one your data supports.</p>
+        <p>Ask about your swing out loud and get answers grounded in your own numbers, spoken back to you — all on-device. The local speech engine is already built; the coaching layer is planned.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- roadmap -->
+  <section id="roadmap" class="wrap">
+    <div class="sec-tag"><span class="num">03</span><h2>Where it is, and where it's going.</h2></div>
+    <p class="sec-lede">PinPoint Studio is in active prototyping and validation. The capture and shot pipeline is functional and the wrist analyzer is the first to produce real output; the broader kinematic, force and coaching layers come next. None of it is released yet — we're proving the numbers first.</p>
+    <div class="horizon">
+      <div class="hzcol">
+        <div class="hz-head"><span class="badge now"><i></i>Now</span><h3>Working</h3></div>
+        <ul>
+          <li>Multi-camera capture with live on-device pose overlay</li>
+          <li>Live lead-arm wrist analysis, scored against coaching bands</li>
+          <li>Shot detection — manual, IMU-impact and acoustic — with per-shot capture, replay &amp; export</li>
+          <li>Per-athlete session history that survives restarts</li>
+          <li>Local speech in &amp; out (Whisper + Kokoro)</li>
+        </ul>
+      </div>
+      <div class="hzcol">
+        <div class="hz-head"><span class="badge dev"><i></i>Next</span><h3>In development</h3></div>
+        <ul>
+          <li>Full swing analysis — kinematic sequence &amp; X-factor</li>
+          <li>Stereo camera calibration &amp; two-camera 3D reconstruction</li>
+          <li>Kinematic metrics: club-head speed, hip/shoulder rotation, lag</li>
+          <li>Normative reference ranges &amp; swing comparison</li>
+        </ul>
+      </div>
+      <div class="hzcol">
+        <div class="hz-head"><span class="badge soon"><i></i>Later</span><h3>On the roadmap</h3></div>
+        <ul>
+          <li>Ground reaction force — following the research as it matures (likely 2027)</li>
+          <li>AI coach grounded in your own session data</li>
+          <li>Launch-monitor integration</li>
+          <li>Smartphone companion once the desktop core is proven</li>
+        </ul>
       </div>
     </div>
   </section>
 
   <!-- spec -->
   <section id="spec" class="wrap">
-    <div class="sec-tag"><span class="num">03</span><h2>Built like an instrument.</h2></div>
+    <div class="sec-tag"><span class="num">04</span><h2>Built like an instrument.</h2></div>
     <div class="specwrap">
-      <div class="specrow"><span class="k">Cameras</span><span class="v">Off-the-shelf &middot; stereo &middot; 150fps+</span></div>
-      <div class="specrow"><span class="k">Calibration</span><span class="v">ChArUco + DLT triangulation</span></div>
-      <div class="specrow"><span class="k">IMUs</span><span class="v">2+ &middot; 200Hz &middot; off-the-shelf BLE</span></div>
-      <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose++ (analysis)</span></div>
-      <div class="specrow"><span class="k">Biomechanics</span><span class="v">OpenSim inverse kinematics</span></div>
-      <div class="specrow"><span class="k">Positions</span><span class="v">P1 – P8</span></div>
-      <div class="specrow"><span class="k">Hardware</span><span class="v">Readily available — no proprietary kit</span></div>
+      <div class="specrow"><span class="k">Cameras</span><span class="v">USB webcam &rarr; GenICam / FLIR industrial</span></div>
+      <div class="specrow"><span class="k">IMUs</span><span class="v">Witmotion WT901BLE67 &middot; BLE &middot; up to 200 Hz</span></div>
+      <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose-B (analysis)</span></div>
+      <div class="specrow"><span class="k">Wrist kinematics</span><span class="v">IMU-quaternion joint angles, P1&ndash;P8</span></div>
+      <div class="specrow"><span class="k">Speech</span><span class="v">Whisper STT &middot; Kokoro TTS &middot; on-device</span></div>
+      <div class="specrow"><span class="k">Privacy</span><span class="v">Local by default &mdash; cloud only if you configure it</span></div>
+      <div class="specrow"><span class="k">Built with</span><span class="v">Qt 6.11 &middot; C++20</span></div>
+      <div class="specrow"><span class="k">Hardware</span><span class="v">Off-the-shelf &mdash; no proprietary kit</span></div>
       <div class="specrow"><span class="k">Platforms</span><span class="v">Windows &middot; macOS &middot; Linux</span></div>
       <div class="specrow"><span class="k">Licence</span><span class="v">GPL v2 &middot; source in the open</span></div>
     </div>
@@ -288,11 +408,11 @@
 
   <!-- personas -->
   <section class="wrap">
-    <div class="sec-tag"><span class="num">04</span><h2>Who it's for.</h2></div>
+    <div class="sec-tag"><span class="num">05</span><h2>Who it's for.</h2></div>
     <div class="personas">
-      <div class="persona"><h4>Teaching pros</h4><p>Numbers you can put in front of a student and defend — the same metrics as a studio bay, without the studio.</p></div>
-      <div class="persona"><h4>Serious amateurs</h4><p>The measurements you've read about for tour players, applied to your own swing, on hardware you choose.</p></div>
-      <div class="persona"><h4>Newcomers</h4><p>A clear, honest picture of what your swing is actually doing — and where the easy wins are.</p></div>
+      <div class="persona"><h4>Teaching pros</h4><p>Objective numbers to set beside what you already see — an evidence layer for a lesson, on hardware that fits a studio bay or a garage.</p></div>
+      <div class="persona"><h4>Serious amateurs</h4><p>The wrist and sequencing measurements you've read about for tour players, applied to your own swing and the kit you choose.</p></div>
+      <div class="persona"><h4>Coaches &amp; researchers</h4><p>An open, inspectable platform for understanding golf movement — every metric traceable to the source, the source in the open.</p></div>
     </div>
   </section>
 
@@ -300,10 +420,10 @@
   <section id="register" class="closing wrap">
     <span class="eyebrow">Pre-release</span>
     <h2>It's early — and it's open.</h2>
-    <p>PinPoint Studio is in active development. Watch the repo, follow along, or tell us you want in and we'll let you know when there's something to put your hands on.</p>
+    <p>PinPoint Studio is in active development, with a first release targeted for late 2026 — once we're confident the measurements can be relied upon. It's GPL&nbsp;v2 and built in the open — for golfers, coaches and researchers alike. Watch the repo to follow along, or tell us you want in and we'll let you know when there's something to put your hands on.</p>
     <div class="cta-row">
-      <a class="btn solid" href="https://github.com/" target="_blank" rel="noopener">View on GitHub</a>
-      <a class="btn" href="mailto:hello@pinpointstudio.org?subject=PinPoint%20Studio%20%E2%80%94%20register%20interest">Register interest</a>
+      <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
+      <a class="btn" href="mailto:liversedge@gmail.com?subject=PinPoint%20Studio%20%E2%80%94%20register%20interest">Register interest</a>
     </div>
   </section>
 </main>
@@ -311,7 +431,7 @@
 <footer>
   <div class="wrap foot">
     <span>PinPoint Studio &middot; open-source golf swing analysis</span>
-    <span><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
+    <span><a href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
   </div>
 </footer>
 </div><!-- /.page -->
