@@ -254,6 +254,11 @@
   .specrow:hover{background:rgba(255,255,255,.02)}
   .specrow .k{color:var(--paper-dim);letter-spacing:.08em;text-transform:uppercase;font-size:11.5px}
   .specrow .v{color:var(--paper);text-align:right}
+  .specrow .v .soon{color:var(--club)}
+  .specrow.hl{position:relative;background:linear-gradient(90deg,rgba(230,172,84,.10),rgba(123,192,219,.05))}
+  .specrow.hl::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--cool))}
+  .specrow.hl .k{color:var(--accent)}
+  .specrow.hl:hover{background:linear-gradient(90deg,rgba(230,172,84,.15),rgba(123,192,219,.08))}
   @media(max-width:560px){.specrow{flex-direction:column;gap:4px}.specrow .v{text-align:left}}
 
   /* ---- personas ---- */
@@ -468,6 +473,7 @@
       <div class="specrow"><span class="k">Speech</span><span class="v">Whisper STT &middot; Kokoro TTS &middot; on-device</span></div>
       <div class="specrow"><span class="k">Privacy</span><span class="v">Local by default &mdash; cloud only if you configure it</span></div>
       <div class="specrow"><span class="k">Built with</span><span class="v">Qt 6.11 &middot; C++20</span></div>
+      <div class="specrow hl"><span class="k">GPU acceleration</span><span class="v">NVIDIA GPUs supported <span class="soon">&middot; AMD planned, not yet available</span></span></div>
       <div class="specrow"><span class="k">Hardware</span><span class="v">Off-the-shelf &mdash; no proprietary kit</span></div>
       <div class="specrow"><span class="k">Platforms</span><span class="v">Windows &middot; macOS &middot; Linux</span></div>
       <div class="specrow"><span class="k">Licence</span><span class="v">GPL v2 &middot; source in the open</span></div>
