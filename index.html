@@ -221,6 +221,19 @@
   .channel p{font-size:15px;color:var(--text-2);line-height:1.58}
   @media(max-width:820px){.channels{grid-template-columns:1fr}}
 
+  /* ---- validation flow ---- */
+  .vflow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .vstep{padding:28px 26px;border:1px solid var(--line);border-radius:13px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,.014),transparent);transition:border-color .25s,transform .25s,box-shadow .25s}
+  .vstep:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:0 26px 50px -40px rgba(0,0,0,.9)}
+  .vstep-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .vstep .vnum{font-family:var(--font-display);font-style:italic;font-weight:500;font-size:32px;line-height:1;color:var(--accent);opacity:.9}
+  .vflow .vstep:nth-child(2) .vnum{color:var(--cool)}
+  .vflow .vstep:nth-child(3) .vnum{color:var(--arm)}
+  .vstep h3{font-family:var(--font-display);font-weight:500;font-size:21px;margin-bottom:9px;letter-spacing:-.008em}
+  .vstep p{font-size:15px;color:var(--text-2);line-height:1.58}
+  @media(max-width:820px){.vflow{grid-template-columns:1fr}}
+
   /* ---- four modes ---- */
   .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
   .screen{
@@ -294,6 +307,7 @@
     <nav class="navlinks">
       <a class="muted" href="#signals">How it works</a>
       <a class="muted" href="#modes">Modes</a>
+      <a class="muted" href="#validation">Validation</a>
       <a class="muted" href="#roadmap">Roadmap</a>
       <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
       <a class="btn solid" href="#register">Follow along</a>
@@ -349,7 +363,31 @@
     <div class="notice reveal" style="--d:3">
       <span class="badge dev"><i></i>Prototyping &amp; validating</span>
       <h3>We won't publish until the numbers can be trusted.</h3>
-      <p>PinPoint Studio is an early prototype under active validation. Every measurement is being checked against ground truth before it goes anywhere near a release — because results you can't rely on are no use to anyone. There's nothing here to download or depend on yet, and there won't be until we're confident the figures hold up. That bar is deliberate, and getting the science right is the whole point.</p>
+      <p>PinPoint Studio is an early prototype under active validation. Every measurement is being checked against a hand-annotated corpus of real swings before it goes anywhere near a release — because results you can't rely on are no use to anyone. There's nothing here to download or depend on yet, and there won't be until we're confident the figures hold up. That bar is deliberate, and getting the science right is the whole point.</p>
+    </div>
+  </section>
+
+  <!-- validation methodology -->
+  <section id="validation" class="wrap">
+    <div class="kicker reveal"><span class="sig amber"></span>Validation</div>
+    <h2 class="reveal" style="--d:1">How we earn the <em>numbers.</em></h2>
+    <p class="sec-lede reveal" style="--d:2">Trustworthy measurement isn't a claim, it's a process. We're building a hand-annotated corpus of real swings and testing every algorithm against it — so a figure only ships once we can show it agrees with the ground truth.</p>
+    <div class="vflow">
+      <div class="vstep reveal" style="--d:1">
+        <div class="vstep-top"><span class="vnum">01</span><span class="badge now"><i></i>Growing</span></div>
+        <h3>A corpus of swings</h3>
+        <p>A growing library of captured swings — multiple cameras, IMUs and players, recorded under real studio conditions. The dataset every measurement is held against, kept varied enough to show where a method breaks.</p>
+      </div>
+      <div class="vstep reveal" style="--d:2">
+        <div class="vstep-top"><span class="vnum">02</span><span class="badge now"><i></i>Built</span></div>
+        <h3>A markup tool to annotate</h3>
+        <p>A purpose-built tool to mark up each swing by hand — swing events, key positions and joint motion — turning raw captures into labelled ground truth a person has actually checked.</p>
+      </div>
+      <div class="vstep reveal" style="--d:3">
+        <div class="vstep-top"><span class="vnum">03</span><span class="badge dev"><i></i>Ongoing</span></div>
+        <h3>Algorithms held to it</h3>
+        <p>Each algorithm's output is compared against those annotations, swing by swing, and the error measured. Nothing reaches a release until the numbers line up with the ground truth closely enough to rely on.</p>
+      </div>
     </div>
   </section>
 
@@ -437,6 +475,7 @@
           <li>Live lead-arm wrist analysis, scored against coaching bands</li>
           <li>Shot detection — manual, IMU-impact and acoustic — with per-shot capture, replay &amp; export</li>
           <li>Per-athlete session history that survives restarts</li>
+          <li>Swing corpus &amp; markup tool for hand-annotated ground truth</li>
           <li>Local speech in &amp; out (Whisper + Kokoro)</li>
         </ul>
       </div>
