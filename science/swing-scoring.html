@@ -18,10 +18,11 @@
     <a class="mark" href="../index.html"><span class="dot"></span><b>PinPoint Studio</b></a>
     <nav class="navlinks">
       <a class="muted" href="../index.html">Home</a>
+      <a class="muted" href="swing-scoring.html" aria-current="page">Swing scoring</a>
       <a class="muted" href="shaft-detection.html">Shaft detection</a>
       <a class="muted" href="validation.html">Validation</a>
       <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
-      <a class="btn solid" href="../index.html">&#8592; Back to site</a>
+      <a class="btn solid" href="../index.html#register">Follow along</a>
     </nav>
   </div>
 </header>
@@ -47,6 +48,7 @@
       <a href="#resemblance">Swing style</a>
       <a href="#confidence">Confidence</a>
       <a href="#improve">Putting it to work</a>
+      <a href="#catalogue">Every metric</a>
     </nav>
   </section>
 
@@ -406,6 +408,142 @@
           <line x1="290" y1="130" x2="310" y2="100" stroke="rgba(242,237,226,.2)" stroke-width="2"/>
         </svg>
         <p class="figcap">Illustrative — the practice loop, one fault at a time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART TWO: THE FULL METRIC CATALOGUE ===================== -->
+  <section id="catalogue" class="xsec reveal">
+    <div class="kicker"><span class="sig paper"></span>Reference &middot; The full catalogue</div>
+    <h2 class="xh" style="font-size:clamp(26px,3.4vw,40px)">Every metric, <em>in plain terms</em></h2>
+    <p class="xlede" style="max-width:72ch">The walk-through above covered the ideas; this is the complete set of measurements the swing analyzer is built to produce, grouped by what they tell you. Each is read at the swing's key positions (the <strong>P1&ndash;P8</strong> system, from address to finish) and scored against a reference band at the phase that matters most.</p>
+    <p class="xlede" style="max-width:72ch;margin-bottom:0">A note on honesty: these are the <strong>designed</strong> metrics. The lead-wrist set produces real output today and is in validation; the rest are being built on the same capture pipeline. The typical ranges are reference targets drawn from the published biomechanics literature and tour datasets, and stay provisional until our own validation completes. Each card also flags what's needed to measure it:</p>
+    <div class="cat-legend">
+      <span><i class="lg-imu"></i>IMU — a worn motion sensor delivers it</span>
+      <span><i class="lg-cam1"></i>1 camera — a single face-on view</span>
+      <span><i class="lg-cam2"></i>2 cams / club — needs a down-the-line camera or club sensor</span>
+    </div>
+
+    <!-- Family: rotation & power -->
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig amber"></span><h3>Rotation &amp; power — the engine</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Pelvis rotation</h4><span class="mkey">pelvisRotation</span></div><span class="mtag imu">IMU</span></div>
+          <p>How far the hips have turned from address, about the body's vertical axis. The hips lead the downswing, so both their turn at the top and how open they are at impact matter.</p>
+          <div class="mmeta"><b>Typical</b> ~45&deg; at top · 35&ndash;45&deg; open at impact</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Thorax rotation</h4><span class="mkey">thoraxRotation</span></div><span class="mtag imu">IMU</span></div>
+          <p>How far the upper torso (the shoulders) has turned versus address. With the pelvis, it sets up the coil that stores power.</p>
+          <div class="mmeta"><b>Typical</b> ~90&deg; (shoulders) at top</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>X-factor</h4><span class="mkey">xFactor</span></div><span class="mtag imu">IMU</span></div>
+          <p>The separation between shoulder turn and hip turn at the top — the stretched-elastic coil. Computed directly as thorax turn minus pelvis turn.</p>
+          <div class="mmeta"><b>Typical</b> ~40&ndash;45&deg; at top · thorax &minus; pelvis</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>X-factor stretch</h4><span class="mkey">xFactorStretch</span></div><span class="mtag imu">IMU</span></div>
+          <p>The <em>extra</em> separation gained in the first instant of the downswing, as the hips fire while the shoulders stay back. A better predictor of speed than the static coil.</p>
+          <div class="mmeta"><b>Typical</b> ~+5&deg; beyond the value at the top</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Hip internal rotation</h4><span class="mkey">hipInternalRotation</span></div><span class="mtag imu">IMU</span></div>
+          <p>True rotation at the hip joint — the thigh turning relative to the pelvis, per side — which governs how cleanly the lower body clears. Needs a thigh sensor.</p>
+          <div class="mmeta"><b>Typical</b> lead ~50&deg; / trail ~40&deg; amplitude · requires thigh IMU</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Kinematic sequence</h4><span class="mkey">kinematicSequence</span></div><span class="mtag imu">IMU</span></div>
+          <p>The order, timing and size of each segment's peak rotational speed: pelvis &rarr; chest &rarr; lead arm &rarr; club. Each peaks then brakes, passing speed on — the single most coach-trusted signal.</p>
+          <div class="mmeta"><b>Typical</b> peaks rise ~480 &rarr; 605 &rarr; 1310 deg/s · ~50&nbsp;ms transition · only the club still accelerating at impact</div></div>
+      </div>
+    </div>
+
+    <!-- Family: posture & stability -->
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig coral"></span><h3>Posture &amp; stability</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Spine forward bend</h4><span class="mkey">spineForwardBend</span></div><span class="mtag imu">IMU</span></div>
+          <p>How much you stay bent toward the ball, held from address through impact. Standing up early shifts the low point and costs strike.</p>
+          <div class="mmeta"><b>Typical</b> ~30&ndash;40&deg; retained from address (irons)</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Spine side bend</h4><span class="mkey">spineSideBend</span></div><span class="mtag imu">IMU</span></div>
+          <p>Tilt of the torso toward the trail side through impact — part of staying behind the ball as the club is delivered.</p>
+          <div class="mmeta"><b>Typical</b> thorax ~32&deg; at driver impact</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Secondary axis tilt</h4><span class="mkey">secondaryAxisTilt</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>Lean of the spine away from the target at impact — the hip-to-shoulder line measured from vertical in the face-on plane.</p>
+          <div class="mmeta"><b>Typical</b> ~20&ndash;25&deg; at impact (from ~6&ndash;8&deg; at address)</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Pelvis sway</h4><span class="mkey">pelvisSway</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>Side-to-side travel of the hips along the target line — a small shift away from target going back, then a drive toward it coming down.</p>
+          <div class="mmeta"><b>Typical</b> away in backswing, toward target in downswing · measured in cm</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Pelvis thrust</h4><span class="mkey">pelvisThrust</span></div><span class="mtag cam2">2 cams / club</span></div>
+          <p>Movement of the hips toward the ball. Thrusting early is the classic "early extension" that crowds the arms and forces you upright. It lives along the depth axis a single face-on camera can't see.</p>
+          <div class="mmeta"><b>Typical</b> minimal toward-ball until late · needs a down-the-line view</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Pelvis lift</h4><span class="mkey">pelvisLift</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>Vertical rise of the hips. A small, controlled push up into impact adds speed; an uncontrolled one is a fault.</p>
+          <div class="mmeta"><b>Typical</b> small controlled rise · measured in cm</div></div>
+      </div>
+    </div>
+
+    <!-- Family: lead wrist & arm -->
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig green"></span><h3>Lead wrist &amp; arm</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Bow / cup</h4><span class="mkey">leadWristFlexExt</span></div><span class="mtag imu">IMU</span></div>
+          <p>Flexion (bowed, palm down) versus extension (cupped) of the lead wrist — the main control of clubface angle, since the back of the lead hand mirrors the face. Carries the highest weight because it drives clubhead speed most.</p>
+          <div class="mmeta"><b>Typical</b> 15&ndash;30&deg; more flexed at impact than address · cupping at the top is a fault</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Hinge (set / lag)</h4><span class="mkey">leadWristRadUln</span></div><span class="mtag imu">IMU</span></div>
+          <p>Radial (cocking up) versus ulnar deviation — how the wrist sets the hinge, holds the lag, then releases it. The <em>lateness</em> of the release into impact is the marker of good timing.</p>
+          <div class="mmeta"><b>Typical</b> large set held to ~P6, releasing late · early drop = casting</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Forearm roll</h4><span class="mkey">forearmPronation</span></div><span class="mtag imu">IMU</span></div>
+          <p>Rotation of the lead forearm (pronation/supination) — the "roll" that squares the face through impact, measured as the forearm's axial twist.</p>
+          <div class="mmeta"><b>Typical</b> rotates toward square through impact · holding off = block/weak fade</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Lead arm / elbow</h4><span class="mkey">leadArmFlexion</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>How straight the lead arm stays — the elbow angle from the shoulder, elbow and wrist. The most reliable camera-only metric; a bent, lifting lead elbow late is the "chicken wing".</p>
+          <div class="mmeta"><b>Typical</b> near-straight (~165&ndash;180&deg;) through impact</div></div>
+      </div>
+    </div>
+
+    <!-- Family: trail side & connection -->
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig paper"></span><h3>Trail side &amp; connection</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Trail wrist (the "tray")</h4><span class="mkey">trailWristFlexExt</span></div><span class="mtag imu">IMU</span></div>
+          <p>The trail wrist's extension that "holds the tray" supporting the club. Flattening it too early is the same throw/flip event the lead wrist shows — used to corroborate the face reading and raise confidence.</p>
+          <div class="mmeta"><b>Typical</b> extension held to ~P6, releasing late · needs a trail-wrist IMU</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Trail set &amp; roll</h4><span class="mkey">trailWristRadUln</span></div><span class="mtag imu">IMU</span></div>
+          <p>The trail-side mirror of the set and the forearm roll. Primarily a cross-check that strengthens confidence in the lead-side findings.</p>
+          <div class="mmeta"><b>Role</b> corroboration · needs a trail-side IMU</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Connection</h4><span class="mkey">leadConnection</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>Whether the lead arm stays connected across the chest rather than lifting away — disconnection at the top, or a bent, splayed lead elbow into impact (chicken wing).</p>
+          <div class="mmeta"><b>Reads</b> lead shoulder &amp; elbow geometry vs address</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Over-the-top check</h4><span class="mkey">trailElbow</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>The trail elbow should fold to about 90&deg; at the top, then extend in sync with the body. A high "flying" elbow or early extension from the top flags an over-the-top / casting tendency.</p>
+          <div class="mmeta"><b>Reads</b> trail elbow &amp; shoulder through transition</div></div>
+      </div>
+    </div>
+
+    <!-- Family: club delivery -->
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig cyan"></span><h3>Club delivery</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Clubhead speed</h4><span class="mkey">clubheadSpeed</span></div><span class="mtag cam2">2 cams / club</span></div>
+          <p>Speed of the clubhead at impact, from its 3D path or from grip motion combined with a club sensor.</p>
+          <div class="mmeta"><b>Typical</b> driver ~113&nbsp;mph · 7-iron ~89&nbsp;mph</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Club path</h4><span class="mkey">clubPath</span></div><span class="mtag cam2">2 cams / club</span></div>
+          <p>The horizontal direction the clubhead travels through impact, relative to the target line — in-to-out (+) or out-to-in (&minus;). It lives along the depth axis, so a lone face-on camera can't resolve it honestly.</p>
+          <div class="mmeta"><b>Typical</b> near 0 &plusmn; a few degrees · canonical down-the-line metric</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Attack angle</h4><span class="mkey">attackAngle</span></div><span class="mtag cam2">2 cams / club</span></div>
+          <p>Whether the clubhead is moving down or up at impact — the vertical angle of its travel.</p>
+          <div class="mmeta"><b>Typical</b> driver ~&minus;1&deg; (or a few up) · 7-iron ~&minus;4.5&deg;</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Face angle</h4><span class="mkey">faceAngle</span></div><span class="mtag cam2">club sensor</span></div>
+          <p>Where the clubface points at impact — the dominant control of where the ball starts. A true reading needs club/face tracking; until then it's shown only as a clearly-labelled forearm-and-wrist estimate.</p>
+          <div class="mmeta"><b>Typical</b> small open/closed · gates ball start direction</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Swing plane</h4><span class="mkey">swingPlane</span></div><span class="mtag cam2">2 cameras</span></div>
+          <p>The tilt and direction of the best-fit plane the clubhead travels on through the downswing. Shown as a hand-path proxy when no club is tracked.</p>
+          <div class="mmeta"><b>Reports</b> plane tilt vs ground + direction · per club</div></div>
+      </div>
+    </div>
+
+    <!-- Family: tempo -->
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig amber"></span><h3>Tempo</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Backswing time</h4><span class="mkey">tempoBackswing</span></div><span class="mtag imu">any source</span></div>
+          <p>How long the backswing takes, from address to the top — read straight from the swing's phase events.</p>
+          <div class="mmeta"><b>Typical</b> ~0.75&ndash;0.85&nbsp;s</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Tempo ratio</h4><span class="mkey">tempoRatio</span></div><span class="mtag imu">any source</span></div>
+          <p>Backswing time divided by downswing time — the rhythm of the swing, and a number that's remarkably consistent among good players.</p>
+          <div class="mmeta"><b>Typical</b> ~3:1</div></div>
       </div>
     </div>
   </section>

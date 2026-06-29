@@ -106,6 +106,8 @@
   .navlinks a.muted::after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:var(--accent);transition:right .28s ease}
   .navlinks a.muted:hover{color:var(--paper)}
   .navlinks a.muted:hover::after{right:0}
+  .navlinks a.muted[aria-current="page"]{color:var(--paper)}
+  .navlinks a.muted[aria-current="page"]::after{right:0}
   .btn{
     font-family:var(--font-mono);font-size:13px;letter-spacing:.02em;
     padding:9px 16px;border-radius:7px;border:1px solid var(--line-strong);
@@ -357,13 +359,12 @@
 
 <header>
   <div class="wrap bar">
-    <div class="mark"><span class="dot"></span><b>PinPoint Studio</b></div>
+    <a class="mark" href="index.html"><span class="dot"></span><b>PinPoint Studio</b></a>
     <nav class="navlinks">
-      <a class="muted" href="#tour">The app</a>
-      <a class="muted" href="#signals">How it works</a>
-      <a class="muted" href="#modes">Modes</a>
-      <a class="muted" href="#validation">Validation</a>
-      <a class="muted" href="#roadmap">Roadmap</a>
+      <a class="muted" href="index.html" aria-current="page">Home</a>
+      <a class="muted" href="science/swing-scoring.html">Swing scoring</a>
+      <a class="muted" href="science/shaft-detection.html">Shaft detection</a>
+      <a class="muted" href="science/validation.html">Validation</a>
       <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
       <a class="btn solid" href="#register">Follow along</a>
     </nav>
