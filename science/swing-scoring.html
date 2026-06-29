@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The science behind the score — PinPoint Studio</title>
+<meta name="description" content="How PinPoint Studio turns a captured swing into honest, explainable numbers — the measurement pipeline, the movements it reads (X-factor, kinematic sequence, wrist angles, stability), and the maths behind scoring and its confidence intervals. Methods under development and validation; first release targeted late 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/science.css">
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="wrap bar">
+    <a class="mark" href="../index.html"><span class="dot"></span><b>PinPoint Studio</b></a>
+    <nav class="navlinks">
+      <a class="muted" href="../index.html">Home</a>
+      <a class="muted" href="shaft-detection.html">Shaft detection</a>
+      <a class="muted" href="../index.html#validation">Validation</a>
+      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
+      <a class="btn solid" href="../index.html">&#8592; Back to site</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- hero -->
+  <section class="subhero wrap">
+    <span class="eyebrow reveal">Science in practice &middot; Scoring &amp; metrics</span>
+    <h1 class="reveal" style="--d:1">The science <em>behind the score.</em></h1>
+    <p class="lede reveal" style="--d:2">A good swing number isn't a verdict handed down from a black box — it's a measurement you can trace back to the movement that produced it. This is how PinPoint Studio reads a swing, the biomechanics it scores against, and the maths that keeps a single number <strong>honest</strong>.</p>
+    <div class="notice reveal" style="--d:3">
+      <span class="badge dev"><i></i>In development &amp; validation</span>
+      <p>This page explains the <strong>approach</strong> we're building. The wrist analyzer produces real output today and is in validation; the full-body kinematics and scoring described here are still being built and checked against a hand-annotated corpus of real swings before any of it is released. Nothing here is a finished, dependable product yet — that's deliberate. <a class="ulink" href="../index.html#validation">See how we earn the numbers &#8594;</a></p>
+    </div>
+    <nav class="contents reveal" style="--d:4" aria-label="On this page">
+      <a href="#pipeline">The pipeline</a>
+      <a href="#kit">Your kit</a>
+      <a href="#xfactor">X-factor</a>
+      <a href="#sequence">Kinematic sequence</a>
+      <a href="#wrist">Lead wrist</a>
+      <a href="#stability">Stability</a>
+      <a href="#adherence">The score</a>
+      <a href="#resemblance">Swing style</a>
+      <a href="#confidence">Confidence</a>
+      <a href="#improve">Putting it to work</a>
+    </nav>
+  </section>
+
+  <!-- 1. PIPELINE -->
+  <section id="pipeline" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>How a shot is read</span>
+        <h2 class="xh">From frames to a <em>score</em></h2>
+        <p class="xlede">To map a swing in milliseconds, each shot runs through a sequence of stages — every one building on the last, from raw pixels up to a coachable number.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Pose &amp; object detection</h4><p>Each frame is run through pose models that trace whole-body landmarks — body, hands and fingers — while the club and ball are tracked separately.</p></div></li>
+          <li class="point"><span class="pi coral">2</span><div><h4>3D fusion &amp; smoothing</h4><p>Camera angles are triangulated and fused with the IMUs' high-rate motion data, then filtered into a stable 3D skeleton in real metric units — resolving the gaps a single camera can't see.</p></div></li>
+          <li class="point"><span class="pi green">3</span><div><h4>Skeleton, scores &amp; faults</h4><p>Events are anchored on impact, metrics are computed against coaching bands, and faults are ranked by how many points they cost — each with a plain-English drill.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="360" fill="#0A1216"/>
+          <text x="200" y="34" fill="var(--paper-dim)" font-size="11" text-anchor="middle" letter-spacing="2">PROCESSING STAGES</text>
+          <polygon points="64,66 336,66 308,104 92,104" fill="rgba(138,179,137,.16)" stroke="var(--arm)" stroke-width="1.5"/>
+          <text x="200" y="90" fill="var(--paper)" font-size="12" text-anchor="middle">Skeleton, scores &amp; faults</text>
+          <line x1="200" y1="134" x2="200" y2="106" stroke="var(--arm)" stroke-width="2" stroke-dasharray="3 3" class="an-flow"/>
+          <polygon points="64,146 336,146 308,184 92,184" fill="rgba(224,126,100,.16)" stroke="var(--thorax)" stroke-width="1.5"/>
+          <text x="200" y="170" fill="var(--paper)" font-size="12" text-anchor="middle">3D fusion &amp; smoothing</text>
+          <line x1="200" y1="214" x2="200" y2="186" stroke="var(--thorax)" stroke-width="2" stroke-dasharray="3 3" class="an-flow"/>
+          <polygon points="64,226 336,226 308,264 92,264" fill="rgba(123,192,219,.16)" stroke="var(--club)" stroke-width="1.5"/>
+          <text x="200" y="250" fill="var(--paper)" font-size="12" text-anchor="middle">Pose &amp; object detection</text>
+          <text x="200" y="312" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle">Each shot flows bottom &#8594; top in milliseconds</text>
+        </svg>
+        <p class="figcap">Illustrative — the analysis pipeline, stage by stage.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. HARDWARE TIERS -->
+  <section id="kit" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Works with the kit you have</span>
+        <h2 class="xh">Full numbers from a <em>single camera</em></h2>
+        <p class="xlede">The system adapts to whatever hardware is in the bay — a single calibrated camera with motion sensors is a first-class setup, not a fallback. More kit sharpens the picture.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>One camera + motion sensors</h4><p>A face-on camera with body and wrist IMUs maps rotation, wrist hinge and the timing of the sequence, while the camera reads posture and tempo.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A second, down-the-line camera</h4><p>Resolves depth the single view can't, unlocking club-delivery measures like path, attack angle and a true 3D swing plane.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>A sensor on the club</h4><p>A light sensor on the shaft gives direct club-head speed and shaft lean without needing the second camera.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <g stroke="rgba(242,237,226,.16)" stroke-width="2">
+            <line x1="200" y1="120" x2="200" y2="220"/>
+            <line x1="200" y1="220" x2="160" y2="340"/>
+            <line x1="200" y1="220" x2="240" y2="340"/>
+            <line x1="160" y1="140" x2="240" y2="140"/>
+            <line x1="160" y1="140" x2="180" y2="240"/>
+            <line x1="240" y1="140" x2="180" y2="240"/>
+            <line x1="180" y1="240" x2="120" y2="330" stroke="var(--club)" stroke-width="3"/>
+          </g>
+          <circle cx="200" cy="150" r="6" fill="var(--thorax)"/>
+          <circle cx="200" cy="150" r="13" fill="none" stroke="var(--thorax)" stroke-width="1.5" class="an-node"/>
+          <circle cx="200" cy="210" r="6" fill="var(--pelvis)"/>
+          <circle cx="200" cy="210" r="13" fill="none" stroke="var(--pelvis)" stroke-width="1.5" class="an-node"/>
+          <circle cx="180" cy="240" r="6" fill="var(--arm)"/>
+          <circle cx="180" cy="240" r="13" fill="none" stroke="var(--arm)" stroke-width="1.5" class="an-node"/>
+          <text x="220" y="154" fill="var(--thorax)" font-size="10">Thorax IMU</text>
+          <text x="220" y="214" fill="var(--pelvis)" font-size="10">Pelvis IMU</text>
+          <text x="196" y="256" fill="var(--arm)" font-size="10">Wrist IMU</text>
+          <path d="M 40 100 L 100 70 L 100 130 Z" fill="rgba(123,192,219,.18)" stroke="var(--club)" stroke-width="1"/>
+          <circle cx="45" cy="100" r="4" fill="var(--paper)"/>
+          <text x="34" y="150" fill="var(--paper-dim)" font-size="10.5">Face-on camera</text>
+        </svg>
+        <p class="figcap">Illustrative — sensor placement and a face-on camera.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. X-FACTOR -->
+  <section id="xfactor" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Power generation</span>
+        <h2 class="xh">The power coil: <em>X-factor</em></h2>
+        <p class="xlede">Speed in golf isn't arm strength — it's elastic tension stored in the core, which we measure in degrees of separation between the shoulders and hips.</p>
+        <ul class="points">
+          <li class="point"><span class="pi amber">1</span><div><h4>The backswing coil</h4><p>The difference in rotation between shoulders and hips at the top. A strong coil separates the two by roughly <strong>40&ndash;50&deg;</strong>, stretching the core.</p></div></li>
+          <li class="point"><span class="pi amber">2</span><div><h4>The downswing stretch</h4><p>As the downswing starts the hips turn first while the shoulders stay coiled, briefly increasing separation — a stretch that acts like a released sling.</p></div></li>
+          <li class="point"><span class="pi cyan">3</span><div><h4>How to use it</h4><p>A low coil usually means the hips are drifting or over-turning — work on hip stability. A weak stretch means starting the downswing from the ground up, not the upper body.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <circle cx="200" cy="210" r="130" fill="none" stroke="rgba(242,237,226,.04)" stroke-width="2"/>
+          <g transform="rotate(45, 200, 210)">
+            <line x1="80" y1="210" x2="320" y2="210" stroke="var(--pelvis)" stroke-width="4"/>
+            <circle cx="80" cy="210" r="8" fill="var(--pelvis)"/>
+            <circle cx="320" cy="210" r="8" fill="var(--pelvis)"/>
+            <text x="300" y="200" fill="var(--pelvis)" font-size="10" transform="rotate(-45, 300, 200)">Hips 45&deg;</text>
+          </g>
+          <g transform="rotate(90, 200, 210)">
+            <line x1="60" y1="210" x2="340" y2="210" stroke="var(--thorax)" stroke-width="4"/>
+            <circle cx="60" cy="210" r="9" fill="var(--thorax)"/>
+            <circle cx="340" cy="210" r="9" fill="var(--thorax)"/>
+            <text x="312" y="196" fill="var(--thorax)" font-size="10" transform="rotate(-90, 312, 196)">Shoulders 90&deg;</text>
+          </g>
+          <path d="M 278 140 A 100 100 0 0 1 200 110" fill="none" stroke="var(--club)" stroke-width="3" stroke-dasharray="2 3"/>
+          <text x="206" y="64" fill="var(--club)" font-size="13" font-weight="500">X-factor: 45&deg;</text>
+          <line x1="200" y1="210" x2="200" y2="64" stroke="var(--paper)" stroke-dasharray="4 4" opacity="0.25"/>
+          <text x="206" y="84" fill="var(--paper-dim)" font-size="10">Target line 0&deg;</text>
+        </svg>
+        <p class="figcap">Illustrative — separation of shoulders and hips, viewed top-down.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. KINEMATIC SEQUENCE -->
+  <section id="sequence" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Swing timing</span>
+        <h2 class="xh">The kinematic <em>sequence</em></h2>
+        <p class="xlede">Like cracking a whip, speed travels through the body in a specific order. Each segment peaks, then brakes to pass its energy to the next.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>The proper order</h4><p>Energy peaks bottom to top: <strong>hips &#8594; chest &#8594; lead arm &#8594; club</strong>. Each segment acts as a pivot, handing speed forward.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>Peak, then brake</h4><p>To transfer speed a segment has to decelerate rapidly. When the hips brake, that energy surges into the chest; when the chest brakes, it snaps into the arms.</p></div></li>
+          <li class="point"><span class="pi coral">3</span><div><h4>Out of order</h4><p>If the shoulders or arms peak before the hips, the swing is "casting" — speed bleeds away, the path changes and slices follow.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <line x1="50" y1="350" x2="350" y2="350" stroke="rgba(242,237,226,.1)"/>
+          <line x1="50" y1="50" x2="50" y2="350" stroke="rgba(242,237,226,.1)"/>
+          <line x1="310" y1="50" x2="310" y2="350" stroke="var(--paper-dim)" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.7"/>
+          <text x="300" y="68" fill="var(--paper-dim)" font-size="10" text-anchor="end">Impact</text>
+          <path d="M 50 330 Q 120 180 180 180 T 260 330 T 310 345" fill="none" stroke="var(--pelvis)" stroke-width="3"/>
+          <circle cx="180" cy="180" r="4" fill="var(--pelvis)"/><text x="186" y="174" fill="var(--pelvis)" font-size="10">1. Hips</text>
+          <path d="M 50 340 Q 130 320 200 130 T 280 320 T 310 345" fill="none" stroke="var(--thorax)" stroke-width="3"/>
+          <circle cx="200" cy="130" r="4" fill="var(--thorax)"/><text x="206" y="124" fill="var(--thorax)" font-size="10">2. Chest</text>
+          <path d="M 50 345 Q 150 340 230 90 T 295 330 T 310 345" fill="none" stroke="var(--arm)" stroke-width="3"/>
+          <circle cx="230" cy="90" r="4" fill="var(--arm)"/><text x="236" y="84" fill="var(--arm)" font-size="10">3. Arm</text>
+          <path d="M 50 348 Q 180 348 290 60 L 310 335" fill="none" stroke="var(--club)" stroke-width="3"/>
+          <circle cx="290" cy="60" r="4" fill="var(--club)"/><text x="258" y="52" fill="var(--club)" font-size="10">4. Club</text>
+          <text x="200" y="380" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle">Angular speed through the downswing</text>
+        </svg>
+        <p class="figcap">Illustrative — peaks fire proximal to distal, in order.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. WRIST -->
+  <section id="wrist" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>The first analyzer &middot; in validation</span>
+        <h2 class="xh">Lead wrist: <em>flexion &amp; extension</em></h2>
+        <p class="xlede">The clubface direction is governed by the lead wrist — the one movement read straight from the IMUs and the first analyzer producing real output today.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>Flexion (bowed, palm down)</h4><p>Bowing the lead wrist rotates the face <strong>closed</strong>. For a slicer, more flexion helps square or close it.</p></div></li>
+          <li class="point"><span class="pi coral">2</span><div><h4>Extension (cupped, knuckles up)</h4><p>Cupping the wrist rotates the face <strong>open</strong>. Excessive cupping is the most common cause of weak, high slices.</p></div></li>
+          <li class="point"><span class="pi cyan">3</span><div><h4>Radial / ulnar hinge</h4><p>Cocking the wrist up stores the lag through the downswing; releasing it down snaps the club square at impact.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <line x1="70" y1="200" x2="200" y2="200" stroke="var(--paper-dim)" stroke-width="8"/>
+          <text x="72" y="182" fill="var(--paper-dim)" font-size="11">Forearm</text>
+          <line x1="200" y1="200" x2="320" y2="200" stroke="rgba(242,237,226,.2)" stroke-width="5" stroke-dasharray="4 4"/>
+          <g class="an-lift">
+            <line x1="200" y1="200" x2="296" y2="270" stroke="var(--arm)" stroke-width="6"/>
+            <text x="232" y="292" fill="var(--arm)" font-size="11" font-weight="500">Bowed &mdash; face closed</text>
+            <path d="M 230 200 A 30 30 0 0 1 223 218" fill="none" stroke="var(--arm)" stroke-width="2"/>
+          </g>
+          <g>
+            <line x1="200" y1="200" x2="296" y2="132" stroke="var(--thorax)" stroke-width="6" opacity="0.9"/>
+            <text x="232" y="124" fill="var(--thorax)" font-size="11">Cupped &mdash; face open</text>
+            <path d="M 230 200 A 30 30 0 0 0 223 182" fill="none" stroke="var(--thorax)" stroke-width="2"/>
+          </g>
+          <circle cx="200" cy="200" r="9" fill="var(--club)"/>
+          <text x="150" y="234" fill="var(--paper)" font-size="11">Wrist joint</text>
+        </svg>
+        <p class="figcap">Illustrative — lead-wrist flexion vs extension and the face.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. STABILITY -->
+  <section id="stability" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Stability &amp; posture</span>
+        <h2 class="xh">Sway, thrust &amp; <em>lift</em></h2>
+        <p class="xlede">Consistency means turning around a stable spine angle — not swaying side to side or thrusting the hips toward the ball.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>Sway (side to side)</h4><p>A small shift away from the target in the backswing, then a strong drive back <strong>toward</strong> the target coming down. Too much either way costs strike.</p></div></li>
+          <li class="point"><span class="pi coral">2</span><div><h4>Thrust (early extension)</h4><p>Hips moving toward the ball crowd the arms and force you to stand up out of posture — a big source of blocks and shanks.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Lift (up and down)</h4><p>Hold your height through the backswing, then push off the ground into impact — controlled vertical lift is a source of power.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <line x1="50" y1="320" x2="350" y2="320" stroke="rgba(242,237,226,.1)" stroke-width="2"/>
+          <line x1="200" y1="100" x2="200" y2="320" stroke="var(--paper-dim)" stroke-dasharray="4 4" stroke-width="2"/>
+          <text x="210" y="112" fill="var(--paper-dim)" font-size="10.5">Ideal rotation centre</text>
+          <ellipse cx="200" cy="240" rx="40" ry="20" fill="none" stroke="var(--club)" stroke-width="3"/>
+          <line x1="200" y1="240" x2="272" y2="240" stroke="var(--arm)" stroke-width="2"/>
+          <polygon points="272,235 282,240 272,245" fill="var(--arm)"/>
+          <text x="226" y="230" fill="var(--arm)" font-size="10">Sway target</text>
+          <line x1="200" y1="240" x2="200" y2="168" stroke="var(--thorax)" stroke-width="2"/>
+          <polygon points="195,168 200,158 205,168" fill="var(--thorax)"/>
+          <text x="210" y="184" fill="var(--thorax)" font-size="10" font-weight="500">Thrust / early extension</text>
+          <circle cx="200" cy="240" r="5" fill="var(--paper)"/>
+          <text x="200" y="350" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle">Hips, viewed from above</text>
+        </svg>
+        <p class="figcap">Illustrative — a good drive vs a thrust toward the ball.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. ADHERENCE SCORE -->
+  <section id="adherence" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The scoring maths</span>
+        <h2 class="xh">One number, no <em>hiding</em></h2>
+        <p class="xlede">For a full swing we don't average the metrics — a plain average lets a serious fault hide behind everything you do well. We use a weighted geometric mean, so the weakest link sets the tone.</p>
+        <ul class="points">
+          <li class="point"><span class="pi coral">1</span><div><h4>Why averages mislead</h4><p>Five perfect metrics (100) and one critical fault (20) average to a flattering <strong>86</strong> — a score that hides the very thing holding you back.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>The geometric-mean penalty</h4><p>Multiplying the scores and taking the root lets one low number pull the whole score down. The same swing becomes a realistic <strong>40</strong>.</p></div></li>
+          <li class="point"><span class="pi cyan">3</span><div><h4>The coaching idea</h4><p>You can't paper over a critical mechanical fault by perfecting something else. The score stays honest about what to fix first.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="360" fill="#0A1216"/>
+          <text x="40" y="60" fill="var(--paper-dim)" font-size="12">Simple average &mdash; misleading</text>
+          <rect x="40" y="74" width="300" height="28" fill="rgba(242,237,226,.05)" rx="6"/>
+          <rect x="40" y="74" width="258" height="28" fill="var(--thorax)" rx="6"/>
+          <text x="312" y="93" fill="var(--paper)" font-size="13" font-weight="500">86</text>
+          <text x="40" y="156" fill="var(--paper-dim)" font-size="12">Weighted geometric mean &mdash; honest</text>
+          <rect x="40" y="170" width="300" height="28" fill="rgba(242,237,226,.05)" rx="6"/>
+          <rect x="40" y="170" width="120" height="28" fill="var(--arm)" rx="6"/>
+          <text x="172" y="189" fill="var(--paper)" font-size="13" font-weight="500">40</text>
+          <rect x="40" y="240" width="320" height="80" fill="rgba(0,0,0,.3)" stroke="var(--line)" rx="12"/>
+          <text x="60" y="272" fill="var(--paper)" font-size="11">score = (m&#8321;^w&#8321; &times; &hellip; &times; m&#8345;^w&#8345;) ^ (1/&Sigma;w)</text>
+          <text x="60" y="298" fill="var(--paper-dim)" font-size="10.5">One metric near zero drags the whole score down.</text>
+        </svg>
+        <p class="figcap">Illustrative — the same swing, two ways of scoring it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. WRIST RESEMBLANCE -->
+  <section id="resemblance" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Style diagnostics</span>
+        <h2 class="xh">There's no one <em>right wrist</em></h2>
+        <p class="xlede">Unlike posture, wrist shape has no single correct answer — great players differ. So instead of scoring you against one ideal, we diagnose which style you're closest to.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Three archetypes</h4><p>Your wrist angles at the top and at impact are matched to three patterns: <strong>bowed</strong> (strong/closed), <strong>neutral</strong>, or <strong>cupped</strong> (open).</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A resemblance for each (0&ndash;100)</h4><p>You get an independent match score for every archetype. Your highest one names your pattern; a high score means you're consistent within that style.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Blended</h4><p>If your top two scores are within <strong>10 points</strong>, you're flagged "blended" — your wrist action is hybrid, and steadying onto one style is usually the goal.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="360" fill="#0A1216"/>
+          <text x="40" y="56" fill="var(--arm)" font-size="12" font-weight="500">BOWED (strong / closed face)</text>
+          <rect x="40" y="66" width="320" height="20" fill="rgba(242,237,226,.05)" rx="4"/>
+          <rect x="40" y="66" width="275" height="20" fill="var(--arm)" rx="4"/>
+          <text x="324" y="81" fill="var(--paper)" font-size="11" font-weight="500">86%</text>
+          <text x="40" y="126" fill="var(--club)" font-size="12">NEUTRAL</text>
+          <rect x="40" y="136" width="320" height="20" fill="rgba(242,237,226,.05)" rx="4"/>
+          <rect x="40" y="136" width="128" height="20" fill="var(--club)" rx="4"/>
+          <text x="178" y="151" fill="var(--paper)" font-size="11">40%</text>
+          <text x="40" y="196" fill="var(--thorax)" font-size="12">CUPPED (open face)</text>
+          <rect x="40" y="206" width="320" height="20" fill="rgba(242,237,226,.05)" rx="4"/>
+          <rect x="40" y="206" width="26" height="20" fill="var(--thorax)" rx="4"/>
+          <text x="76" y="221" fill="var(--paper)" font-size="11">8%</text>
+          <rect x="40" y="252" width="320" height="72" fill="rgba(138,179,137,.06)" stroke="var(--arm)" stroke-width="1" rx="12"/>
+          <text x="60" y="284" fill="var(--arm)" font-size="14" font-weight="500">Pattern: Bowed &mdash; highly consistent</text>
+          <text x="60" y="306" fill="var(--paper-dim)" font-size="10.5">Blended: no &mdash; one clear, repeatable style.</text>
+        </svg>
+        <p class="figcap">Illustrative — resemblance scores name the swing's style.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. CONFIDENCE -->
+  <section id="confidence" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Honest uncertainty</span>
+        <h2 class="xh">A score with a <em>margin</em></h2>
+        <p class="xlede">Cameras and sensors live in the real world — shadows, noise and timing jitter are facts of it. Rather than pretend to a false precision, we show an honest range.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>"82 (&plusmn;9)", not just "82"</h4><p>The result is an interval — say 73 to 91, centred on 82 — that reflects the real margin of timing and sensor noise.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Data quality sets the width</h4><p>Good light, snug straps and two calibrated cameras give a tight band (&plusmn;3). Poor light or loose straps widen it (&plusmn;12).</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Noise never costs you</h4><p>Lower confidence only <strong>widens</strong> the interval — it never lowers the score. A bad environment shouldn't dent your history.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="320" fill="#0A1216"/>
+          <text x="200" y="100" fill="var(--paper)" font-size="30" font-weight="500" text-anchor="middle" font-family="DM Mono,monospace">82 (&plusmn;9)</text>
+          <line x1="50" y1="180" x2="350" y2="180" stroke="rgba(242,237,226,.1)" stroke-width="6" stroke-linecap="round"/>
+          <rect x="180" y="165" width="100" height="30" fill="rgba(123,192,219,.3)" stroke="var(--club)" stroke-width="1.5" rx="4"/>
+          <line x1="180" y1="160" x2="180" y2="200" stroke="var(--club)" stroke-width="2"/>
+          <line x1="280" y1="160" x2="280" y2="200" stroke="var(--club)" stroke-width="2"/>
+          <circle cx="230" cy="180" r="8" fill="var(--pelvis)"/>
+          <circle cx="230" cy="180" r="15" fill="none" stroke="var(--pelvis)" stroke-width="2" class="an-node"/>
+          <text x="180" y="222" fill="var(--paper-dim)" font-size="11" text-anchor="middle">73</text>
+          <text x="280" y="222" fill="var(--paper-dim)" font-size="11" text-anchor="middle">91</text>
+          <text x="50" y="208" fill="var(--paper-dim)" font-size="10" text-anchor="middle">0</text>
+          <text x="350" y="208" fill="var(--paper-dim)" font-size="10" text-anchor="middle">100</text>
+          <text x="200" y="276" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle">Band width = timing jitter + sensor noise</text>
+        </svg>
+        <p class="figcap">Illustrative — the score sits inside an honest interval.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. PUTTING IT TO WORK -->
+  <section id="improve" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Putting it to work</span>
+        <h2 class="xh">Fix one thing, <em>then re-test</em></h2>
+        <p class="xlede">The point of all this measurement is a clear next move — not a wall of numbers. The aim is a simple, prioritised loop you can actually practise.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Know your style first</h4><p>Check your wrist resemblance. If you're a bowed-wrist player, don't chase neutral or cupped tips — consistency within your own style is the goal.</p></div></li>
+          <li class="point"><span class="pi amber">2</span><div><h4>Attack the top-ranked fault</h4><p>Faults are ranked by <strong>points lost</strong>, so the top one is whatever is holding the score back most. Work on that single thing.</p></div></li>
+          <li class="point"><span class="pi green">3</span><div><h4>Drill, then re-capture</h4><p>Every ranked fault comes with a plain-English drill. Do it, capture a fresh swing, and watch that one metric drift the right way — and the interval tighten as it gets repeatable.</p></div></li>
+        </ul>
+        <div class="callout"><p><strong>The takeaway:</strong> improvement isn't guesswork about "feel" — it's measured movement. Change one thing at a time, let the numbers confirm it, and trust the physics over the urge to overhaul everything at once.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="360" fill="#0A1216"/>
+          <rect x="260" y="60" width="100" height="40" fill="rgba(138,179,137,.18)" stroke="var(--arm)" stroke-width="1.5" rx="8"/>
+          <text x="310" y="85" fill="var(--arm)" font-size="11" font-weight="500" text-anchor="middle">4. Re-test</text>
+          <rect x="190" y="130" width="100" height="40" fill="rgba(123,192,219,.18)" stroke="var(--club)" stroke-width="1.5" rx="8"/>
+          <text x="240" y="155" fill="var(--club)" font-size="11" font-weight="500" text-anchor="middle">3. Drill</text>
+          <rect x="120" y="200" width="100" height="40" fill="rgba(230,172,84,.34)" stroke="var(--pelvis)" stroke-width="2.4" rx="8" class="an-lift"/>
+          <text x="170" y="225" fill="var(--pelvis)" font-size="11" font-weight="500" text-anchor="middle">2. Top fault</text>
+          <circle cx="212" cy="196" r="5" fill="var(--pelvis)"/>
+          <circle cx="212" cy="196" r="12" fill="none" stroke="var(--pelvis)" stroke-width="1.5" class="an-node"/>
+          <rect x="50" y="270" width="100" height="40" fill="rgba(242,237,226,.05)" stroke="var(--line)" stroke-width="1.5" rx="8"/>
+          <text x="100" y="295" fill="var(--paper)" font-size="11" font-weight="500" text-anchor="middle">1. Your style</text>
+          <line x1="150" y1="270" x2="170" y2="240" stroke="rgba(242,237,226,.2)" stroke-width="2"/>
+          <line x1="220" y1="200" x2="240" y2="170" stroke="rgba(242,237,226,.2)" stroke-width="2"/>
+          <line x1="290" y1="130" x2="310" y2="100" stroke="rgba(242,237,226,.2)" stroke-width="2"/>
+        </svg>
+        <p class="figcap">Illustrative — the practice loop, one fault at a time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- cross-link -->
+  <section class="wrap">
+    <div class="morelink reveal">
+      <a href="shaft-detection.html">
+        <div>
+          <div class="ml-k">Science in practice &middot; Club tracking</div>
+          <h3>Finding the shaft in the blur</h3>
+        </div>
+        <span class="ml-go">Read how we track the club &#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- closing -->
+  <section class="closing wrap">
+    <span class="eyebrow reveal">Science-led, kept open</span>
+    <h2 class="reveal" style="--d:1">Measured, not <em>guessed.</em></h2>
+    <p class="reveal" style="--d:2">Every method here is drawn from the published literature and held against real, hand-annotated swings before it ships. It's an open, inspectable platform — and a prototype under validation, with a first release targeted for late 2026.</p>
+    <div class="cta-row reveal" style="--d:3">
+      <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
+      <a class="btn" href="../index.html#validation">How we validate</a>
+      <a class="btn" href="../index.html">&#8592; Back to site</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>PinPoint Studio &middot; open-source golf swing analysis</span>
+    <span><a href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
+  </div>
+</footer>
+</div><!-- /.page -->
+<script src="../assets/science.js"></script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finding the shaft in the blur — PinPoint Studio</title>
+<meta name="description" content="How PinPoint Studio tracks a thin golf shaft moving at 100+ mph — anchoring on the hands, constraining the search by the golfer's own anatomy and swing physics, and reading the motion blur instead of fighting it. A method under development and validation; first release targeted late 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/science.css">
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="wrap bar">
+    <a class="mark" href="../index.html"><span class="dot"></span><b>PinPoint Studio</b></a>
+    <nav class="navlinks">
+      <a class="muted" href="../index.html">Home</a>
+      <a class="muted" href="swing-scoring.html">Swing scoring</a>
+      <a class="muted" href="../index.html#validation">Validation</a>
+      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
+      <a class="btn solid" href="../index.html">&#8592; Back to site</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- hero -->
+  <section class="subhero wrap">
+    <span class="eyebrow reveal">Science in practice &middot; Club tracking</span>
+    <h1 class="reveal" style="--d:1">Finding the shaft <em>in the blur.</em></h1>
+    <p class="lede reveal" style="--d:2">A golf shaft is a dark quarter-inch stick moving past 100&nbsp;mph against a busy background. It's the hardest thing in the bay to track — so rather than stare harder at the pixels, we lean on the golfer's own anatomy and the <strong>physics</strong> of a swing to know where the club has to be.</p>
+    <div class="notice reveal" style="--d:3">
+      <span class="badge dev"><i></i>In development &amp; validation</span>
+      <p>Club and ball tracking is part of the full-swing pipeline that's still being built. This page explains the <strong>method</strong> we're developing, not a finished feature — every part of it is being measured against a hand-annotated corpus of real swings before it goes near a release. <a class="ulink" href="../index.html#validation">See how we earn the numbers &#8594;</a></p>
+    </div>
+    <nav class="contents reveal" style="--d:4" aria-label="On this page">
+      <a href="#challenge">The challenge</a>
+      <a href="#scan">How it looks</a>
+      <a href="#blind">Where naive fails</a>
+      <a href="#anatomy">Body-aware</a>
+      <a href="#pendulum">Swing physics</a>
+      <a href="#blur">Reading the blur</a>
+      <a href="#replay">Self-checking</a>
+      <a href="#refine">Built-in care</a>
+    </nav>
+  </section>
+
+  <!-- 1. THE CHALLENGE -->
+  <section id="challenge" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The problem</span>
+        <h2 class="xh">The fastest move in <em>sport</em></h2>
+        <p class="xlede">A full swing lasts under two seconds; the downswing is a fraction of that. At those speeds an ordinary camera fights two problems at once.</p>
+        <ul class="points">
+          <li class="point"><span class="pi coral">!</span><div><h4>Severe motion blur</h4><p>Past 100&nbsp;mph a thin shaft isn't a crisp line — it smears into a faint, semi-transparent wedge of grey across the frame.</p></div></li>
+          <li class="point"><span class="pi amber">!</span><div><h4>Background clutter</h4><p>Alignment sticks, trouser creases, shadows and seams in the turf all look line-like — and tempt a naive tracker into "finding" a club that isn't there.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <circle cx="200" cy="120" r="25" fill="var(--paper)" opacity="0.08"/>
+          <circle cx="200" cy="220" r="10" fill="var(--club)"/>
+          <path d="M200 220 L310 330 A 150 150 0 0 1 230 370 Z" fill="rgba(242,237,226,.06)"/>
+          <path d="M200 220 L290 350 A 150 150 0 0 1 250 365 Z" fill="rgba(242,237,226,.1)"/>
+          <line x1="50" y1="350" x2="350" y2="350" stroke="var(--pelvis)" stroke-width="3" stroke-dasharray="5 5" opacity="0.65"/>
+          <text x="56" y="336" fill="var(--pelvis)" font-size="11">Alignment stick (clutter)</text>
+          <text x="210" y="214" fill="var(--club)" font-size="12" font-weight="500">Hands (pivot)</text>
+          <text x="280" y="290" fill="var(--paper-dim)" font-size="11">Motion-blur fan</text>
+        </svg>
+        <p class="figcap">Illustrative — the club becomes a faint fan; the ground lies in wait.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. HOW IT LOOKS -->
+  <section id="scan" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The baseline idea</span>
+        <h2 class="xh">How the computer <em>looks</em></h2>
+        <p class="xlede">Rather than search the whole frame at once, the tracker works outward from what it already knows for certain.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Anchor on the hands</h4><p>It first finds the golfer's hands from the body-pose skeleton. That becomes the pivot everything else is measured from.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>Search outward in rays</h4><p>It casts search lines out from the hands in a circle, only as far as a club could possibly reach.</p></div></li>
+          <li class="point"><span class="pi green">3</span><div><h4>Look for a ridge</h4><p>Along each ray it looks for a long, high-contrast run of dark pixels — the signature of a real shaft, not a stray mark.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(242,237,226,.05)" stroke-width="2"/>
+          <circle cx="200" cy="200" r="140" fill="none" stroke="var(--club)" stroke-width="1" stroke-dasharray="4 8" opacity="0.35"/>
+          <g opacity="0.22" stroke="var(--paper)" stroke-width="1">
+            <line x1="200" y1="200" x2="340" y2="200"/><line x1="200" y1="200" x2="299" y2="299"/>
+            <line x1="200" y1="200" x2="200" y2="340"/><line x1="200" y1="200" x2="101" y2="299"/>
+            <line x1="200" y1="200" x2="60" y2="200"/><line x1="200" y1="200" x2="101" y2="101"/>
+            <line x1="200" y1="200" x2="200" y2="60"/><line x1="200" y1="200" x2="299" y2="101"/>
+          </g>
+          <line x1="200" y1="200" x2="290" y2="310" stroke="var(--arm)" stroke-width="4" class="an-shaft"/>
+          <g class="an-scan">
+            <line x1="200" y1="200" x2="340" y2="200" stroke="var(--club)" stroke-width="2"/>
+            <polygon points="200,200 340,182 340,200" fill="rgba(123,192,219,.35)"/>
+          </g>
+          <circle cx="200" cy="200" r="12" fill="var(--club)"/>
+          <circle cx="200" cy="200" r="20" fill="none" stroke="var(--club)" stroke-width="1.5" opacity="0.5"/>
+          <text x="214" y="192" fill="var(--club)" font-size="11">Hands pivot</text>
+          <text x="258" y="334" fill="var(--arm)" font-size="11">Detected shaft</text>
+        </svg>
+        <p class="figcap">Illustrative — rays sweep outward from the hands.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. WHERE NAIVE FAILS -->
+  <section id="blind" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge warning"><i></i>The blind spots</span>
+        <h2 class="xh">Where the naive way <em>fails</em></h2>
+        <p class="xlede">Blind to the golfer's body, that basic search falls into two classic traps.</p>
+        <ul class="points">
+          <li class="point"><span class="pi coral">&#10007;</span><div><h4>Panicking when cropped</h4><p>To guess scale it assumed a fixed height. Crop the feet out of frame and that guess collapses — the search widens to the whole image and gets lost in the noise.</p></div></li>
+          <li class="point"><span class="pi coral">&#10007;</span><div><h4>Locking onto tiny lines</h4><p>A club is longer than an arm, yet the basic search would happily lock onto a two-inch sleeve crease or watch strap beside the hands — bright, sharp and completely wrong.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <path d="M120 60 Q200 30 280 60 L260 220 L140 220 Z" fill="rgba(242,237,226,.05)"/>
+          <rect x="50" y="40" width="300" height="210" fill="none" stroke="var(--thorax)" stroke-width="2" stroke-dasharray="5 5"/>
+          <text x="58" y="58" fill="var(--thorax)" font-size="11">Viewport &mdash; legs cropped out</text>
+          <circle cx="200" cy="190" r="10" fill="var(--club)"/>
+          <line x1="200" y1="190" x2="216" y2="222" stroke="var(--thorax)" stroke-width="5"/>
+          <circle cx="208" cy="206" r="15" fill="none" stroke="var(--thorax)" stroke-width="1.5"/>
+          <text x="120" y="300" fill="var(--thorax)" font-size="11" text-anchor="middle">Wrist-crease false positive &mdash; far too short</text>
+          <line x1="200" y1="190" x2="285" y2="345" stroke="var(--paper-dim)" stroke-width="2" opacity="0.4"/>
+          <text x="300" y="340" fill="var(--paper-dim)" font-size="10">Real shaft, ignored</text>
+        </svg>
+        <p class="figcap">Illustrative — a crop and a crease, both leading the search astray.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. BODY-AWARE -->
+  <section id="anatomy" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Body-aware constraints</span>
+        <h2 class="xh">Scale and gate by the <em>arm</em></h2>
+        <p class="xlede">The fix is to tie the search to the skeleton itself. The golfer's own arm sets both how far to look and how short is too short.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>Sizing from the arm, not a guess</h4><p>We measure the arm on screen, shoulder to wrist. A club is always around 1.8&ndash;2.2&times; that length, so the search radius is set precisely — however the video is framed or cropped.</p></div></li>
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>A physical-length gate</h4><p>A club is longer than an arm, full stop. Anything shorter than one arm length is rejected outright, so sleeve folds and watch straps never reach the matching stage.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(138,179,137,.2)" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <circle cx="200" cy="200" r="100" fill="rgba(224,126,100,.05)" stroke="rgba(224,126,100,.25)" stroke-width="1"/>
+          <line x1="160" y1="100" x2="200" y2="200" stroke="var(--club)" stroke-width="4"/>
+          <circle cx="160" cy="100" r="6" fill="var(--paper)"/>
+          <circle cx="200" cy="200" r="8" fill="var(--club)"/>
+          <text x="108" y="92" fill="var(--paper)" font-size="11">Shoulder</text>
+          <text x="166" y="150" fill="var(--club)" font-size="11">Arm length</text>
+          <line x1="200" y1="200" x2="320" y2="338" stroke="var(--arm)" stroke-width="2" stroke-dasharray="4 4"/>
+          <text x="234" y="252" fill="var(--arm)" font-size="10.5">Max radius &asymp; 2.1&times; arm</text>
+          <text x="132" y="300" fill="var(--thorax)" font-size="10.5">Reject zone &lt; 1 arm</text>
+          <line x1="200" y1="200" x2="300" y2="350" stroke="var(--arm)" stroke-width="4"/>
+          <text x="298" y="338" fill="var(--arm)" font-size="11" font-weight="500" text-anchor="end">Passes the gate</text>
+        </svg>
+        <p class="figcap">Illustrative — the arm sets both the reach and the floor.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. SWING PHYSICS -->
+  <section id="pendulum" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Swing physics</span>
+        <h2 class="xh">A swing is a <em>double pendulum</em></h2>
+        <p class="xlede">Mechanically, the lead arm and club behave like two linked pendulums. That gives a physics-based guardrail for where the club can plausibly be.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">&#10003;</span><div><h4>A predictable wrist-cock angle</h4><p>The angle between lead arm and club follows a known curve through the swing — near straight at address, hinged near the top, holding lag, releasing back to straight at impact.</p></div></li>
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>A moving angle guardrail</h4><p>Knowing the swing phase and the arm's angle, the model predicts where the club should be, allows a soft margin around it, and rejects anything that grossly breaks the physics.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <line x1="200" y1="90" x2="200" y2="210" stroke="var(--paper-dim)" stroke-width="4"/>
+          <text x="210" y="150" fill="var(--paper-dim)" font-size="11">Lead arm</text>
+          <path d="M200 210 L272 340 A 150 150 0 0 1 128 340 Z" fill="rgba(123,192,219,.08)" stroke="rgba(123,192,219,.25)" stroke-width="1" stroke-dasharray="2 4"/>
+          <text x="130" y="362" fill="var(--club)" font-size="10.5">Allowed envelope (&plusmn;25&deg;)</text>
+          <circle cx="200" cy="210" r="8" fill="var(--club)"/>
+          <line x1="200" y1="210" x2="232" y2="348" stroke="var(--arm)" stroke-width="4"/>
+          <text x="240" y="306" fill="var(--arm)" font-size="11" font-weight="500">Predicted club</text>
+          <path d="M 200 250 A 40 40 0 0 0 210 247" fill="none" stroke="var(--club)" stroke-width="2"/>
+        </svg>
+        <p class="figcap">Illustrative — the physics narrows the search to a sector.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. READING THE BLUR -->
+  <section id="blur" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>The fastest phase</span>
+        <h2 class="xh">Don't fight the blur &mdash; <em>predict it</em></h2>
+        <p class="xlede">At the bottom of the downswing the club is a ghost. So we stop hunting for a crisp line and change the rules for the high-speed zone.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>Expect a wedge, not a line</h4><p>From the club's speed and the camera's exposure time, the model works out how wide the blurred fan should be — then looks for that fan instead of a sharp edge.</p></div></li>
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>Add up the faint energy</h4><p>Any single pixel in the smear is too faint to trust, but summing the light across the whole predicted sweep adds up to a confident detection.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <circle cx="200" cy="150" r="10" fill="var(--club)"/>
+          <path d="M200 150 L270 330 A 200 200 0 0 1 130 330 Z" fill="none" stroke="rgba(138,179,137,.15)" stroke-width="20" stroke-dasharray="10 10"/>
+          <path d="M200 150 L270 330 A 200 200 0 0 1 130 330 Z" fill="rgba(138,179,137,.08)" stroke="rgba(138,179,137,.4)" stroke-width="2"/>
+          <line x1="200" y1="150" x2="200" y2="340" stroke="rgba(138,179,137,.35)" stroke-width="1.5"/>
+          <line x1="200" y1="150" x2="170" y2="335" stroke="rgba(138,179,137,.35)" stroke-width="1.5"/>
+          <line x1="200" y1="150" x2="230" y2="335" stroke="rgba(138,179,137,.35)" stroke-width="1.5"/>
+          <text x="214" y="146" fill="var(--club)" font-size="11">Hands pivot</text>
+          <text x="148" y="362" fill="var(--arm)" font-size="11">Swept-energy wedge</text>
+        </svg>
+        <p class="figcap">Illustrative — energy summed across the predicted sweep.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. SELF-CHECKING -->
+  <section id="replay" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Replay &amp; self-checking</span>
+        <h2 class="xh">Two tracks that <em>check each other</em></h2>
+        <p class="xlede">Because the tracker produces both a measured path and a predicted one, it can grade its own work — and show that working on replay.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>Measured vs predicted</h4><p>One path comes from the pixels, the other from the physics model. The gap between them is a running health check on the tracker.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>A "ghost" overlay for testing</h4><p>During checks, a faint dashed prediction can be drawn behind the solid detected club, making any drift easy to spot by eye.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>A clubhead trail on replay</h4><p>Replays draw a fading, glowing trail of the last few clubhead positions, so swing path and release read at a glance.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <line x1="200" y1="90" x2="200" y2="190" stroke="rgba(242,237,226,.2)" stroke-width="2"/>
+          <circle cx="200" cy="190" r="6" fill="var(--paper)"/>
+          <line x1="200" y1="190" x2="310" y2="310" stroke="var(--arm)" stroke-width="3"/>
+          <circle cx="310" cy="310" r="6" fill="var(--arm)"/>
+          <text x="300" y="306" fill="var(--arm)" font-size="11" text-anchor="end">Measured</text>
+          <line x1="200" y1="190" x2="280" y2="325" stroke="var(--club)" stroke-width="2" stroke-dasharray="4 4"/>
+          <circle cx="280" cy="325" r="4" fill="var(--club)"/>
+          <text x="160" y="346" fill="var(--club)" font-size="11">Predicted (ghost)</text>
+          <path d="M 310 310 Q 280 250 200 200" fill="none" stroke="var(--arm)" stroke-width="1.5" stroke-dasharray="2 2" opacity="0.5"/>
+          <circle cx="282" cy="275" r="4" fill="var(--arm)" opacity="0.6"/>
+          <circle cx="258" cy="250" r="3" fill="var(--arm)" opacity="0.4"/>
+          <circle cx="230" cy="225" r="2" fill="var(--arm)" opacity="0.25"/>
+        </svg>
+        <p class="figcap">Illustrative — measured and predicted, side by side, with the trail.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. BUILT-IN CARE -->
+  <section id="refine" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Care built in</span>
+        <h2 class="xh">Tuned to the footage in <em>front of it</em></h2>
+        <p class="xlede">A few touches let the tracker adapt to real, messy video rather than assuming ideal conditions.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Exposure, measured not assumed</h4><p>A quick first pass measures how wide the blur smear actually is on this footage, so the model uses the real exposure rather than a fixed default.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>Eased for unusual swings</h4><p>It gauges how clean the footage is and relaxes or tightens its assumptions for non-standard stances, instead of forcing one setting on everyone.</p></div></li>
+          <li class="point"><span class="pi green">3</span><div><h4>Handedness, worked out for you</h4><p>Left- or right-handed is read from the direction the club first travels in the backswing — nothing to set.</p></div></li>
+          <li class="point"><span class="pi green">4</span><div><h4>Club lifted off the background</h4><p>A still background is estimated and subtracted, and the moving body is masked out, so the faint club smear stands clear of everything else.</p></div></li>
+        </ul>
+        <div class="callout"><p><strong>Still being proven.</strong> These refinements are built and improving, not signed off. Next on the bench: projecting the physics through the camera's true 3D geometry, calibrating against motion-sensor ground truth, and extending the model to down-the-line views &mdash; each held to the same validation bar before it ships.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="360" fill="#0A1216"/>
+          <rect x="40" y="40" width="320" height="240" fill="none" stroke="var(--line)" stroke-width="1.5" rx="10"/>
+          <text x="52" y="62" fill="var(--paper-dim)" font-size="10.5">Frame</text>
+          <path d="M150 110 Q200 86 250 110 L238 230 L162 230 Z" fill="rgba(224,126,100,.12)" stroke="rgba(224,126,100,.35)" stroke-width="1" stroke-dasharray="4 4"/>
+          <text x="200" y="250" fill="var(--thorax)" font-size="10.5" text-anchor="middle">Body masked out</text>
+          <circle cx="200" cy="150" r="7" fill="var(--club)"/>
+          <path d="M200 150 L300 250 A 130 130 0 0 1 250 268 Z" fill="rgba(138,179,137,.16)" stroke="var(--arm)" stroke-width="2"/>
+          <text x="266" y="208" fill="var(--arm)" font-size="10.5">Club isolated</text>
+          <text x="200" y="320" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle">Background removed &middot; body masked &middot; club kept</text>
+        </svg>
+        <p class="figcap">Illustrative — isolating the club from a moving scene.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- cross-link -->
+  <section class="wrap">
+    <div class="morelink reveal">
+      <a href="swing-scoring.html">
+        <div>
+          <div class="ml-k">Science in practice &middot; Scoring &amp; metrics</div>
+          <h3>The science behind the score</h3>
+        </div>
+        <span class="ml-go">Read how scoring works &#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- closing -->
+  <section class="closing wrap">
+    <span class="eyebrow reveal">Science-led, kept open</span>
+    <h2 class="reveal" style="--d:1">Anatomy and physics, <em>not luck.</em></h2>
+    <p class="reveal" style="--d:2">Tracking the club well comes from constraining the problem with what a body and a swing can physically do — drawn from the literature, kept open to inspect, and held against real swings before it ships. It's a prototype under validation, with a first release targeted for late 2026.</p>
+    <div class="cta-row reveal" style="--d:3">
+      <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
+      <a class="btn" href="../index.html#validation">How we validate</a>
+      <a class="btn" href="../index.html">&#8592; Back to site</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>PinPoint Studio &middot; open-source golf swing analysis</span>
+    <span><a href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
+  </div>
+</footer>
+</div><!-- /.page -->
+<script src="../assets/science.js"></script>
+</body>
+</html>
