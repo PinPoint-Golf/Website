@@ -173,6 +173,7 @@ h2 em{font-style:italic;color:var(--accent)}
 .point h4{font-family:var(--font-display);font-weight:500;font-size:18.5px;letter-spacing:-.008em;margin-bottom:5px;line-height:1.25}
 .point p{font-size:14.5px;color:var(--text-2);line-height:1.58}
 .point strong{color:var(--paper);font-weight:600}
+.formula{font-family:var(--font-mono);font-size:12.5px;color:var(--paper);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap}
 
 .callout{border:1px solid var(--line-strong);border-radius:13px;background:linear-gradient(180deg,var(--ink-2),transparent);padding:18px 20px;position:relative;overflow:hidden;margin-top:24px}
 .callout::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--cool))}
