@@ -516,6 +516,7 @@
     <!-- Family: club delivery -->
     <div class="mfam">
       <div class="mfam-head"><span class="sig cyan"></span><h3>Club delivery</h3></div>
+      <p class="xlede" style="max-width:74ch;margin-bottom:20px">You might wonder why these sit here at all when a launch monitor already reads the ball and club. The overlap is deliberate. A launch monitor tells you the <em>outcome</em>; PinPoint tells you what the body did to cause it &mdash; and club delivery is where those two worlds meet. In a sound setup the shared numbers should agree, and when they do each set vouches for the other: you get provenance for every reading, and a clean line from a fault in the ball flight back to the move that produced it.</p>
       <div class="mgrid">
         <div class="mcard"><div class="mtop"><div><h4>Clubhead speed</h4><span class="mkey">clubheadSpeed</span></div><span class="mtag cam2">2 cams / club</span></div>
           <p>Speed of the clubhead at impact, from its 3D path or from grip motion combined with a club sensor.</p>
@@ -526,6 +527,9 @@
         <div class="mcard"><div class="mtop"><div><h4>Attack angle</h4><span class="mkey">attackAngle</span></div><span class="mtag cam2">2 cams / club</span></div>
           <p>Whether the clubhead is moving down or up at impact — the vertical angle of its travel.</p>
           <div class="mmeta"><b>Typical</b> driver ~&minus;1&deg; (or a few up) · 7-iron ~&minus;4.5&deg;</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Low point</h4><span class="mkey">lowPointAheadIn</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>How far target-side of the ball the clubhead bottoms out its arc, signed in inches. Positive is a low point ahead of the ball — the descending, ball-then-turf strike an iron wants; negative sits behind it, a fat/scoop with an iron but exactly right hitting up on a driver. A delivery number a launch monitor doesn't give you.</p>
+          <div class="mmeta"><b>Typical</b> irons a few inches ahead (+) · driver behind (&minus;) · face-on 2D, experimental on the projected clubhead</div></div>
         <div class="mcard"><div class="mtop"><div><h4>Face angle</h4><span class="mkey">faceAngle</span></div><span class="mtag cam2">club sensor</span></div>
           <p>Where the clubface points at impact — the dominant control of where the ball starts. A true reading needs club/face tracking; until then it's shown only as a clearly-labelled forearm-and-wrist estimate.</p>
           <div class="mmeta"><b>Typical</b> small open/closed · gates ball start direction</div></div>
