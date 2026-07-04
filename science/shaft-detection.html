@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finding the shaft in the blur — PinPoint Studio</title>
-<meta name="description" content="How PinPoint Studio tracks a thin golf shaft moving at 100+ mph — anchoring on the hands, constraining the search by the golfer's own anatomy and swing physics, and reading the motion blur instead of fighting it. A method under development and validation; first release targeted late 2026.">
+<title>Tracking the club — it starts with the room — PinPoint Studio</title>
+<meta name="description" content="How PinPoint Studio tracks a thin golf shaft moving at 100+ mph — why the room it's swung in matters most, how retroreflective shaft tape and a light at the lens lift tracking in dark sim rooms to instrument grade, and how the passive tracker leans on the golfer's anatomy and swing physics for a plain, untaped club. A method under development and validation; first release targeted late 2026.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -32,13 +32,15 @@
   <!-- hero -->
   <section class="subhero wrap">
     <span class="eyebrow reveal">Science in practice &middot; Club tracking</span>
-    <h1 class="reveal" style="--d:1">Finding the shaft <em>in the blur.</em></h1>
-    <p class="lede reveal" style="--d:2">A golf shaft is a dark quarter-inch stick moving past 100&nbsp;mph against a busy background. It's the hardest thing in the bay to track — so rather than stare harder at the pixels, we lean on the golfer's own anatomy and the <strong>physics</strong> of a swing to know where the club has to be.</p>
+    <h1 class="reveal" style="--d:1">The club is only as findable as <em>the room.</em></h1>
+    <p class="lede reveal" style="--d:2">A golf shaft is a dark quarter-inch stick moving past 100&nbsp;mph &mdash; the hardest thing in the bay to track. What decides how well we track it isn't really the algorithm; it's <strong>the room it's swung in</strong>. A bright bay with a plain wall gives up the whole swing arc; a dark sim room hides half of it. And where the room can't help, a few grams of <strong>retroreflective tape</strong> on the shaft &mdash; lit by a small ring at the lens &mdash; lift club tracking to instrument grade.</p>
     <div class="notice reveal" style="--d:3">
       <span class="badge dev"><i></i>In development &amp; validation</span>
       <p>Club and ball tracking is part of the full-swing pipeline that's still being built. This page explains the <strong>method</strong> we're developing, not a finished feature — every part of it is being measured against a hand-annotated corpus of real swings before it goes near a release. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
     </div>
     <nav class="contents reveal" style="--d:4" aria-label="On this page">
+      <a href="#environment">The room</a>
+      <a href="#tape">Taped clubs</a>
       <a href="#challenge">The challenge</a>
       <a href="#scan">How it looks</a>
       <a href="#blind">Where naive fails</a>
@@ -50,13 +52,102 @@
     </nav>
   </section>
 
+  <!-- 0a. THE ROOM / ENVIRONMENT LADDER -->
+  <section id="environment" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>The environment</span>
+        <h2 class="xh">The room does <em>half the work</em></h2>
+        <p class="xlede">Before any code runs, the room has already decided how easy the club is to see. It's your choice &mdash; nobody should repaint a wall or bin a sim room to use a camera &mdash; but two things matter here, and they aren't equal.</p>
+        <ul class="points">
+          <li class="point"><span class="pi amber">1</span><div><h4>Light is the hard limit</h4><p>Missing photons can't be recovered in software. A dark room forces long exposures (more blur) and high gain (more noise), and the shaft either vanishes into dark surrounds or washes out against a bright mat. No detector fixes that after the fact.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>A quiet background is second</h4><p>Static clutter &mdash; window frames, screens, club racks &mdash; invites false locks, but it's <em>manageable</em>: the tracker can veto anything that was already sitting in the empty scene. Manageable isn't free, but unlike darkness it isn't a wall.</p></div></li>
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>An honest ladder</h4><p>Best to worst: bright light and a plain wall (full performance), bright but busy, dark but plain, and &mdash; the typical home simulator &mdash; dark <em>and</em> busy. That last one is the hard case, and it's exactly where tape earns its place.</p></div></li>
+        </ul>
+        <div class="callout"><p><strong>The point of the tape.</strong> The retroreflective option below is deliberately environment-independent &mdash; it makes the hardest room behave like the ideal one. That's why it's the right answer for a black sim room, and largely unnecessary in a bright bay with a quiet backdrop.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="207" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle">Background &mdash; quiet &#8594; busy</text>
+          <text x="26" y="207" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" transform="rotate(-90 26 207)">Light &mdash; bright &#8594; dark</text>
+          <rect x="62" y="52" width="143" height="143" fill="rgba(138,179,137,.12)" stroke="rgba(138,179,137,.45)" stroke-width="1.5"/>
+          <rect x="205" y="52" width="143" height="143" fill="rgba(242,237,226,.025)" stroke="var(--line)" stroke-width="1"/>
+          <rect x="62" y="195" width="143" height="143" fill="rgba(242,237,226,.025)" stroke="var(--line)" stroke-width="1"/>
+          <rect x="205" y="195" width="143" height="143" fill="rgba(224,126,100,.12)" stroke="rgba(224,126,100,.45)" stroke-width="1.5"/>
+          <text x="133" y="116" fill="var(--arm)" font-size="13" text-anchor="middle" font-weight="500">Tier 1</text>
+          <text x="133" y="135" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">bright &middot; quiet</text>
+          <text x="276" y="116" fill="var(--text-2)" font-size="13" text-anchor="middle">Tier 2</text>
+          <text x="276" y="135" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">bright &middot; busy</text>
+          <text x="133" y="259" fill="var(--text-2)" font-size="13" text-anchor="middle">Tier 3</text>
+          <text x="133" y="278" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">dark &middot; quiet</text>
+          <text x="276" y="255" fill="var(--thorax)" font-size="13" text-anchor="middle" font-weight="500">Tier 4</text>
+          <text x="276" y="274" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">dark &middot; busy</text>
+          <text x="276" y="288" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">home sim</text>
+          <line x1="250" y1="250" x2="158" y2="148" stroke="var(--club)" stroke-width="2" stroke-dasharray="6 4"/>
+          <polygon points="158,148 172,153 162,163" fill="var(--club)"/>
+          <text x="211" y="192" fill="var(--club)" font-size="10.5" text-anchor="middle" transform="rotate(48 211 192)">tape + ring light</text>
+        </svg>
+        <p class="figcap">Illustrative &mdash; light first, background second; tape lifts tier&nbsp;4 to tier&nbsp;1.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 0b. TAPED CLUBS -->
+  <section id="tape" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Instrumented club &middot; optional</span>
+        <h2 class="xh">A few grams of tape, <em>instrument grade</em></h2>
+        <p class="xlede">Vision-only tracking is the default, and no one has to touch their clubs. But a hard room takes its toll on any photometric detector long before it troubles a marker &mdash; so for a dark bay, a taped shaft changes the problem entirely.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>Bands become bright blobs</h4><p>Retroreflective tape lit by a small light at the lens throws that light straight back, saturating as bright, compact dots whatever the background &mdash; dark wall or blown-out mat alike. A banded shaft is trackable exactly where a plain one is invisible.</p></div></li>
+          <li class="point"><span class="pi cyan">&#10003;</span><div><h4>Known spacing is geometry</h4><p>Bands at measured spacings turn every frame into direct geometry: projected spacing against known spacing gives the shaft's foreshortening outright, the line of bands gives its angle without leaning on the hands, and the clubhead follows as a known extrapolation even when the head can't be seen.</p></div></li>
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>A pattern, not a lucky flash</h4><p>Along-shaft distance ratios survive projection, so the pattern reads the same at any club angle. A specular glint is one blob; several bands in a line at the recorded ratios are unmistakably ours &mdash; and because blur smears across the shaft while the gaps run along it, the pattern survives the impact streak.</p></div></li>
+          <li class="point"><span class="pi amber">!</span><div><h4>One physical rule</h4><p>Retro tape returns light to its source within a ~1&ndash;2&deg; cone, so the light must sit <em>at the lens</em> &mdash; a small LED ring, not the ceiling. Visible-band only; never IR, which fights launch monitors.</p></div></li>
+        </ul>
+        <div class="callout"><p><strong>Optional by design.</strong> The untaped tracker stays the product &mdash; and every taped swing doubles as dense ground truth for proving the unmarked detector, so both improve together. Taping is an opt-in high-accuracy mode for hard rooms, not a requirement. <a class="ulink" href="studio-setup.html#markup">How to mark up a club &#8594;</a></p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <line x1="150" y1="70" x2="330" y2="320" stroke="rgba(242,237,226,.16)" stroke-width="4"/>
+          <rect x="139" y="52" width="20" height="30" rx="4" fill="rgba(242,237,226,.14)" transform="rotate(54 149 67)"/>
+          <text x="120" y="66" fill="var(--paper-dim)" font-size="10" text-anchor="end">Grip</text>
+          <ellipse cx="341" cy="336" rx="15" ry="9" fill="none" stroke="var(--paper-dim)" stroke-width="1.5" transform="rotate(54 341 336)"/>
+          <text x="356" y="358" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">Head (extrapolated)</text>
+          <g>
+            <circle cx="166" cy="93" r="8" fill="rgba(123,192,219,.22)"/><circle cx="166" cy="93" r="4.5" fill="var(--club)"/>
+            <circle cx="179" cy="110" r="8" fill="rgba(123,192,219,.22)"/><circle cx="179" cy="110" r="4.5" fill="var(--club)"/>
+            <circle cx="231" cy="183" r="8" fill="rgba(123,192,219,.22)"/><circle cx="231" cy="183" r="4.5" fill="var(--club)"/>
+            <circle cx="280" cy="250" r="8" fill="rgba(123,192,219,.22)"/><circle cx="280" cy="250" r="4.5" fill="var(--club)"/>
+            <circle cx="292" cy="268" r="8" fill="rgba(123,192,219,.22)"/><circle cx="292" cy="268" r="4.5" fill="var(--club)"/>
+            <circle cx="305" cy="285" r="8" fill="rgba(123,192,219,.22)"/><circle cx="305" cy="285" r="4.5" fill="var(--club)"/>
+          </g>
+          <text x="150" y="88" fill="var(--club)" font-size="11" text-anchor="end" font-weight="500">2</text>
+          <text x="250" y="178" fill="var(--club)" font-size="11" font-weight="500">1</text>
+          <text x="322" y="264" fill="var(--club)" font-size="11" font-weight="500">3</text>
+          <rect x="34" y="300" width="52" height="40" rx="6" fill="rgba(123,192,219,.10)" stroke="var(--club)" stroke-width="1.6"/>
+          <circle cx="86" cy="320" r="11" fill="none" stroke="var(--club)" stroke-width="2"/>
+          <circle cx="86" cy="320" r="15" fill="none" stroke="rgba(123,192,219,.45)" stroke-width="1.3"/>
+          <text x="58" y="360" fill="var(--club)" font-size="10" text-anchor="middle">Camera + ring light</text>
+          <line x1="95" y1="313" x2="272" y2="245" stroke="var(--club)" stroke-width="1.3" stroke-dasharray="5 4" opacity="0.75"/>
+          <polygon points="272,245 261,246 266,255" fill="var(--club)"/>
+          <polygon points="95,313 106,312 101,303" fill="var(--club)"/>
+          <text x="120" y="305" fill="var(--paper-dim)" font-size="9" text-anchor="start">returns to the lens</text>
+        </svg>
+        <p class="figcap">Illustrative &mdash; a &ldquo;2&ndash;1&ndash;3&rdquo; band pattern, lit from the lens and read as geometry.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- 1. THE CHALLENGE -->
   <section id="challenge" class="xsec reveal">
     <div class="xgrid">
       <div class="xcol">
-        <span class="badge"><i></i>The problem</span>
+        <span class="badge"><i></i>The passive path</span>
         <h2 class="xh">The fastest move in <em>sport</em></h2>
-        <p class="xlede">A full swing lasts under two seconds; the downswing is a fraction of that. At those speeds an ordinary camera fights two problems at once.</p>
+        <p class="xlede">Most rooms aren't the ideal bay and most clubs aren't taped &mdash; so the tracker still has to find a plain shaft in whatever light the room gives it. That's the product default, and it's a hard problem: a full swing lasts under two seconds, the downswing a fraction of that, and at those speeds an ordinary camera fights two things at once.</p>
         <ul class="points">
           <li class="point"><span class="pi coral">!</span><div><h4>Severe motion blur</h4><p>Past 100&nbsp;mph a thin shaft isn't a crisp line — it smears into a faint, semi-transparent wedge of grey across the frame.</p></div></li>
           <li class="point"><span class="pi amber">!</span><div><h4>Background clutter</h4><p>Alignment sticks, trouser creases, shadows and seams in the turf all look line-like — and tempt a naive tracker into "finding" a club that isn't there.</p></div></li>
@@ -321,8 +412,8 @@
   <!-- closing -->
   <section class="closing wrap">
     <span class="eyebrow reveal">Science-led, kept open</span>
-    <h2 class="reveal" style="--d:1">Anatomy and physics, <em>not luck.</em></h2>
-    <p class="reveal" style="--d:2">Tracking the club well comes from constraining the problem with what a body and a swing can physically do — drawn from the literature, kept open to inspect, and held against real swings before it ships. It's a prototype under validation, with a first release targeted for late 2026.</p>
+    <h2 class="reveal" style="--d:1">The room, the tape, the <em>physics.</em></h2>
+    <p class="reveal" style="--d:2">Good club tracking starts with the room, leans on a few grams of tape where the room can't help, and &mdash; for every plain shaft in between &mdash; falls back on what a body and a swing can physically do. All of it is drawn from the literature, kept open to inspect, and held against real swings before it ships. It's a prototype under validation, with a first release targeted for late 2026.</p>
     <div class="cta-row reveal" style="--d:3">
       <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
       <a class="btn" href="validation.html">How we validate</a>
