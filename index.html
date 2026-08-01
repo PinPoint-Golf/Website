@@ -202,7 +202,7 @@
   .studio-screen .shot.active{opacity:1;transform:scale(1);transition:opacity .9s ease,transform 6.4s linear}
   .studio-note{margin-top:12px;padding:0 4px;font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--paper-dim);opacity:.75}
 
-  .tourbar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}
+  .tourbar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
   .tstep{--c:var(--accent);text-align:left;color:inherit;font:inherit;cursor:pointer;position:relative;overflow:hidden;
     background:linear-gradient(180deg,rgba(255,255,255,.014),transparent);border:1px solid var(--line);border-radius:12px;
     padding:15px 16px 17px;transition:border-color .25s,background .25s,transform .2s}
@@ -214,7 +214,6 @@
   .tstep .tprog i{display:block;height:100%;width:0;background:var(--c);box-shadow:0 0 8px var(--c)}
   .tstep[aria-current="true"]{border-color:var(--line-strong);background:linear-gradient(180deg,rgba(255,255,255,.035),transparent)}
   .tstep[aria-current="true"] .tnum{color:var(--c)}
-  @media(max-width:980px){.tourbar{grid-template-columns:repeat(3,1fr)}}
   @media(max-width:620px){.tourbar{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:430px){.tourbar{grid-template-columns:1fr}}
 
@@ -416,17 +415,18 @@
   <section id="tour" class="wrap">
     <div class="kicker reveal"><span class="sig paper"></span>The app</div>
     <h2 class="reveal" style="--d:1">Inside <em>the studio.</em></h2>
-    <p class="sec-lede reveal" style="--d:2">A first look at the desktop app as it stands today — from setting up your kit, through replaying a swing beside its numbers, to marking swings up by hand for validation.</p>
+    <p class="sec-lede reveal" style="--d:2">A first look at the desktop app as it stands today — from setting up your kit, through replaying a swing beside its numbers and reading those numbers against a codified diagnostic model, to marking swings up by hand for validation.</p>
 
     <div id="studio" class="studio reveal" style="--d:3">
       <div class="studio-head">
         <span class="studio-mode"><i></i>Now viewing&nbsp;<b>Home</b></span>
-        <span class="studio-count"><b>1</b>&thinsp;/&thinsp;5</span>
+        <span class="studio-count"><b>1</b>&thinsp;/&thinsp;6</span>
       </div>
       <div class="studio-screen">
         <img class="shot active" src="assets/home.webp" width="1800" height="1230" alt="PinPoint Studio home screen — choosing a player, club and analysis mode to start a session.">
         <img class="shot" src="assets/settings.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio settings — assigning and testing an IMU sensor before capture.">
         <img class="shot" src="assets/replay.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio replay — a captured swing played back beside its wrist metrics.">
+        <img class="shot" src="assets/diagnostics.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio diagnostic model — the fault 'early extension' shown as a causal graph of what causes it and what it leads to, beside the measurement that detects it and the citation behind it.">
         <img class="shot" src="assets/markup.webp" width="1800" height="1227" loading="lazy" alt="PinPoint Studio markup — annotating swing positions by hand for validation.">
         <img class="shot" src="assets/system.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio system view — built-in performance profiler showing CPU, memory, threads and per-model GPU use.">
       </div>
@@ -446,13 +446,18 @@
           <p>Play a captured swing back frame-by-frame, beside the key metrics it produced.</p>
           <span class="tprog"><i></i></span>
         </button>
+        <button type="button" class="tstep" data-mode="Diagnostics" style="--c:#f0c279" aria-current="false">
+          <span class="tnum">04</span><h4>Diagnostics</h4>
+          <p>Swing faults codified from the literature and leading coaching texts — a causal network linking each fault to its causes, the measurements that detect it and the drills that correct it.</p>
+          <span class="tprog"><i></i></span>
+        </button>
         <button type="button" class="tstep" data-mode="Markup" style="--c:#8AB389" aria-current="false">
-          <span class="tnum">04</span><h4>Markup</h4>
+          <span class="tnum">05</span><h4>Markup</h4>
           <p>Annotate swings by hand — the ground-truth labelling that underpins validation.</p>
           <span class="tprog"><i></i></span>
         </button>
         <button type="button" class="tstep" data-mode="System" style="--c:#F2EDE2" aria-current="false">
-          <span class="tnum">05</span><h4>System</h4>
+          <span class="tnum">06</span><h4>System</h4>
           <p>Built-in profiling of CPU, memory and threads — performance engineered in from the ground up, across Windows, macOS and Linux.</p>
           <span class="tprog"><i></i></span>
         </button>
