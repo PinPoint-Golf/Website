@@ -261,6 +261,7 @@
 
   /* ---- signals: three channels ---- */
   .channels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .channels.c4{grid-template-columns:repeat(2,1fr)}
   .channel{padding:28px 26px;border:1px solid var(--line);border-radius:13px;position:relative;overflow:hidden;
     background:linear-gradient(180deg,rgba(255,255,255,.014),transparent);transition:border-color .25s,transform .25s,box-shadow .25s}
   .channel::after{content:'';position:absolute;inset:0;border-radius:13px;opacity:0;transition:opacity .3s;
@@ -512,8 +513,8 @@
       </div>
       <div class="vstep reveal" style="--d:3">
         <div class="vstep-top"><span class="vnum">03</span><span class="badge dev"><i></i>Ongoing</span></div>
-        <h3>Algorithms held to it</h3>
-        <p>Each algorithm's output is compared against those annotations, swing by swing, and the error measured. Nothing reaches a release until the numbers line up with the ground truth closely enough to rely on.</p>
+        <h3>SwingLab holds them to it</h3>
+        <p>SwingLab, our validation harness, replays the exact production pipeline over the corpus and scores it against physics invariants and the hand-labelled truth — with byte-identical regression gates, so a change that shifts a single number can't slip through unnoticed.</p>
       </div>
     </div>
     <a class="vlink reveal" style="--d:4" href="science/validation.html">Read the full method — validation &amp; tuning &#8594;</a>
@@ -523,8 +524,8 @@
   <section id="signals" class="wrap">
     <div class="kicker reveal"><span class="sig cyan"></span>Capture</div>
     <h2 class="reveal" style="--d:1">Ordinary kit, measured carefully.</h2>
-    <p class="sec-lede reveal" style="--d:2">PinPoint Studio reads the swing from hardware you can buy off the shelf — there's no sealed rig and no per-shot cloud round-trip. Two signals are capturing today; force estimation is on the way.</p>
-    <div class="channels">
+    <p class="sec-lede reveal" style="--d:2">PinPoint Studio reads the swing from hardware you can buy off the shelf — there's no sealed rig and no per-shot cloud round-trip. Three signals capture today — cameras, motion sensors and, if you have one, your launch monitor; force estimation is on the way.</p>
+    <div class="channels c4">
       <div class="channel reveal" style="--d:1;--gw:rgba(123,192,219,.10)">
         <div class="ch-top">
           <div class="ch-label" style="color:var(--club)"><i style="background:var(--club)"></i>Cameras</div>
@@ -539,7 +540,14 @@
         </div>
         <p>Off-the-shelf BLE IMUs (Witmotion WT901BLE67) at up to 200 Hz capture the wrist flexion, deviation and rotation a camera can't see cleanly — fused into joint angles on-device.</p>
       </div>
-      <div class="channel reveal" style="--d:3;--gw:rgba(138,179,137,.10)">
+      <div class="channel reveal" style="--d:3;--gw:rgba(240,194,121,.10)">
+        <div class="ch-top">
+          <div class="ch-label" style="color:var(--thorax)"><i style="background:var(--thorax)"></i>Launch monitor</div>
+          <span class="badge now"><i></i>Built</span>
+        </div>
+        <p>A Foresight GCQuad (read via FSX2020) folds its readings into every swing — ball speed, spin, face and path recorded beside our own estimates. It's treated as a reference instrument: measured values sit alongside ours for honest comparison, never replacing them.</p>
+      </div>
+      <div class="channel reveal" style="--d:4;--gw:rgba(138,179,137,.10)">
         <div class="ch-top">
           <div class="ch-label" style="color:var(--arm)"><i style="background:var(--arm)"></i>Force</div>
           <span class="badge soon"><i></i>Planned</span>
@@ -554,15 +562,15 @@
   <section id="modes" class="wrap">
     <div class="kicker reveal"><span class="sig coral"></span>Analysis</div>
     <h2 class="reveal" style="--d:1">Four ways to see a swing.</h2>
-    <p class="sec-lede reveal" style="--d:2">PinPoint Studio is built around four analysis modes. Wrist Motion is the first to produce real output — now under validation; the rest are being built on the same capture pipeline.</p>
+    <p class="sec-lede reveal" style="--d:2">PinPoint Studio is built around four analysis modes. Wrist Motion and full Swing Analysis both produce real output today — under validation, not yet released; Ground Force and the AI Coach follow on the same capture pipeline.</p>
     <div class="screens">
       <div class="screen reveal" style="--d:1">
         <div class="screen-top">
           <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 28c6 0 7-16 12-16s6 10 10 10 5-12 12-12"/><circle cx="15" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
-          <span class="badge dev"><i></i>In dev</span>
+          <span class="badge now"><i></i>Built</span>
         </div>
         <h3>Swing Analysis</h3>
-        <p>Full-body kinematics from the captured frames — the kinematic sequence, X-factor and how speed builds up the chain. Multi-camera capture and live pose are in place; the metric extraction is being built.</p>
+        <p>Full-body kinematics from the captured frames — a 133-keypoint whole-body pose, shaft, club-head and ball tracking, and 45 swing metrics extracted today from an 88-metric catalogue: X-factor, club-head speed, lag, hip and shoulder rotation, tempo and more. The whole-swing score is the piece still being built.</p>
       </div>
       <div class="screen reveal" style="--d:2">
         <div class="screen-top">
@@ -578,15 +586,45 @@
           <span class="badge soon"><i></i>Planned</span>
         </div>
         <h3>Ground Force</h3>
-        <p>Loading, weight shift and ground reaction force through the downswing — where the power comes from, not just where it ends up. The research on measuring this affordably is still emerging, so we'll let it lead and lean on inexpensive sensors if that's the honest way to do it. Realistically, something meaningful here is a late-2027 job.</p>
+        <p>Loading, weight shift and ground reaction force through the downswing — where the power comes from, not just where it ends up. The approach is scoped and the research reviewed, but it's gated on force-plate ground truth we don't yet have — so we'll let the science lead rather than rush. Realistically, something meaningful here is a late-2027 job.</p>
       </div>
       <div class="screen reveal" style="--d:2">
         <div class="screen-top">
           <svg class="glyph" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h26a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H17l-8 6V11a2 2 0 0 1 2-2Z"/><path d="M14 17h2M20 17h2M26 17h2"/></svg>
-          <span class="badge soon"><i></i>Planned</span>
+          <span class="badge dev"><i></i>In dev</span>
         </div>
         <h3>AI Coach</h3>
-        <p>Ask about your swing out loud and get answers grounded in your own numbers, spoken back to you — all on-device. The local speech engine is already built; the coaching layer is planned.</p>
+        <p>Ask about your swing out loud and get answers spoken back — all on-device. The local language model (Phi-4-mini), speech in and out, and the conversation loop are already built and running; grounding it in your own session findings is the work in progress.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- diagnosis -->
+  <section id="diagnosis" class="wrap">
+    <div class="kicker reveal"><span class="sig amber"></span>Diagnosis</div>
+    <h2 class="reveal" style="--d:1">From numbers to a <em>diagnosis.</em></h2>
+    <p class="sec-lede reveal" style="--d:2">Measurements alone don't coach. PinPoint Studio codifies the swing-fault literature into a causal model, then reads every session against it — so a number out of range becomes a named fault, a likely cause and a drill to work on.</p>
+    <div class="channels">
+      <div class="channel reveal" style="--d:1;--gw:rgba(240,194,121,.10)">
+        <div class="ch-top">
+          <div class="ch-label" style="color:var(--pelvis)"><i style="background:var(--pelvis)"></i>Diagnostic model</div>
+          <span class="badge now"><i></i>Built</span>
+        </div>
+        <p>152 swing conditions linked by 338 causal edges, 129 measures and 178 reference corridors, plus drills and physical screens — drawn from a 39-source bibliography, every claim carrying its provenance. Browsable and editable inside the app, causal graph and all.</p>
+      </div>
+      <div class="channel reveal" style="--d:2;--gw:rgba(123,192,219,.10)">
+        <div class="ch-top">
+          <div class="ch-label" style="color:var(--club)"><i style="background:var(--club)"></i>Session diagnostics</div>
+          <span class="badge now"><i></i>Built</span>
+        </div>
+        <p>A shot fires findings; only a session diagnoses. Patterns that recur across shots are held to honest statistics, causes are ranked along the model's authored chains, and the live panel can be cast to a second screen for the athlete to see.</p>
+      </div>
+      <div class="channel reveal" style="--d:3;--gw:rgba(138,179,137,.10)">
+        <div class="ch-top">
+          <div class="ch-label" style="color:var(--arm)"><i style="background:var(--arm)"></i>Honest by construction</div>
+          <span class="badge now"><i></i>Built</span>
+        </div>
+        <p>Every verdict carries its receipt — the measurement behind it and the corridor it broke — and when something can't be read, the panel says exactly why. Today's corridors are literature-seeded; re-seating them from measured swings is what the validation corpus is for.</p>
       </div>
     </div>
   </section>
@@ -595,35 +633,39 @@
   <section id="roadmap" class="wrap">
     <div class="kicker reveal"><span class="sig green"></span>Timeline</div>
     <h2 class="reveal" style="--d:1">Where it is, and where it's going.</h2>
-    <p class="sec-lede reveal" style="--d:2">PinPoint Studio is in active prototyping and validation. The capture and shot pipeline is functional and the wrist analyzer is the first to produce real output; the broader kinematic, force and coaching layers come next. None of it is released yet — we're proving the numbers first.</p>
+    <p class="sec-lede reveal" style="--d:2">PinPoint Studio is in active prototyping and validation. Capture, full-swing metric extraction, the diagnostic model and launch-monitor integration are all working; the whole-swing score, ball flight and the depth axis come next. None of it is released yet — we're proving the numbers first.</p>
     <div class="horizon">
       <div class="hzcol c-now reveal" style="--d:1">
         <div class="hz-head"><span class="badge now"><i></i>Now</span><h3>Working</h3></div>
         <ul>
           <li>Multi-camera capture with live on-device pose overlay</li>
+          <li>Post-shot analysis — 133-keypoint whole-body pose, shaft, club-head &amp; ball tracking</li>
+          <li>45 swing metrics extracted today — X-factor, club-head speed, lag, rotation, tempo</li>
           <li>Live lead-arm wrist analysis, scored against coaching bands</li>
+          <li>Diagnostic model — 152 conditions, 338 causal edges, 178 cited corridors — editable in-app</li>
+          <li>Session diagnostics — cross-shot patterns &amp; ranked causes, cast to a second display</li>
+          <li>Launch-monitor integration (Foresight GCQuad) — measured values beside our estimates</li>
           <li>Shot detection — manual, IMU-impact and acoustic — with per-shot capture, replay &amp; export</li>
-          <li>Per-athlete session history that survives restarts</li>
-          <li>Swing corpus &amp; markup tool for hand-annotated ground truth</li>
-          <li>Local speech in &amp; out (Whisper + Kokoro)</li>
+          <li>Swing corpus, in-app markup tool &amp; the SwingLab validation harness</li>
+          <li>Local speech in &amp; out (Whisper + Kokoro) and a local coaching LLM (Phi-4-mini)</li>
         </ul>
       </div>
       <div class="hzcol c-dev reveal" style="--d:2">
         <div class="hz-head"><span class="badge dev"><i></i>Next</span><h3>In development</h3></div>
         <ul>
-          <li>Full swing analysis — kinematic sequence &amp; X-factor</li>
-          <li>Stereo camera calibration &amp; two-camera 3D reconstruction</li>
-          <li>Ball &amp; club-head detection and tracking</li>
-          <li>Kinematic metrics: club-head speed, hip/shoulder rotation, lag</li>
-          <li>Normative reference ranges &amp; swing comparison</li>
+          <li>Whole-swing 0&ndash;100 score — the scorer &amp; uncertainty maths are built; full-swing bands being seated</li>
+          <li>True kinematic-sequence chart from angular-velocity series</li>
+          <li>Full P1&ndash;P10 phase segmentation (today: address, takeaway, top, impact, finish)</li>
+          <li>Ball-flight tracking — ball speed, launch angle &amp; direction</li>
+          <li>Corpus v1 — re-seating the literature-seeded norms from measured swings</li>
+          <li>AI coach grounded in your session findings (chat, voice &amp; local LLM already built)</li>
         </ul>
       </div>
       <div class="hzcol c-soon reveal" style="--d:3">
         <div class="hz-head"><span class="badge soon"><i></i>Later</span><h3>On the roadmap</h3></div>
         <ul>
-          <li>Ground reaction force — following the research as it matures (likely 2027)</li>
-          <li>AI coach grounded in your own session data</li>
-          <li>Launch-monitor integration</li>
+          <li>Down-the-line camera &amp; two-camera 3D — unlocks the depth-axis metrics (swing plane, club path)</li>
+          <li>Ground reaction force — gated on force-plate ground truth (likely late 2027)</li>
           <li>Smartphone companion once the desktop core is proven</li>
         </ul>
       </div>
@@ -637,8 +679,11 @@
     <div class="specwrap reveal" style="--d:2">
       <div class="specrow"><span class="k">Cameras</span><span class="v">USB webcam &rarr; GenICam / FLIR industrial</span></div>
       <div class="specrow"><span class="k">IMUs</span><span class="v">Witmotion WT901BLE67 &middot; BLE &middot; up to 200 Hz</span></div>
-      <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose-B (analysis)</span></div>
+      <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose 133-keypoint whole-body (analysis)</span></div>
       <div class="specrow"><span class="k">Wrist kinematics</span><span class="v">IMU-quaternion joint angles, P1&ndash;P8</span></div>
+      <div class="specrow"><span class="k">Metrics</span><span class="v">88-metric catalogue &middot; 45 produced today</span></div>
+      <div class="specrow"><span class="k">Diagnostics</span><span class="v">152 conditions &middot; 338 causal edges &middot; 39 cited sources</span></div>
+      <div class="specrow"><span class="k">Launch monitor</span><span class="v">Foresight GCQuad via FSX2020</span></div>
       <div class="specrow"><span class="k">Speech</span><span class="v">Whisper STT &middot; Kokoro TTS &middot; on-device</span></div>
       <div class="specrow"><span class="k">Privacy</span><span class="v">Local by default &mdash; cloud only if you configure it</span></div>
       <div class="specrow"><span class="k">Built with</span><span class="v">Qt 6.11 &middot; C++20</span></div>
