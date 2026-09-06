@@ -256,9 +256,13 @@ footer{border-top:1px solid var(--line);padding-block:38px;color:var(--paper-dim
 @keyframes scan-ray{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes pulse-glow{0%,100%{filter:drop-shadow(0 0 2px var(--club))}50%{filter:drop-shadow(0 0 12px var(--club))}}
 @keyframes lift-motion{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-.an-node{animation:pulse-dot 2.4s infinite ease-in-out;transform-origin:center}
+.an-node{animation:pulse-dot 2.4s infinite ease-in-out;
+  /* fill-box is load-bearing: SVG elements default to transform-box:view-box, where
+     `center` means the centre of the 400x400 viewBox, not the centre of the circle —
+     so the pulse scaled every dot about the middle of the diagram and walked it. */
+  transform-box:fill-box;transform-origin:center}
 .an-flow{stroke-dasharray:8 4;animation:wave-flow 1.6s linear infinite}
-.an-scan{transform-origin:200px 200px;animation:scan-ray 7s linear infinite}
+.an-scan{transform-box:view-box;transform-origin:200px 200px;animation:scan-ray 7s linear infinite}  /* viewBox coords, deliberately — not fill-box */
 .an-shaft{animation:pulse-glow 2.2s infinite ease-in-out}
 .an-lift{animation:lift-motion 2.6s infinite ease-in-out}
 
