@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How it works (for the nerds) — PinPoint Studio</title>
+<meta name="description" content="The whole PinPoint Studio pipeline end to end — device integration over BLE, cameras, microphone and phone; the WitMotion, HackMotion, FLIR and PPCP specifics; IMU and camera calibration; the lock-free capture ring, one monotonic clock and delayed fetch; pose, ball and shaft inference; fusion and synthesis; phase segmentation; metric and joint extraction; the causal diagnostics model with its corridors; and session assessment with drills and screens. A prototype under validation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/science.css">
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="wrap bar">
+    <a class="mark" href="../index.html"><span class="dot"></span><b>PinPoint Studio</b></a>
+    <nav class="navlinks">
+      <a class="muted" href="../index.html">Home</a>
+      <a class="muted" href="how-it-works.html" aria-current="page">How it works</a>
+      <a class="muted" href="swing-scoring.html">Swing scoring</a>
+      <a class="muted" href="shaft-detection.html">Shaft detection</a>
+      <a class="muted" href="studio-setup.html">Studio setup</a>
+      <a class="muted" href="validation.html">Validation</a>
+      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
+      <a class="btn solid" href="../index.html#register">Follow along</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- hero -->
+  <section class="subhero wrap">
+    <span class="eyebrow reveal">Science in practice &middot; The whole stack</span>
+    <h1 class="reveal" style="--d:1">How it works <em>(for the nerds).</em></h1>
+    <p class="lede reveal" style="--d:2">The other pages explain a method. This one is the <strong>tour of the machine</strong> — every stage a swing passes through, from a BLE packet and a Bayer mosaic to a ranked cause with a drill attached. If you want to know what the software actually does between the strike and the sentence on screen, this is the page.</p>
+    <div class="notice reveal" style="--d:3">
+      <span class="badge dev"><i></i>Prototype &middot; in development &amp; validation</span>
+      <p>Everything described here is <strong>implemented and running</strong> — this is a description of the code, not a roadmap. What it is <em>not</em> yet is signed off: the numbers the pipeline produces are still being measured against a hand-annotated corpus before anything is called dependable. Where a stage is dark, gated or unproven, this page says so. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
+    </div>
+    <nav class="contents reveal" style="--d:4" aria-label="On this page">
+      <a href="#spine">Two spines</a>
+      <a href="#devices">Device integration</a>
+      <a href="#hardware">The kit itself</a>
+      <a href="#imucal">IMU calibration</a>
+      <a href="#camcal">Camera calibration</a>
+      <a href="#buffer">The ring buffer</a>
+      <a href="#clock">One clock</a>
+      <a href="#deferred">Delayed fetch</a>
+      <a href="#pose">Pose</a>
+      <a href="#ball">Ball</a>
+      <a href="#shaft">Shaft</a>
+      <a href="#fusion">Fusion &amp; synthesis</a>
+      <a href="#phases">Phase segmentation</a>
+      <a href="#metrics">Metrics &amp; joints</a>
+      <a href="#diagnostics">Diagnostics</a>
+      <a href="#session">Session assessment</a>
+    </nav>
+  </section>
+
+  <!-- 1. THE SPINE -->
+  <section id="spine" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The shape of the whole thing</span>
+        <h2 class="xh">Two spines, <em>one clock</em></h2>
+        <p class="xlede">There are only two kinds of evidence in the building: <strong>orientation</strong>, from sensors strapped to the body, and <strong>pixels</strong>, from cameras pointed at it. Each is a state trajectory in time, each climbs its own ladder from raw bytes to a coachable number, and they meet because they were stamped against the same microsecond clock from the very first byte.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">A</span><div><h4>The inertial spine</h4><p>BLE frame &#8594; raw accelerometer + gyroscope &#8594; on-host orientation filter &#8594; anatomical frame &#8594; a fixed-rate resampled grid &#8594; joint angles. A quaternion, all the way down.</p></div></li>
+          <li class="point"><span class="pi cyan">B</span><div><h4>The optical spine</h4><p>Sensor frame &#8594; pose keypoints &#8594; smoothed tracks &#8594; a grip-anchored shaft angle &#8594; image-plane landmarks. A pixel coordinate, all the way down.</p></div></li>
+          <li class="point"><span class="pi amber">C</span><div><h4>Degradation is the design</h4><p>Each spine is self-sufficient. Sensors but no camera still scores a swing; a camera but no sensors still scores a swing. The fused case is their <strong>union</strong>, never a dependency chain — device presence is data the pipeline reads, not a branch someone wrote.</p></div></li>
+        </ul>
+        <div class="callout"><p>Analysis runs as a list of <strong>capability-gated stages over one typed context</strong> — twenty-odd of them in authored order, each with an off switch and a reason it skipped. Every permutation of hardware takes exactly one code path, and every new idea lands as one more stage rather than another branch inside a function nobody dares touch.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">TWO SPINES, ONE TIMEBASE</text>
+          <text x="102" y="52" fill="var(--arm)" font-size="10.5" text-anchor="middle">INERTIAL</text>
+          <text x="298" y="52" fill="var(--club)" font-size="10.5" text-anchor="middle">OPTICAL</text>
+          <g stroke="var(--arm)" stroke-width="1.3" fill="rgba(138,179,137,.10)">
+            <rect x="34" y="64" width="136" height="26" rx="6"/>
+            <rect x="34" y="104" width="136" height="26" rx="6"/>
+            <rect x="34" y="144" width="136" height="26" rx="6"/>
+            <rect x="34" y="184" width="136" height="26" rx="6"/>
+          </g>
+          <g stroke="var(--club)" stroke-width="1.3" fill="rgba(123,192,219,.10)">
+            <rect x="230" y="64" width="136" height="26" rx="6"/>
+            <rect x="230" y="104" width="136" height="26" rx="6"/>
+            <rect x="230" y="144" width="136" height="26" rx="6"/>
+            <rect x="230" y="184" width="136" height="26" rx="6"/>
+          </g>
+          <g fill="var(--paper)" font-size="10.5" text-anchor="middle">
+            <text x="102" y="81">BLE accel + gyro</text>
+            <text x="102" y="121">orientation filter</text>
+            <text x="102" y="161">anatomical frame</text>
+            <text x="102" y="201">200 Hz grid</text>
+            <text x="298" y="81">sensor frames</text>
+            <text x="298" y="121">pose keypoints</text>
+            <text x="298" y="161">smoothed tracks</text>
+            <text x="298" y="201">shaft &amp; ball</text>
+          </g>
+          <path d="M102 210 L102 250 L200 276" fill="none" stroke="var(--arm)" stroke-width="2" stroke-dasharray="6 4" class="an-flow"/>
+          <path d="M298 210 L298 250 L200 276" fill="none" stroke="var(--club)" stroke-width="2" stroke-dasharray="6 4" class="an-flow"/>
+          <rect x="88" y="278" width="224" height="30" rx="8" fill="rgba(230,172,84,.16)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="200" y="297" fill="var(--paper)" font-size="11" text-anchor="middle">segmentation &#183; metrics &#183; score</text>
+          <line x1="200" y1="308" x2="200" y2="332" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 4" class="an-flow"/>
+          <rect x="112" y="334" width="176" height="28" rx="8" fill="rgba(224,126,100,.14)" stroke="var(--thorax)" stroke-width="1.5"/>
+          <text x="200" y="352" fill="var(--paper)" font-size="11" text-anchor="middle">diagnosis &amp; drills</text>
+          <text x="200" y="384" fill="var(--paper-dim)" font-size="10" text-anchor="middle">one monotonic clock underneath all of it</text>
+        </svg>
+        <p class="figcap">Illustrative — two independent ladders converging on one shared timebase.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. DEVICE INTEGRATION -->
+  <section id="devices" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Device integration</span>
+        <h2 class="xh">Four transports, <em>one contract</em></h2>
+        <p class="xlede">A Bluetooth sensor, a USB3 machine-vision camera, a microphone and a phone over the network have nothing in common physically. They have everything in common structurally: each is a <em>source</em> that registers with the central buffer, writes raw bytes into its own ring, and deregisters when the user lets it go.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">BLE</span><div><h4>Bluetooth sensors</h4><p>Wrist and torso IMUs over Qt Bluetooth LE. Scanning is asynchronous and continuous; a device appears in the list the moment it is discovered, and connecting is what constructs the instance that registers a source.</p></div></li>
+          <li class="point"><span class="pi cyan">CAM</span><div><h4>Cameras</h4><p>Four backends behind one interface — UVC webcams, Aravis (GenICam), Spinnaker (Teledyne&nbsp;/&nbsp;FLIR) and AVFoundation on macOS. One shared view component publishes each camera's frames to every subscriber, so the same feed can appear on several screens at once.</p></div></li>
+          <li class="point"><span class="pi coral">MIC</span><div><h4>Microphone</h4><p>One active input, feeding two independent consumers: local speech-to-text, and an onset detector listening for the click of impact. The two are gated separately — you can have acoustic shot detection with the voice interface off.</p></div></li>
+          <li class="point"><span class="pi amber">PPCP</span><div><h4>Phone</h4><p>A paired phone joins the session as just another camera. Its streams appear in the device list beside the USB and industrial ones, and the rest of the pipeline cannot tell the difference.</p></div></li>
+        </ul>
+        <div class="callout"><p><strong>Enumerated &#8594; Selected &#8594; Recording &#8594; Deselected.</strong> Every device walks the same four stages, and the invariants are hard: nothing registers at startup, registration happens exactly once inside selection, and the buffer is paused around every register and deregister so the merge thread can never read a half-built or already-freed source. Adding a force plate or a launch monitor is filling in this contract, not extending it.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">SOURCES &#8594; ONE BUFFER</text>
+          <g font-size="10" text-anchor="middle">
+            <circle cx="56" cy="76" r="26" fill="rgba(138,179,137,.14)" stroke="var(--arm)" stroke-width="1.4"/>
+            <text x="56" y="80" fill="var(--arm)">BLE</text>
+            <circle cx="150" cy="62" r="26" fill="rgba(123,192,219,.14)" stroke="var(--club)" stroke-width="1.4"/>
+            <text x="150" y="66" fill="var(--club)">CAM</text>
+            <circle cx="250" cy="62" r="26" fill="rgba(224,126,100,.14)" stroke="var(--thorax)" stroke-width="1.4"/>
+            <text x="250" y="66" fill="var(--thorax)">MIC</text>
+            <circle cx="344" cy="76" r="26" fill="rgba(230,172,84,.14)" stroke="var(--accent)" stroke-width="1.4"/>
+            <text x="344" y="80" fill="var(--accent)">PPCP</text>
+          </g>
+          <g fill="none" stroke-width="1.8" stroke-dasharray="5 4" class="an-flow">
+            <path d="M56 102 L120 152" stroke="var(--arm)"/>
+            <path d="M150 88 L172 152" stroke="var(--club)"/>
+            <path d="M250 88 L228 152" stroke="var(--thorax)"/>
+            <path d="M344 102 L280 152" stroke="var(--accent)"/>
+          </g>
+          <rect x="60" y="154" width="280" height="46" rx="9" fill="rgba(242,237,226,.05)" stroke="var(--line-strong)" stroke-width="1.4"/>
+          <text x="200" y="174" fill="var(--paper)" font-size="11" text-anchor="middle">registerSource( )</text>
+          <text x="200" y="190" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">buffer paused around every register / deregister</text>
+          <g stroke="var(--line-strong)" stroke-width="1.2" fill="rgba(242,237,226,.03)">
+            <rect x="60" y="216" width="64" height="52" rx="6"/>
+            <rect x="132" y="216" width="64" height="52" rx="6"/>
+            <rect x="204" y="216" width="64" height="52" rx="6"/>
+            <rect x="276" y="216" width="64" height="52" rx="6"/>
+          </g>
+          <g fill="var(--paper-dim)" font-size="9" text-anchor="middle">
+            <text x="92" y="238">ring</text><text x="92" y="252">cam0</text>
+            <text x="164" y="238">ring</text><text x="164" y="252">cam1</text>
+            <text x="236" y="238">ring</text><text x="236" y="252">imu</text>
+            <text x="308" y="238">ring</text><text x="308" y="252">audio</text>
+          </g>
+          <line x1="200" y1="270" x2="200" y2="294" stroke="var(--paper-dim)" stroke-width="1.6" stroke-dasharray="4 4" class="an-flow"/>
+          <rect x="60" y="296" width="280" height="34" rx="8" fill="rgba(230,172,84,.12)" stroke="var(--accent)" stroke-width="1.4"/>
+          <text x="200" y="317" fill="var(--paper)" font-size="11" text-anchor="middle">merger thread &#8594; unified timeline</text>
+          <text x="200" y="360" fill="var(--paper-dim)" font-size="10" text-anchor="middle">Enumerated &#8594; Selected &#8594; Recording &#8594; Deselected</text>
+          <text x="200" y="378" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".7">the same four stages for every device type</text>
+        </svg>
+        <p class="figcap">Illustrative — heterogeneous devices, one registration contract.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. HARDWARE -->
+  <section id="hardware" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Device specifics</span>
+        <h2 class="xh">What's actually <em>in the bay</em></h2>
+        <p class="xlede">The abstraction above is real, but the devices underneath it each have a personality — and most of the awkward engineering in this project is a consequence of one of them.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>WitMotion WT901BLE67</h4><p>A six-axis BLE IMU: accelerometer and gyroscope at 10&ndash;200&nbsp;Hz, 100&nbsp;Hz by default. <strong>Its on-board fused orientation is deliberately discarded</strong> — measured against real motion, its joint axes came out 15&ndash;50&deg; off and it gimbals near &plusmn;90&deg; pitch, while its raw inertials are faithful to a fifth of a degree. We re-derive orientation on the host instead, with a selectable Madgwick or ESKF filter.</p></div></li>
+          <li class="point"><span class="pi amber">2</span><div><h4>HackMotion wG3</h4><p>A wrist instrument carrying <em>two</em> sensing units in one strap — lower arm and palm — so a single device fills both wrist slots. It exists in the pipeline as a criterion instrument: two independently-fusing six-axis sensors cannot agree on heading, and the error lands exactly on the bow/cup versus hinge split. Measured, its relative angle held to <strong>0.58&deg; over five minutes</strong> while its two units individually drifted 1.95&deg; and 1.13&deg;. It is also the device that forced the delayed-fetch work below.</p></div></li>
+          <li class="point"><span class="pi cyan">3</span><div><h4>Teledyne FLIR (Chameleon3)</h4><p>USB3&nbsp;Vision / GenICam, <strong>global shutter</strong> — no rolling-shutter skew on a club moving past 100&nbsp;mph — and no compressed output at all: Mono8, Mono12, Bayer, YUV. Raw Bayer bytes are kept off the CPU hot path entirely; a GPU shader demosaics for display at screen rate while the pose estimator gets a properly demosaiced frame at its own, slower rate.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>The phone, over PPCP</h4><p>The PinPoint Capture Protocol: <strong>TLS 1.3 with an external pre-shared key</strong>, no unencrypted mode, carried either over WiFi (the phone dials the host) or over a USB cable (the host dials the phone through Apple's usbmux tunnel). Pairing is a QR code; discovery afterwards is DNS-SD. Every optional part degrades to <em>absent</em>, never broken — no discovery still leaves pairing working, no usbmux just means the cable is never offered.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">A TYPICAL BAY</text>
+          <g stroke="rgba(242,237,226,.18)" stroke-width="2" fill="none">
+            <line x1="238" y1="128" x2="238" y2="232"/>
+            <line x1="238" y1="232" x2="212" y2="336"/>
+            <line x1="238" y1="232" x2="266" y2="336"/>
+            <line x1="210" y1="148" x2="266" y2="148"/>
+            <line x1="210" y1="148" x2="222" y2="248"/>
+            <line x1="266" y1="148" x2="222" y2="248"/>
+          </g>
+          <line x1="222" y1="248" x2="176" y2="330" stroke="var(--club)" stroke-width="3" class="an-shaft"/>
+          <circle cx="238" cy="112" r="15" fill="none" stroke="rgba(242,237,226,.18)" stroke-width="2"/>
+          <circle cx="238" cy="156" r="5.5" fill="var(--thorax)"/>
+          <circle cx="238" cy="212" r="5.5" fill="var(--pelvis)"/>
+          <circle cx="222" cy="248" r="5.5" fill="var(--arm)"/>
+          <circle cx="222" cy="248" r="12" fill="none" stroke="var(--arm)" stroke-width="1.4" class="an-node"/>
+          <g font-size="9.5">
+            <text x="250" y="160" fill="var(--thorax)">thorax IMU</text>
+            <text x="250" y="216" fill="var(--pelvis)">pelvis IMU</text>
+            <text x="140" y="252" fill="var(--arm)">wrist unit</text>
+          </g>
+          <path d="M34 96 L86 72 L86 120 Z" fill="rgba(123,192,219,.18)" stroke="var(--club)" stroke-width="1.2"/>
+          <circle cx="38" cy="96" r="3.5" fill="var(--paper)"/>
+          <text x="30" y="140" fill="var(--paper-dim)" font-size="9.5">FLIR face-on</text>
+          <rect x="40" y="196" width="30" height="52" rx="5" fill="rgba(230,172,84,.14)" stroke="var(--accent)" stroke-width="1.2"/>
+          <rect x="47" y="204" width="16" height="26" rx="2" fill="rgba(230,172,84,.3)"/>
+          <text x="26" y="266" fill="var(--paper-dim)" font-size="9.5">phone (PPCP)</text>
+          <g stroke="var(--thorax)" stroke-width="1.2" fill="none">
+            <path d="M330 210 a 14 14 0 0 1 0 28"/>
+            <path d="M336 204 a 22 22 0 0 1 0 40" opacity=".6"/>
+            <path d="M342 198 a 30 30 0 0 1 0 52" opacity=".35"/>
+          </g>
+          <circle cx="322" cy="224" r="7" fill="rgba(224,126,100,.3)" stroke="var(--thorax)" stroke-width="1.2"/>
+          <text x="300" y="256" fill="var(--paper-dim)" font-size="9.5">microphone</text>
+          <line x1="30" y1="352" x2="370" y2="352" stroke="rgba(242,237,226,.14)" stroke-width="2"/>
+          <circle cx="196" cy="345" r="4.5" fill="var(--paper)"/>
+          <text x="200" y="378" fill="var(--paper-dim)" font-size="10" text-anchor="middle">off-the-shelf kit &#183; no sealed rig &#183; nothing leaves the machine</text>
+        </svg>
+        <p class="figcap">Illustrative — cameras, wrist and torso sensors, a phone and a mic.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. IMU CALIBRATION -->
+  <section id="imucal" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Calibration &middot; inertial</span>
+        <h2 class="xh">From a strap angle to <em>an anatomy</em></h2>
+        <p class="xlede">A sensor knows its own orientation in the world. It knows nothing about the arm it is taped to. Calibration is the step that turns one into the other, and it is a single composition applied everywhere: <span class="formula">q_anat = A &middot; q_raw &middot; M</span>.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">M</span><div><h4>The mount</h4><p>A constant per strap convention — how the sensor body sits on the limb. For a dorsal hand mount it is solved numerically rather than assumed; for arm segments it is a fixed convention.</p></div></li>
+          <li class="point"><span class="pi green">A</span><div><h4>The reference pose</h4><p>Solved <em>per session</em>, so the anatomical frame is identity at a pose the golfer actually held. The wizard captures two: arm at rest, then a T-pose, each requiring three cumulative seconds of stillness before it is accepted.</p></div></li>
+          <li class="point"><span class="pi amber">&Delta;</span><div><h4>Joints are relative</h4><p>Running six-axis with no magnetometer means yaw is unobservable and drifts. It cancels: a joint angle is the <strong>relative</strong> rotation between two segments, so a drift shared by both sensors disappears in the subtraction. That is why two-sensor wrist angles work at all.</p></div></li>
+          <li class="point"><span class="pi coral">!</span><div><h4>What it costs</h4><p>The cancellation is not perfect. Roughly <strong>10&ndash;15&deg; of cross-talk</strong> remains between flexion/extension and radial/ulnar deviation, because the heading the two sensors disagree on lands squarely on that split. It is documented in the header of the file that computes it, and it is why a criterion instrument matters.</p></div></li>
+        </ul>
+        <div class="callout"><p>Orientation is stored and computed as <strong>quaternions, never Euler angles</strong> — Euler exists only as a label on a screen. The stored sample keeps accelerometer, gyroscope and quaternion all in the one raw sensor frame, so nothing downstream has to guess which frame a field is in.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">SENSOR FRAME &#8594; ANATOMICAL</text>
+          <g transform="translate(100,140)">
+            <rect x="-30" y="-22" width="60" height="44" rx="5" transform="rotate(-24)" fill="rgba(242,237,226,.06)" stroke="var(--paper-dim)" stroke-width="1.3"/>
+            <line x1="0" y1="0" x2="46" y2="-20" stroke="var(--thorax)" stroke-width="2"/>
+            <line x1="0" y1="0" x2="20" y2="44" stroke="var(--arm)" stroke-width="2"/>
+            <line x1="0" y1="0" x2="-40" y2="-16" stroke="var(--club)" stroke-width="2"/>
+            <text x="50" y="-22" fill="var(--thorax)" font-size="9.5">x</text>
+            <text x="24" y="54" fill="var(--arm)" font-size="9.5">y</text>
+            <text x="-52" y="-18" fill="var(--club)" font-size="9.5">z</text>
+          </g>
+          <text x="100" y="220" fill="var(--paper-dim)" font-size="10" text-anchor="middle">q_raw</text>
+          <path d="M154 168 L246 168" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 4" class="an-flow"/>
+          <text x="200" y="158" fill="var(--accent)" font-size="10.5" text-anchor="middle">A &#183; q &#183; M</text>
+          <g transform="translate(300,140)">
+            <rect x="-30" y="-22" width="60" height="44" rx="5" fill="rgba(138,179,137,.08)" stroke="var(--arm)" stroke-width="1.3"/>
+            <line x1="0" y1="0" x2="48" y2="0" stroke="var(--thorax)" stroke-width="2"/>
+            <line x1="0" y1="0" x2="0" y2="48" stroke="var(--arm)" stroke-width="2"/>
+            <line x1="0" y1="0" x2="-34" y2="-26" stroke="var(--club)" stroke-width="2"/>
+            <text x="54" y="4" fill="var(--thorax)" font-size="9.5">flexion</text>
+            <text x="-16" y="60" fill="var(--arm)" font-size="9.5">long</text>
+            <text x="-58" y="-28" fill="var(--club)" font-size="9.5">dorsal</text>
+          </g>
+          <text x="300" y="220" fill="var(--paper-dim)" font-size="10" text-anchor="middle">q_anat</text>
+          <line x1="40" y1="252" x2="360" y2="252" stroke="var(--line)" stroke-width="1"/>
+          <text x="200" y="278" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">THE JOINT IS THE DIFFERENCE</text>
+          <rect x="52" y="294" width="90" height="30" rx="6" fill="rgba(138,179,137,.12)" stroke="var(--arm)" stroke-width="1.3"/>
+          <text x="97" y="313" fill="var(--paper)" font-size="10.5" text-anchor="middle">forearm</text>
+          <rect x="258" y="294" width="90" height="30" rx="6" fill="rgba(123,192,219,.12)" stroke="var(--club)" stroke-width="1.3"/>
+          <text x="303" y="313" fill="var(--paper)" font-size="10.5" text-anchor="middle">hand</text>
+          <path d="M146 309 L254 309" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <text x="200" y="303" fill="var(--accent)" font-size="10" text-anchor="middle">q&#8315;&#185;&#183;q</text>
+          <text x="200" y="352" fill="var(--paper-dim)" font-size="10" text-anchor="middle">shared yaw drift cancels in the relative rotation</text>
+          <text x="200" y="376" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".7">bow/cup on Z &#183; hinge on X &#183; roll on Y</text>
+        </svg>
+        <p class="figcap">Illustrative — the mount, the reference pose, and why joints beat segments.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. CAMERA CALIBRATION -->
+  <section id="camcal" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge dev"><i></i>Calibration &middot; optical</span>
+        <h2 class="xh">Four questions, and <em>a golf ball</em></h2>
+        <p class="xlede">Camera calibration is not one thing. It answers four separate questions, and an operator may only need some of them — but one of the four is a precondition for the other three.</p>
+        <ul class="points">
+          <li class="point"><span class="pi amber">1</span><div><h4>Focus first, or none of it counts</h4><p>A solve computed from soft corners returns small residuals and large errors, and nothing in the arithmetic tells you. So focus sits <em>inside</em> calibration rather than beside it in a settings panel — and it is handled by what the camera can do (read the lens position, lock it, or nothing at all), never by which driver it happens to use.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>Scale, distortion, pose</h4><p>Millimetres per pixel at the hitting plane; whether a straight line is straight; where this camera sits relative to the ball and the other cameras. Clubhead speed needs the first, shaft angle away from frame centre needs the second, anything 3D needs the third.</p></div></li>
+          <li class="point"><span class="pi green">3</span><div><h4>A tier ladder, declared per swing</h4><p>From nothing at all, through factory intrinsics, through a known-size object, to a printed ChArUco board and finally board-derived extrinsics. <strong>Every swing records the tier it was captured under</strong>, and a metric that needs scale reads that and refuses rather than producing a number in fictional millimetres.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>The ball is the best reference in the building</h4><p>A golf ball is <strong>42.67&nbsp;mm</strong>, spherical (so its projected diameter is independent of orientation), high-contrast against a mat, at exactly the plane that matters — and present in every single shot. That makes it both a calibration reference for an operator with no board <em>and</em> a permanent, free verifier: if its diameter in pixels drifts while the bay is nominally unchanged, something moved.</p></div></li>
+        </ul>
+        <div class="callout"><p>Every calibration record carries a <strong>mandatory uncertainty</strong>. A calibration without an error bar cannot be verified, cannot be compared to a later one, and cannot tell a metric whether to trust it. A ball ~40&nbsp;px across measured to &plusmn;1&nbsp;px is &plusmn;2.5&nbsp;% scale — that is a real number, and it is carried rather than rounded away.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">THE TIER LADDER</text>
+          <g stroke-width="1.4">
+            <rect x="46" y="256" width="308" height="34" rx="6" fill="rgba(242,237,226,.04)" stroke="var(--paper-dim)"/>
+            <rect x="46" y="212" width="308" height="34" rx="6" fill="rgba(224,126,100,.10)" stroke="var(--thorax)"/>
+            <rect x="46" y="168" width="308" height="34" rx="6" fill="rgba(230,172,84,.12)" stroke="var(--accent)"/>
+            <rect x="46" y="124" width="308" height="34" rx="6" fill="rgba(123,192,219,.12)" stroke="var(--club)"/>
+            <rect x="46" y="80" width="308" height="34" rx="6" fill="rgba(138,179,137,.14)" stroke="var(--arm)"/>
+          </g>
+          <g fill="var(--paper)" font-size="10.5">
+            <text x="62" y="278">0 &#183; nothing</text>
+            <text x="62" y="234">1 &#183; factory intrinsics</text>
+            <text x="62" y="190">2 &#183; known-size object</text>
+            <text x="62" y="146">3 &#183; ChArUco solve</text>
+            <text x="62" y="102">4 &#183; + extrinsics</text>
+          </g>
+          <g fill="var(--paper-dim)" font-size="9" text-anchor="end">
+            <text x="342" y="278">pixels only</text>
+            <text x="342" y="234">approx scale</text>
+            <text x="342" y="190">scale + error bar</text>
+            <text x="342" y="146">+ distortion</text>
+            <text x="342" y="102">everything, in a bay frame</text>
+          </g>
+          <circle cx="200" cy="326" r="15" fill="var(--paper)" opacity=".85"/>
+          <circle cx="200" cy="326" r="24" fill="none" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 4" class="an-node"/>
+          <line x1="185" y1="352" x2="215" y2="352" stroke="var(--accent)" stroke-width="1.6"/>
+          <line x1="185" y1="348" x2="185" y2="356" stroke="var(--accent)" stroke-width="1.6"/>
+          <line x1="215" y1="348" x2="215" y2="356" stroke="var(--accent)" stroke-width="1.6"/>
+          <text x="200" y="374" fill="var(--accent)" font-size="10" text-anchor="middle">42.67 mm &#183; in every single frame</text>
+          <text x="200" y="60" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">focus gates all of it &#183; uncertainty is mandatory</text>
+        </svg>
+        <p class="figcap">Illustrative — what an operator gets with what they own.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. RING BUFFER -->
+  <section id="buffer" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>Capture &middot; the ring</span>
+        <h2 class="xh">Always recording, <em>never allocating</em></h2>
+        <p class="xlede">A swing you didn't know was coming has to be already in memory when you find out. So the app records continuously into pre-allocated rings and simply stops throwing the last few seconds away when a shot fires.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>One ring per source, sized once</h4><p>A fixed window per source, allocated at registration and never again — no allocation on the hot path, ever. Slot counts are powers of two: 60&nbsp;fps over five seconds is 300 frames, which rounds to 512. Two 1080p60 mono cameras plus three sensors is around 2&nbsp;GB of RAM, deliberately spent.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Lock-free, single producer</h4><p>Each capture thread is the only writer to its own ring; slots are framed by generation counters so a reader can tell it was overtaken mid-read and retry. Consumers track sequence numbers, so an overrun is <em>detected</em> rather than silently papered over. Drop-oldest, never backpressure — a slow consumer must never stall a camera.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Raw bytes, described not interpreted</h4><p>The buffer stores exactly what the device delivered — a Bayer mosaic stays a Bayer mosaic — alongside a format descriptor. Nothing in the buffer knows what a golf swing is.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>A shot freezes a window</h4><p>On a shot the rings keep filling through a short post-roll so the follow-through lands inside, then pause. The trailing window is frozen as an immutable object that analysis and export both read <strong>zero-copy and const</strong>. Two runs over the same frozen window are byte-identical — which is exactly what makes corpus-scale regression testing a plain diff.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">CIRCULAR, DROP-OLDEST</text>
+          <circle cx="200" cy="180" r="116" fill="none" stroke="rgba(242,237,226,.08)" stroke-width="22"/>
+          <path d="M 200 64 A 116 116 0 0 1 316 180" fill="none" stroke="var(--club)" stroke-width="22" opacity=".55"/>
+          <path d="M 316 180 A 116 116 0 0 1 200 296" fill="none" stroke="var(--arm)" stroke-width="22" opacity=".55"/>
+          <path d="M 200 296 A 116 116 0 0 1 84 180" fill="none" stroke="var(--pelvis)" stroke-width="22" opacity=".5"/>
+          <g class="an-scan" style="transform-origin:200px 180px">
+            <line x1="200" y1="180" x2="200" y2="52" stroke="var(--accent)" stroke-width="2.5"/>
+            <circle cx="200" cy="64" r="7" fill="var(--accent)"/>
+          </g>
+          <circle cx="200" cy="180" r="66" fill="#0A1216" stroke="var(--line)" stroke-width="1"/>
+          <text x="200" y="170" fill="var(--paper)" font-size="12" text-anchor="middle">5 s</text>
+          <text x="200" y="190" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">pre-allocated</text>
+          <text x="200" y="206" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">512 slots</text>
+          <text x="326" y="132" fill="var(--club)" font-size="9.5">writing</text>
+          <text x="300" y="272" fill="var(--arm)" font-size="9.5">recent</text>
+          <text x="52" y="272" fill="var(--pelvis)" font-size="9.5">oldest</text>
+          <rect x="60" y="318" width="280" height="32" rx="7" fill="rgba(224,126,100,.12)" stroke="var(--thorax)" stroke-width="1.4"/>
+          <text x="200" y="338" fill="var(--paper)" font-size="10.5" text-anchor="middle">SHOT &#8594; post-roll &#8594; pause &#8594; freeze window</text>
+          <text x="200" y="372" fill="var(--paper-dim)" font-size="10" text-anchor="middle">frozen, const, zero-copy &#183; two runs are byte-identical</text>
+        </svg>
+        <p class="figcap">Illustrative — the ring is always turning; a shot decides what to keep.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CLOCK -->
+  <section id="clock" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Capture &middot; clock alignment</span>
+        <h2 class="xh">Everything arrives late, <em>differently</em></h2>
+        <p class="xlede">A camera frame, a Bluetooth packet and an audio buffer describing the same instant arrive at different times, each delayed by its own capture chain. Aligning them is the linchpin of the whole design — get it wrong and every metric is quietly measured against the wrong moment.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>One clock, read at first touch</h4><p>Every timestamp in the app comes from a single shared monotonic clock — never wall time, never a per-device clock — and reading it is the <em>first executable statement</em> in every device callback. Where a device supplies its own hardware timestamp it is anchored to that clock at the first packet and re-anchored periodically through a low-pass filter to stop drift.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>The buffer never compensates</h4><p>Latency is deliberately <em>not</em> corrected inside the buffer. Sources are stamped at arrival, honestly; each detector back-dates by its own known latency when it makes a claim. One place to be wrong is better than four.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Three detectors, one arbiter</h4><p>The sensor sees a shock, the mic hears a click, the ball's response in the hitting area collapses off a cliff. Each back-dates and reports a candidate; the first opens a <strong>200&nbsp;ms hold window</strong>; at the deadline the arbiter commits once — when two <em>distinct</em> modalities agree, or one is decisively strong. Two acoustic onsets are one voice, not two.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Audio pinpoints, the rest confirm</h4><p>When modalities agree their estimates differ by a few milliseconds, so the committed timestamp comes from the highest-authority one — <strong>acoustic before inertial before vision</strong> — because audio is sample-accurate with stable latency while the others are coarse. That instant is written into the buffer as a marker before anything downstream is told a shot happened.</p></div></li>
+          <li class="point"><span class="pi cyan">5</span><div><h4>And the phone, which has its own clock entirely</h4><p>A phone's clock shares no origin with the host's. PPCP runs a sync estimator that publishes an offset <em>and its sigma</em>. Measured on an iPhone: offset &sigma; <strong>1.16&nbsp;ms over WiFi</strong>, <strong>0.34&nbsp;ms and 3.3&nbsp;ppm skew over the cable</strong>. The estimator refuses to claim better than half the minimum round-trip time, so the number is floored by physics rather than optimism.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">BACK-DATING TO IMPACT</text>
+          <line x1="120" y1="52" x2="120" y2="234" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="120" y="250" fill="var(--accent)" font-size="10" text-anchor="middle">true impact</text>
+          <g stroke-width="2">
+            <line x1="40" y1="90" x2="360" y2="90" stroke="rgba(242,237,226,.10)"/>
+            <line x1="40" y1="150" x2="360" y2="150" stroke="rgba(242,237,226,.10)"/>
+            <line x1="40" y1="210" x2="360" y2="210" stroke="rgba(242,237,226,.10)"/>
+          </g>
+          <g font-size="9.5" fill="var(--paper-dim)">
+            <text x="40" y="80">acoustic</text>
+            <text x="40" y="140">inertial</text>
+            <text x="40" y="200">vision</text>
+          </g>
+          <circle cx="160" cy="90" r="7" fill="var(--thorax)"/>
+          <circle cx="236" cy="150" r="7" fill="var(--arm)"/>
+          <circle cx="292" cy="210" r="7" fill="var(--club)"/>
+          <g stroke-dasharray="4 4" stroke-width="1.8" class="an-flow">
+            <line x1="153" y1="90" x2="124" y2="90" stroke="var(--thorax)"/>
+            <line x1="229" y1="150" x2="124" y2="150" stroke="var(--arm)"/>
+            <line x1="285" y1="210" x2="124" y2="210" stroke="var(--club)"/>
+          </g>
+          <g font-size="9" fill="var(--paper-dim)" text-anchor="middle">
+            <text x="196" y="82">arrival</text>
+            <text x="240" y="142">&#8722; transport latency</text>
+            <text x="296" y="202">&#8722; frame age</text>
+          </g>
+          <rect x="60" y="278" width="280" height="46" rx="8" fill="rgba(230,172,84,.12)" stroke="var(--accent)" stroke-width="1.4"/>
+          <text x="200" y="297" fill="var(--paper)" font-size="10.5" text-anchor="middle">arbiter &#183; 200 ms hold</text>
+          <text x="200" y="313" fill="var(--paper-dim)" font-size="9" text-anchor="middle">two modalities agree, or one is decisively strong</text>
+          <text x="200" y="352" fill="var(--paper-dim)" font-size="10" text-anchor="middle">authority: acoustic &gt; inertial &gt; vision</text>
+          <text x="200" y="374" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".7">the commit writes one marker, then the pipeline runs</text>
+        </svg>
+        <p class="figcap">Illustrative — three arrivals, one committed instant.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. DEFERRED -->
+  <section id="deferred" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge dev"><i></i>Capture &middot; delayed fetch</span>
+        <h2 class="xh">Some data <em>arrives afterwards</em></h2>
+        <p class="xlede">Every source described so far is a live producer: by the time the window freezes, everything that will ever exist for that shot is already in the ring. One class of device breaks that assumption entirely — it holds the real record internally and will only hand it over if you ask, after the fact.</p>
+        <ul class="points">
+          <li class="point"><span class="pi coral">1</span><div><h4>Arrival time carries no information</h4><p>A deferred source's samples land thousands at a time, in no relation to when they were measured. They must carry their own host-clock timestamps or they cannot be placed on the swing timeline at all — which is the whole reason the clock work above has to be exact.</p></div></li>
+          <li class="point"><span class="pi amber">2</span><div><h4>The window is still built once, and still const</h4><p>Nothing became mutable. What changed is that "delivered" is no longer simultaneous with "frozen": the rings freeze on time, the pipeline enters a short <strong>gathering</strong> state, and the window is constructed once the deferred sources have reported or their deadline has passed. No stage ever sees a window growing under it.</p></div></li>
+          <li class="point"><span class="pi green">3</span><div><h4>The stitch, and what it costs</h4><p>The live link carries a thin, decimated view while the device holds the dense record. The pull is not free: the device's own sample counter stalls for the duration — measured at <strong>289&nbsp;ms mean</strong> across six pulls — so the clock fit has to re-anchor at every bracket rather than span one.</p></div></li>
+          <li class="point"><span class="pi cyan">4</span><div><h4>Motion-adaptive, not fixed rate</h4><p>The replayed record isn't a flat 800&nbsp;Hz. It is adaptive: a still pre-roll comes back at about 100&nbsp;Hz, the downswing at nearly 800&nbsp;Hz. Coverage of 16&ndash;50&nbsp;% of the window is the <em>correct</em> answer, not a fault — and asking for a narrower window does not come back denser, because density is set by the motion.</p></div></li>
+        </ul>
+        <div class="callout"><p>The seam this needed already existed. The offline re-analysis path had been feeding the same frozen-window type from disk rather than from the ring for months — so a deferred source is a second implementation of a backing that was already in production, not a new hole cut in the buffer.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">FREEZE, GATHER, BUILD</text>
+          <text x="46" y="70" fill="var(--paper-dim)" font-size="9.5">live rings</text>
+          <rect x="46" y="78" width="200" height="24" rx="4" fill="rgba(123,192,219,.20)" stroke="var(--club)" stroke-width="1.2"/>
+          <text x="146" y="95" fill="var(--paper)" font-size="9.5" text-anchor="middle">continuous</text>
+          <line x1="246" y1="64" x2="246" y2="300" stroke="var(--thorax)" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="246" y="58" fill="var(--thorax)" font-size="9.5" text-anchor="middle">freeze</text>
+          <text x="46" y="136" fill="var(--paper-dim)" font-size="9.5">deferred device</text>
+          <rect x="46" y="144" width="200" height="24" rx="4" fill="rgba(138,179,137,.10)" stroke="var(--arm)" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <text x="146" y="161" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">decimated live view</text>
+          <path d="M246 156 L300 156" stroke="var(--arm)" stroke-width="2" stroke-dasharray="5 4" class="an-flow" fill="none"/>
+          <rect x="300" y="140" width="56" height="32" rx="6" fill="rgba(138,179,137,.16)" stroke="var(--arm)" stroke-width="1.3"/>
+          <text x="328" y="160" fill="var(--paper)" font-size="9.5" text-anchor="middle">pull</text>
+          <path d="M328 176 L328 200 L146 200 L146 216" fill="none" stroke="var(--arm)" stroke-width="1.8" stroke-dasharray="5 4" class="an-flow"/>
+          <text x="46" y="212" fill="var(--paper-dim)" font-size="9.5">stitched lane</text>
+          <g>
+            <rect x="46" y="218" width="60" height="24" rx="4" fill="rgba(138,179,137,.18)" stroke="var(--arm)" stroke-width="1.2"/>
+            <rect x="108" y="218" width="80" height="24" rx="4" fill="rgba(138,179,137,.45)" stroke="var(--arm)" stroke-width="1.2"/>
+            <rect x="190" y="218" width="56" height="24" rx="4" fill="rgba(138,179,137,.18)" stroke="var(--arm)" stroke-width="1.2"/>
+          </g>
+          <text x="76" y="256" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">~100 Hz</text>
+          <text x="148" y="256" fill="var(--arm)" font-size="8.5" text-anchor="middle">~800 Hz</text>
+          <text x="218" y="256" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">~100 Hz</text>
+          <rect x="60" y="286" width="280" height="34" rx="8" fill="rgba(230,172,84,.12)" stroke="var(--accent)" stroke-width="1.4"/>
+          <text x="200" y="307" fill="var(--paper)" font-size="10.5" text-anchor="middle">window built once &#183; const for its whole life</text>
+          <text x="200" y="352" fill="var(--paper-dim)" font-size="10" text-anchor="middle">density follows the motion, not the request</text>
+          <text x="200" y="374" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".7">nothing downstream knows a source was late</text>
+        </svg>
+        <p class="figcap">Illustrative — the freeze instant and the delivery instant come apart.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. POSE -->
+  <section id="pose" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>Inference &middot; pose</span>
+        <h2 class="xh">The body, <em>down to the knuckles</em></h2>
+        <p class="xlede">Pose is the substrate everything optical stands on: the shaft tracker anchors on the hands, the body metrics read joint geometry, the segmentation falls back to it. Two entirely different models run, in two regimes, for two purposes — and the one that matters for measurement is not the one you watch on screen.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Live: a preview, and only a preview</h4><p>The skeleton drawn over the running camera feed is MoveNet Lightning or Thunder — 17 body joints, GPU-accelerated through ONNX Runtime (CoreML on Apple Silicon, CUDA on Linux and Windows), throttled so inference lag never exceeds one cycle: while the model is busy the newest frame simply overwrites the pending one. It exists so you can see the capture is working. <strong>No measurement is ever taken from it.</strong></p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Offline: 133 landmarks, whole body</h4><p>The analysis runs <strong>ViTPose whole-body</strong> over the frozen window — a 256&times;192 crop in, a 133-channel heatmap stack out: <strong>17 body joints, 6 for the feet, 68 across the face and 21 landmarks per hand</strong>. Two tiers ship — a ~330&nbsp;MB base model bundled, a 1.23&nbsp;GB large one on demand — through one decode path. The model computes all 133 channels either way, so reading the whole set costs nothing at inference time.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>What the extra landmarks buy</h4><p>The feet give a ground line at <em>shoe</em> level rather than the ankle — 8 to 12&nbsp;cm lower — which tightens the ball search region and yields real stance width, foot flare and toe-line direction. The hands give the grip anchor the shaft tracker pivots on. And each swing is posed inside one fixed, aspect-locked person crop, so the golfer fills the model's input instead of occupying a corner of a 1080p frame.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Effort spent where the swing moves</h4><p>Frames are <em>not</em> sampled uniformly: dense around impact, roughly four times sparser through mid-swing, a long stride across the address hold. The pose pass dominates the analysis wall-clock, so it is bounded to the detected swing span and concentrated where the club is actually accelerating.</p></div></li>
+          <li class="point"><span class="pi cyan">5</span><div><h4>Smoothing that can see the future</h4><p>Because the window is frozen, the smoother is allowed to be non-causal. Every landmark coordinate gets its own three-state constant-jerk Kalman filter with a fixed-interval smoother pass back over it — <strong>266 of them, one per axis per landmark</strong> — rebuilt at each step for the uneven sampling, with a 3&sigma; gate rejecting outliers and a coast budget measured in time rather than frames. The classic occluded trail wrist at the top becomes a gap the backward pass bridges, and every smoothed point carries its own posterior sigma.</p></div></li>
+          <li class="point"><span class="pi green">6</span><div><h4>Deterministic, on purpose</h4><p>The same window in gives the same track out, every time. That is not an accident of the model — it is a property the whole validation harness depends on.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="24" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">THE OFFLINE PASS</text>
+          <text x="200" y="42" fill="var(--paper-dim)" font-size="9" text-anchor="middle" opacity=".7">133 whole-body landmarks, sampled where it matters</text>
+          <line x1="40" y1="120" x2="360" y2="120" stroke="rgba(242,237,226,.14)" stroke-width="1.5"/>
+          <g fill="var(--paper-dim)">
+            <circle cx="52" cy="120" r="2.5"/><circle cx="88" cy="120" r="2.5"/><circle cx="124" cy="120" r="2.5"/>
+          </g>
+          <g fill="var(--club)">
+            <circle cx="150" cy="120" r="3"/><circle cx="168" cy="120" r="3"/><circle cx="186" cy="120" r="3"/>
+            <circle cx="204" cy="120" r="3"/>
+          </g>
+          <g fill="var(--accent)">
+            <circle cx="216" cy="120" r="4"/><circle cx="224" cy="120" r="4"/><circle cx="232" cy="120" r="4"/>
+            <circle cx="240" cy="120" r="4"/><circle cx="248" cy="120" r="4"/><circle cx="256" cy="120" r="4"/>
+            <circle cx="264" cy="120" r="4"/><circle cx="272" cy="120" r="4"/>
+          </g>
+          <g fill="var(--club)">
+            <circle cx="292" cy="120" r="3"/><circle cx="312" cy="120" r="3"/><circle cx="336" cy="120" r="3"/>
+          </g>
+          <line x1="244" y1="88" x2="244" y2="152" stroke="var(--thorax)" stroke-width="1.6" stroke-dasharray="4 3"/>
+          <text x="244" y="82" fill="var(--thorax)" font-size="9.5" text-anchor="middle">impact</text>
+          <g fill="var(--paper-dim)" font-size="9" text-anchor="middle">
+            <text x="88" y="146">address hold</text>
+            <text x="177" y="146">mid-swing</text>
+            <text x="244" y="166">dense</text>
+            <text x="314" y="146">through</text>
+          </g>
+          <text x="200" y="204" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">THEN SMOOTHED BOTH WAYS</text>
+          <path d="M50 300 L84 262 L118 296 L152 250 L186 288 L220 244 L254 278 L288 240 L322 268 L352 248"
+                fill="none" stroke="var(--paper-dim)" stroke-width="1.4" opacity=".5"/>
+          <g fill="var(--paper-dim)" opacity=".55">
+            <circle cx="84" cy="262" r="2.5"/><circle cx="152" cy="250" r="2.5"/><circle cx="220" cy="244" r="2.5"/>
+            <circle cx="288" cy="240" r="2.5"/>
+          </g>
+          <path d="M50 296 C 110 280, 160 268, 210 258 S 300 244, 352 250"
+                fill="none" stroke="var(--arm)" stroke-width="2.6"/>
+          <text x="62" y="326" fill="var(--paper-dim)" font-size="9.5">raw keypoint</text>
+          <text x="250" y="326" fill="var(--arm)" font-size="9.5">smoothed, non-causal</text>
+          <text x="200" y="366" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">occluded points coast; the backward pass bridges the gap</text>
+        </svg>
+        <p class="figcap">Illustrative — effort concentrated at impact, then filtered in both directions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. BALL -->
+  <section id="ball" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>Inference &middot; ball</span>
+        <h2 class="xh">A white ball on <em>a white mat</em></h2>
+        <p class="xlede">The first ball detector needed a two-minute place-remove-validate calibration. Every swing in the corpus was recorded with it uncalibrated, because nobody ever did the chore — and an uncalibrated detector emits nothing. The lesson was blunt: <strong>reliability begins with removing the user from the loop.</strong></p>
+        <ul class="points">
+          <li class="point"><span class="pi coral">1</span><div><h4>Why the obvious approach fails</h4><p>The hitting area is the brightest spot in the studio. Measured mat luminance directly around the ball ran to fully clipped in one session &mdash; a white ball on a white mat, literally invisible except for its contact shadow. Any cue built on absolute brightness reads zero there, however real the ball is. And a frozen background model meets a scene that never stops changing: the player's shadow sweeps the whole hitting area, and its changed-pixel mass dwarfs a 19-pixel ball by two orders of magnitude.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>What replaced it</h4><p>A self-calibrating temporal matched filter. It learns only the empty mat — one press, no ball-appearance profile, no drift monitor — and then watches a scale-matched response at the spot over time. <strong>Ball presence is a stable signal, not a bright pixel.</strong></p></div></li>
+          <li class="point"><span class="pi green">3</span><div><h4>Stability is the whole tell</h4><p>Across an entire three-and-a-half-second address &mdash; waggle, grounding the club, foot shuffles included &mdash; the response never dropped below about 85&nbsp;% of its median. Then the ball leaves: the response collapses below 10&nbsp;% of its address level within <strong>two frames at 149&nbsp;fps</strong>, about 13&nbsp;ms. That cliff is unmistakable, and it is also a third opinion for the shot arbiter.</p></div></li>
+          <li class="point"><span class="pi amber">4</span><div><h4>And it hands the pipeline a ruler</h4><p>Because the ball is a known 42.67&nbsp;mm and its radius is measured, the same detector supplies the pixels-to-millimetres conversion at the hitting plane, plus a robust address ball centre. Low point, club length and strike geometry all read off it.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">THE LAUNCH CLIFF</text>
+          <rect x="46" y="52" width="308" height="120" rx="6" fill="rgba(242,237,226,.05)" stroke="var(--line)" stroke-width="1"/>
+          <text x="60" y="70" fill="var(--paper-dim)" font-size="9">response at the spot</text>
+          <line x1="60" y1="150" x2="340" y2="150" stroke="rgba(242,237,226,.12)" stroke-width="1"/>
+          <line x1="60" y1="108" x2="248" y2="108" stroke="var(--arm)" stroke-width="1" stroke-dasharray="3 3" opacity=".5"/>
+          <text x="66" y="122" fill="var(--arm)" font-size="8">85 % floor, held across the whole address</text>
+          <path d="M60 90 L90 93 L118 88 L146 94 L174 89 L202 92 L230 90 L248 91 L256 144 L264 156 L340 157"
+                fill="none" stroke="var(--club)" stroke-width="2.4"/>
+          <line x1="252" y1="60" x2="252" y2="166" stroke="var(--thorax)" stroke-width="1.6" stroke-dasharray="4 3"/>
+          <text x="292" y="76" fill="var(--thorax)" font-size="9">2 frames &#183; ~13 ms</text>
+          <text x="140" y="166" fill="var(--paper-dim)" font-size="9" text-anchor="middle">address, ~3.4 s</text>
+          <text x="200" y="204" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">A BALL YOU CANNOT SEE</text>
+          <rect x="46" y="220" width="146" height="112" rx="6" fill="#e8e6e0" opacity=".9"/>
+          <circle cx="119" cy="278" r="17" fill="#f2f0ea"/>
+          <ellipse cx="119" cy="296" rx="16" ry="5" fill="rgba(0,0,0,.16)"/>
+          <text x="119" y="348" fill="var(--paper-dim)" font-size="9" text-anchor="middle">clipped mat: only a shadow</text>
+          <rect x="208" y="220" width="146" height="112" rx="6" fill="#4a4a46"/>
+          <circle cx="281" cy="278" r="17" fill="#f6f4ee"/>
+          <circle cx="281" cy="278" r="26" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 4" class="an-node"/>
+          <text x="281" y="348" fill="var(--paper-dim)" font-size="9" text-anchor="middle">healthy exposure</text>
+          <text x="200" y="378" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">the detector must work in both, with no chore in between</text>
+        </svg>
+        <p class="figcap">Illustrative — presence read from stability, departure from the collapse.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. SHAFT -->
+  <section id="shaft" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge dev"><i></i>Inference &middot; shaft</span>
+        <h2 class="xh">Physics as the <em>discriminator</em></h2>
+        <p class="xlede">The previous tracker fought every false positive with another generic guard, and bought honesty by abstaining — coverage shrank with each patch. The current one promotes the physical structure of a golf swing to a first-class constraint, so counterfeits are rejected by <em>understanding</em> while real measurements are kept. There's a whole page on this; here is the mechanism in four lines.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">C1</span><div><h4>The club is held in the hands</h4><p>Club evidence must <strong>terminate</strong> just behind the grip, within about 260&nbsp;mm. A line whose support continues on past the butt is a trouser crease, a screen edge or a shadow — vetoed however well it scores. The old weak form of this test ("the ray passes near the hands") was passed by every counterfeit ever adjudicated.</p></div></li>
+          <li class="point"><span class="pi green">C2</span><div><h4>The club overlaps the body only at the ends</h4><p>From takeaway to follow-through the club is in free space. A per-frame body polygon from the pose skeleton vetoes candidates supported mostly inside it — which is exactly where every adjudicated false positive lived.</p></div></li>
+          <li class="point"><span class="pi amber">C3</span><div><h4>The swing changes direction once</h4><p>Phases come from the <em>hands alone</em> — grip speed and trajectory reversal — needing no club detection at all. Within each phase the rotation direction is known, and the chirality is detected per swing rather than hardcoded to a handedness. That makes a 180&deg; flip <strong>structurally impossible</strong> rather than statistically unlikely.</p></div></li>
+          <li class="point"><span class="pi coral">C4</span><div><h4>Club and lead arm are a double pendulum</h4><p>The wrist angle between them is anatomically bounded and evolves smoothly — hinging back, releasing monotonically through the downswing. That becomes a shape constraint enforced by isotonic regression rather than a smoothing fudge.</p></div></li>
+        </ul>
+        <div class="callout"><p>Estimation is <strong>global, not per-frame</strong>: a Viterbi pass over a grid of shaft angles across the whole clip, with emission costs from the image evidence and transition costs from the constraints above. A frame with no usable evidence is bridged by a bounded, monotone sweep — not by naive interpolation between two guesses. <a class="ulink" href="shaft-detection.html">The full story, in plain English &#8594;</a></p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">A PATH, NOT A SERIES OF GUESSES</text>
+          <g stroke="rgba(242,237,226,.07)" stroke-width="1">
+            <line x1="60" y1="70" x2="340" y2="70"/><line x1="60" y1="106" x2="340" y2="106"/>
+            <line x1="60" y1="142" x2="340" y2="142"/><line x1="60" y1="178" x2="340" y2="178"/>
+            <line x1="60" y1="214" x2="340" y2="214"/><line x1="60" y1="250" x2="340" y2="250"/>
+          </g>
+          <text x="44" y="74" fill="var(--paper-dim)" font-size="8" text-anchor="end">&#952;</text>
+          <g fill="var(--paper-dim)" opacity=".35">
+            <circle cx="90" cy="214" r="3"/><circle cx="90" cy="106" r="3"/>
+            <circle cx="130" cy="178" r="3"/><circle cx="130" cy="70" r="3"/>
+            <circle cx="170" cy="142" r="3"/><circle cx="170" cy="250" r="3"/>
+            <circle cx="210" cy="106" r="3"/><circle cx="210" cy="214" r="3"/>
+            <circle cx="250" cy="142" r="3"/><circle cx="250" cy="70" r="3"/>
+            <circle cx="290" cy="178" r="3"/><circle cx="290" cy="106" r="3"/>
+            <circle cx="330" cy="214" r="3"/><circle cx="330" cy="250" r="3"/>
+          </g>
+          <path d="M90 214 L130 178 L170 142 L210 106 L250 142 L290 178 L330 214"
+                fill="none" stroke="var(--club)" stroke-width="2.6"/>
+          <g fill="var(--club)">
+            <circle cx="90" cy="214" r="5"/><circle cx="130" cy="178" r="5"/><circle cx="170" cy="142" r="5"/>
+            <circle cx="210" cy="106" r="5"/><circle cx="250" cy="142" r="5"/><circle cx="290" cy="178" r="5"/>
+            <circle cx="330" cy="214" r="5"/>
+          </g>
+          <circle cx="210" cy="106" r="11" fill="none" stroke="var(--accent)" stroke-width="1.5" class="an-node"/>
+          <text x="210" y="92" fill="var(--accent)" font-size="9" text-anchor="middle">top</text>
+          <circle cx="250" cy="142" r="9" fill="none" stroke="var(--thorax)" stroke-width="1.4" stroke-dasharray="3 3"/>
+          <text x="266" y="132" fill="var(--thorax)" font-size="8.5">bridged</text>
+          <text x="200" y="290" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">GATED BY FOUR CONSTRAINTS</text>
+          <g font-size="9.5">
+            <rect x="46" y="306" width="70" height="26" rx="6" fill="rgba(123,192,219,.12)" stroke="var(--club)" stroke-width="1.2"/>
+            <text x="81" y="323" fill="var(--club)" text-anchor="middle">C1 butt</text>
+            <rect x="124" y="306" width="70" height="26" rx="6" fill="rgba(138,179,137,.12)" stroke="var(--arm)" stroke-width="1.2"/>
+            <text x="159" y="323" fill="var(--arm)" text-anchor="middle">C2 body</text>
+            <rect x="202" y="306" width="70" height="26" rx="6" fill="rgba(230,172,84,.12)" stroke="var(--accent)" stroke-width="1.2"/>
+            <text x="237" y="323" fill="var(--accent)" text-anchor="middle">C3 phase</text>
+            <rect x="280" y="306" width="74" height="26" rx="6" fill="rgba(224,126,100,.12)" stroke="var(--thorax)" stroke-width="1.2"/>
+            <text x="317" y="323" fill="var(--thorax)" text-anchor="middle">C4 wrist</text>
+          </g>
+          <text x="200" y="364" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">the whole clip is solved at once, not frame by frame</text>
+        </svg>
+        <p class="figcap">Illustrative — one global path chosen through the evidence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. FUSION -->
+  <section id="fusion" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Fusion &amp; synthesis</span>
+        <h2 class="xh">Putting it on <em>one grid</em></h2>
+        <p class="xlede">Sensors sample at their own rate, cameras at theirs, and neither lands on the instants you actually want to read. Fusion is the step that makes everything answerable at the same moment — and synthesis is what fills the space between the moments that were measured.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>Resample, don't interpolate blindly</h4><p>Every bound segment is slerped onto one fixed 200&nbsp;Hz grid, with the raw inertials rotated into the anatomical frame alongside. Rotations are interpolated <em>as rotations</em> — spherically, on the quaternion — never as three numbers that happen to look like angles.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>Corroboration, not averaging</h4><p>Where two modalities measure the same thing they are recorded side by side rather than blended into a single confident-looking number. A connected launch monitor's readings sit <em>beside</em> our own estimates on every swing, never replacing them. Where they agree, each vouches for the other and you get provenance for free.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Fusing an estimate that has no single source</h4><p>Club length in pixels is estimated four different ways — from the ball, from the detected bands, from the located head, and from a persistent prior — and combined by inverse variance, with an explicit path to <strong>abstain</strong> when they disagree. A fused number that cannot say "I don't know" is not a measurement.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Synthesis is a separate tier, flagged</h4><p>Between the located coaching positions, a dense club state is synthesized by Hermite interpolation on a 240&nbsp;Hz grid, so quarter-speed replay and the shaft fan scrub smoothly. It rides <em>alongside</em> the real per-frame track and replaces nothing — and it carries a flag, so scoring and the estimands filter it out. Where a metric does read it (the low point of the arc genuinely lives between frames) that is a stated, narrow exception, not a quiet one.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">DIFFERENT RATES, ONE GRID</text>
+          <text x="44" y="66" fill="var(--arm)" font-size="9" text-anchor="start">imu</text>
+          <g fill="var(--arm)">
+            <circle cx="70" cy="80" r="3"/><circle cx="96" cy="80" r="3"/><circle cx="122" cy="80" r="3"/>
+            <circle cx="148" cy="80" r="3"/><circle cx="174" cy="80" r="3"/><circle cx="200" cy="80" r="3"/>
+            <circle cx="226" cy="80" r="3"/><circle cx="252" cy="80" r="3"/><circle cx="278" cy="80" r="3"/>
+            <circle cx="304" cy="80" r="3"/><circle cx="330" cy="80" r="3"/>
+          </g>
+          <text x="44" y="116" fill="var(--club)" font-size="9" text-anchor="start">cam</text>
+          <g fill="var(--club)">
+            <circle cx="82" cy="130" r="3.5"/><circle cx="146" cy="130" r="3.5"/><circle cx="210" cy="130" r="3.5"/>
+            <circle cx="274" cy="130" r="3.5"/><circle cx="338" cy="130" r="3.5"/>
+          </g>
+          <text x="44" y="166" fill="var(--pelvis)" font-size="9" text-anchor="start">worn</text>
+          <g fill="var(--pelvis)">
+            <circle cx="70" cy="180" r="2.5"/><circle cx="150" cy="180" r="2.5"/>
+            <circle cx="196" cy="180" r="2.5"/><circle cx="206" cy="180" r="2.5"/><circle cx="216" cy="180" r="2.5"/>
+            <circle cx="226" cy="180" r="2.5"/><circle cx="236" cy="180" r="2.5"/><circle cx="246" cy="180" r="2.5"/>
+            <circle cx="300" cy="180" r="2.5"/>
+          </g>
+          <g stroke-dasharray="4 4" stroke-width="1.4" class="an-flow">
+            <line x1="200" y1="88" x2="200" y2="224" stroke="var(--arm)" opacity=".5"/>
+            <line x1="210" y1="138" x2="204" y2="224" stroke="var(--club)" opacity=".5"/>
+            <line x1="206" y1="188" x2="206" y2="224" stroke="var(--pelvis)" opacity=".5"/>
+          </g>
+          <rect x="46" y="226" width="308" height="34" rx="7" fill="rgba(230,172,84,.14)" stroke="var(--accent)" stroke-width="1.4"/>
+          <text x="200" y="247" fill="var(--paper)" font-size="11" text-anchor="middle">200 Hz shared grid &#183; slerped</text>
+          <line x1="200" y1="262" x2="200" y2="284" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 4" class="an-flow"/>
+          <text x="200" y="302" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">AND BETWEEN THE ANCHORS</text>
+          <g fill="var(--club)">
+            <circle cx="72" cy="342" r="5"/><circle cx="160" cy="330" r="5"/><circle cx="248" cy="346" r="5"/><circle cx="336" cy="334" r="5"/>
+          </g>
+          <path d="M72 342 C 110 320, 130 322, 160 330 S 218 356, 248 346 S 310 326, 336 334"
+                fill="none" stroke="var(--thorax)" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="72" y="366" fill="var(--club)" font-size="9" text-anchor="middle">measured</text>
+          <text x="248" y="372" fill="var(--thorax)" font-size="9" text-anchor="middle">synthesized &#183; flagged, filtered from scoring</text>
+        </svg>
+        <p class="figcap">Illustrative — resampled onto one timeline, then densified for display.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. PHASE SEGMENTATION -->
+  <section id="phases" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>Phase segmentation</span>
+        <h2 class="xh">Anchored on the one thing <em>we know</em></h2>
+        <p class="xlede">Almost every metric is "the value of this quantity <em>at</em> a moment" — at the top, at impact, at delivery. So finding those moments correctly matters more than any single measurement, and the ladder is built outward from the only instant that was directly observed.</p>
+        <ul class="points">
+          <li class="point"><span class="pi amber">1</span><div><h4>Impact is the anchor, and it is never moved</h4><p>It came from the shot arbiter, back-dated from a sample-accurate acoustic onset. Everything else is chained backwards and forwards from it: the top by back-chaining through the run of positive swing-plane rotation, the transition from the reversal of pelvis rotation, address as the last sustained stillness before movement, the finish from post-impact criteria.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A millisecond-cheap inertial pass first</h4><p>The whole ladder falls out of the sensors alone, before a single frame is decoded — and it pays for itself immediately, because the heavy camera stages can then be bounded to the detected swing span instead of scanning the whole five-second ring. That is roughly half the pose inferences, not run.</p></div></li>
+          <li class="point"><span class="pi cyan">3</span><div><h4>Monotone by construction</h4><p>Events carry a confidence and a provenance, and the chain must be strictly ordered. An event that violates the ordering is <strong>dropped by confidence, never reordered</strong> — a ladder that quietly re-sorted itself would be a ladder you could not trust at all. The segmentation's own confidence is the minimum across its load-bearing events.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Then the club refines it</h4><p>On a camera-only swing there is no inertial ladder, so a vision one is adopted at vision-grade confidence — and once the shaft track exists, a refinement pass retimes address and takeaway from the club's own motion. It abstains below a confidence floor and beyond a maximum shift, and it is forbidden from touching impact. Nothing is ever invented; an event is either measured, refined, or absent.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">CHAINED FROM IMPACT</text>
+          <line x1="46" y1="150" x2="354" y2="150" stroke="rgba(242,237,226,.14)" stroke-width="2"/>
+          <path d="M56 150 C 110 150, 130 96, 176 92 C 220 90, 232 132, 262 150"
+                fill="none" stroke="var(--club)" stroke-width="2" opacity=".55"/>
+          <path d="M262 150 C 292 168, 316 130, 344 106"
+                fill="none" stroke="var(--club)" stroke-width="2" opacity=".55"/>
+          <g>
+            <circle cx="262" cy="150" r="9" fill="var(--accent)"/>
+            <circle cx="262" cy="150" r="18" fill="none" stroke="var(--accent)" stroke-width="1.6" class="an-node"/>
+          </g>
+          <text x="262" y="196" fill="var(--accent)" font-size="10.5" text-anchor="middle">IMPACT</text>
+          <text x="262" y="210" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">acoustic, back-dated</text>
+          <g fill="var(--club)">
+            <circle cx="56" cy="150" r="6"/><circle cx="120" cy="128" r="6"/><circle cx="176" cy="92" r="6"/>
+            <circle cx="214" cy="102" r="6"/><circle cx="344" cy="106" r="6"/>
+          </g>
+          <g fill="var(--paper-dim)" font-size="9" text-anchor="middle">
+            <text x="56" y="172">P1</text><text x="120" y="118">P2</text><text x="176" y="80">P4</text>
+            <text x="214" y="92">P5</text><text x="344" y="96">P10</text>
+          </g>
+          <g stroke-width="1.6" stroke-dasharray="5 4" class="an-flow" fill="none">
+            <path d="M250 142 L222 108" stroke="var(--arm)"/>
+            <path d="M206 96 L184 92" stroke="var(--arm)"/>
+            <path d="M168 96 L126 124" stroke="var(--arm)"/>
+            <path d="M112 132 L64 148" stroke="var(--arm)"/>
+            <path d="M276 146 L336 112" stroke="var(--thorax)"/>
+          </g>
+          <text x="140" y="238" fill="var(--arm)" font-size="9" text-anchor="middle">&#8592; back-chained</text>
+          <text x="318" y="238" fill="var(--thorax)" font-size="9" text-anchor="middle">forward &#8594;</text>
+          <line x1="46" y1="262" x2="354" y2="262" stroke="var(--line)" stroke-width="1"/>
+          <text x="200" y="288" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">TWO LADDERS, ONE RESOLVED</text>
+          <rect x="46" y="304" width="140" height="30" rx="6" fill="rgba(138,179,137,.12)" stroke="var(--arm)" stroke-width="1.3"/>
+          <text x="116" y="323" fill="var(--arm)" font-size="10" text-anchor="middle">inertial &#183; preferred</text>
+          <rect x="214" y="304" width="140" height="30" rx="6" fill="rgba(123,192,219,.12)" stroke="var(--club)" stroke-width="1.3"/>
+          <text x="284" y="323" fill="var(--club)" font-size="10" text-anchor="middle">vision &#183; if confident</text>
+          <text x="200" y="366" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">then club-refined &#183; monotone &#183; impact untouched</text>
+        </svg>
+        <p class="figcap">Illustrative — the ladder grows outward from the observed instant.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. METRICS -->
+  <section id="metrics" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>Metric &amp; joint extraction</span>
+        <h2 class="xh">Ninety-five things, <em>each knowing its own limits</em></h2>
+        <p class="xlede">With a ladder of events and a fused set of streams, extraction is arithmetic — but the honesty lives in the bookkeeping around it. The catalogue owns what a metric <em>is</em>; the producers own how it is computed; and a metric never judges itself.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>Joint angles, decomposed deliberately</h4><p>The wrist is read from the relative rotation between forearm and hand: flexion/extension and radial/ulnar deviation from a Tait-Bryan decomposition chosen so that forearm twist drops out on the middle axis, then pronation and elbow flexion from a swing-twist decomposition about the forearm's long axis. Signs are hardware-locked and pinned by tests, because an inverted sign is a fault that fires happily on the wrong swings.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>Everything the camera can add</h4><p>Head movement, foot and pressure geometry, frontal-plane lower-body measures, upper-body measures, pelvis and thorax turn with X-factor and its stretch, club delivery, tempo. Each is its own stage with its own gate — <strong>the gate is the stage's own conditions, never the session type</strong>. A session type is a capture <em>intent</em>; it is not evidence about what was captured.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>A route ladder, best first</h4><p>Each metric declares an ordered list of ways it can be obtained — triangulated, inertial, fused, from a device, derived — each rung carrying its own requirement and whether it is a direct reading or an estimate. The app walks the ladder against what was actually connected, and the answer is what the swing card shows. "Needs a down-the-line camera" and "needs a launch monitor" reach you through the same mechanism.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Scored, unscored, and honest about which</h4><p>Only a small set of metrics feeds the score. The rest are replay lanes — drawn, tabulated and diagnosable, but deliberately kept out of the number, so adding a new measurement can never silently move an athlete's score. Measurement sigma travels with the series and is quoted on the card.</p></div></li>
+        </ul>
+        <div class="callout"><p>No millimetres or miles per hour are invented from a monocular view. Where scale is not established, quantities stay in the image plane and say so — which is the same rule the calibration tier enforces from the other end. <a class="ulink" href="swing-scoring.html">The full metric catalogue, explained &#8594;</a></p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">ONE METRIC, SEVERAL ROUTES</text>
+          <rect x="112" y="50" width="176" height="34" rx="8" fill="rgba(230,172,84,.14)" stroke="var(--accent)" stroke-width="1.4"/>
+          <text x="200" y="72" fill="var(--paper)" font-size="11" text-anchor="middle">clubhead speed</text>
+          <g stroke-width="1.6" fill="none" stroke-dasharray="5 4" class="an-flow">
+            <path d="M200 86 L110 116" stroke="var(--arm)"/>
+            <path d="M200 86 L200 116" stroke="var(--club)"/>
+            <path d="M200 86 L290 116" stroke="var(--paper-dim)"/>
+          </g>
+          <g stroke-width="1.3">
+            <rect x="46" y="118" width="126" height="52" rx="7" fill="rgba(138,179,137,.12)" stroke="var(--arm)"/>
+            <rect x="182" y="118" width="36" height="52" rx="7" fill="rgba(123,192,219,.12)" stroke="var(--club)"/>
+            <rect x="228" y="118" width="126" height="52" rx="7" fill="rgba(242,237,226,.04)" stroke="var(--paper-dim)"/>
+          </g>
+          <g font-size="9.5" text-anchor="middle">
+            <text x="109" y="138" fill="var(--arm)">club sensor</text>
+            <text x="109" y="154" fill="var(--paper-dim)">direct</text>
+            <text x="200" y="146" fill="var(--club)">&#8942;</text>
+            <text x="291" y="138" fill="var(--paper-dim)">face-on track</text>
+            <text x="291" y="154" fill="var(--paper-dim)">estimated</text>
+          </g>
+          <text x="200" y="192" fill="var(--paper-dim)" font-size="9" text-anchor="middle">best available rung wins &#183; the card says which</text>
+          <line x1="46" y1="212" x2="354" y2="212" stroke="var(--line)" stroke-width="1"/>
+          <text x="200" y="238" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">SCORED VS DRAWN</text>
+          <rect x="46" y="256" width="140" height="72" rx="8" fill="rgba(230,172,84,.10)" stroke="var(--accent)" stroke-width="1.3"/>
+          <text x="116" y="282" fill="var(--accent)" font-size="20" text-anchor="middle" font-family="var(--font-mono)">scored</text>
+          <text x="116" y="304" fill="var(--paper-dim)" font-size="9" text-anchor="middle">a small, stable set</text>
+          <text x="116" y="318" fill="var(--paper-dim)" font-size="9" text-anchor="middle">feeds the number</text>
+          <rect x="214" y="256" width="140" height="72" rx="8" fill="rgba(123,192,219,.08)" stroke="var(--club)" stroke-width="1.3" stroke-dasharray="5 4"/>
+          <text x="284" y="282" fill="var(--club)" font-size="20" text-anchor="middle" font-family="var(--font-mono)">drawn</text>
+          <text x="284" y="304" fill="var(--paper-dim)" font-size="9" text-anchor="middle">charted, tabled,</text>
+          <text x="284" y="318" fill="var(--paper-dim)" font-size="9" text-anchor="middle">diagnosable</text>
+          <text x="200" y="360" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">a new measurement can never silently move your score</text>
+        </svg>
+        <p class="figcap">Illustrative — how a metric is obtained, and whether it counts.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15. DIAGNOSTICS -->
+  <section id="diagnostics" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge dev"><i></i>Diagnostics &middot; the model</span>
+        <h2 class="xh">Numbers are content, <em>not code</em></h2>
+        <p class="xlede">A number on its own is not a diagnosis. Turning readings into named movement patterns takes an authored model — and the design rule that shapes all of it is that <strong>no corridor is compiled in</strong>. Every band, every claim, every causal link is reviewable content that a coach can read, argue with and re-seat from data.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Five registries, joined by rules</h4><p>Measures (a metric plus <em>which</em> reading — at the top, the change to the top, the trough between two positions), signals (the rule that watches one), conditions (the named characteristic), norms (what normal looks like, per context), and the edges between them. Shipped today: <strong>134 measures, 131 signals, 157 conditions, 365 causal edges and 178 norms</strong> across a tree of 28 shot contexts, with 40 cited references.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Corridors, and what a grade means</h4><p>A norm carries a centre and <em>asymmetric</em> tolerances by design, plus separate bounds outside which the reading is simply <strong>not believed</strong>. Grading is distance in tolerances, per side. Three states are never merged: a capture <em>gap</em> (nothing arrived), a swing <em>finding</em> (something arrived and was poor), and a capture <em>fault</em> (something arrived that this instrument cannot produce) — because grading a mis-tracked ball in either direction would launder a hardware problem into a confident diagnosis.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>A signal fires on a deviation</h4><p>Not merely on leaving the ideal band. Ideal is the <em>middle</em> of normal, so firing there would trip about a third of a healthy population on every characteristic, every swing. And a missing corridor yields "we could not assess this" — <strong>never a pass</strong>. That is the single most important branch in the engine.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>A causal graph, validated as one</h4><p>Causal edges must form a DAG and the library refuses to load a cycle. Edge strength is authored in words and read in words — "rarely" through "usually" — and nothing renders it as a percentage. Ranking combines how often a cause produces an effect with how common the cause is in the first place, then greedily covers the findings: <strong>a characteristic that itself has a cause in the pack is never presented as a root</strong>, because handing a coach a symptom and calling it the diagnosis is the failure mode this whole layer exists to avoid.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">CORRIDOR, THEN CAUSE</text>
+          <rect x="46" y="52" width="308" height="96" rx="7" fill="rgba(242,237,226,.03)" stroke="var(--line)" stroke-width="1"/>
+          <rect x="126" y="66" width="148" height="68" fill="rgba(138,179,137,.20)"/>
+          <rect x="88" y="66" width="38" height="68" fill="rgba(230,172,84,.16)"/>
+          <rect x="274" y="66" width="38" height="68" fill="rgba(230,172,84,.16)"/>
+          <rect x="58" y="66" width="30" height="68" fill="rgba(224,126,100,.16)"/>
+          <rect x="312" y="66" width="30" height="68" fill="rgba(224,126,100,.16)"/>
+          <line x1="200" y1="60" x2="200" y2="140" stroke="var(--arm)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
+          <g font-size="8.5" text-anchor="middle" fill="var(--paper-dim)">
+            <text x="200" y="158">ideal</text><text x="107" y="158">watch</text><text x="293" y="158">watch</text>
+            <text x="73" y="158">action</text><text x="327" y="158">action</text>
+          </g>
+          <circle cx="298" cy="100" r="7" fill="var(--accent)"/>
+          <circle cx="298" cy="100" r="14" fill="none" stroke="var(--accent)" stroke-width="1.4" class="an-node"/>
+          <text x="298" y="46" fill="var(--accent)" font-size="9" text-anchor="middle">this swing</text>
+          <line x1="298" y1="164" x2="298" y2="192" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 4" class="an-flow"/>
+          <text x="200" y="188" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">a deviation, not just a wobble</text>
+          <g stroke-width="1.3">
+            <circle cx="298" cy="222" r="20" fill="rgba(224,126,100,.16)" stroke="var(--thorax)"/>
+            <circle cx="200" cy="284" r="20" fill="rgba(224,126,100,.16)" stroke="var(--thorax)"/>
+            <circle cx="104" cy="222" r="20" fill="rgba(224,126,100,.10)" stroke="var(--thorax)" stroke-dasharray="4 3"/>
+            <circle cx="200" cy="348" r="22" fill="rgba(138,179,137,.18)" stroke="var(--arm)"/>
+          </g>
+          <g font-size="8.5" text-anchor="middle" fill="var(--paper)">
+            <text x="298" y="226">fault A</text>
+            <text x="200" y="288">fault B</text>
+            <text x="104" y="222">fault C</text>
+            <text x="104" y="234" fill="var(--paper-dim)" font-size="8">unmeasurable</text>
+            <text x="200" y="346">ROOT</text>
+            <text x="200" y="358" font-size="8" fill="var(--paper-dim)">screened</text>
+          </g>
+          <g stroke-width="1.8" fill="none">
+            <path d="M200 306 L282 236" stroke="var(--thorax)" marker-end=""/>
+            <path d="M200 326 L200 304" stroke="var(--arm)"/>
+            <path d="M186 332 L118 238" stroke="var(--thorax)" stroke-dasharray="4 3" opacity=".5"/>
+          </g>
+          <text x="200" y="386" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">a node with a cause in the pack is never shown as the root</text>
+        </svg>
+        <p class="figcap">Illustrative — a reading becomes a finding, findings resolve to a cause.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16. SESSION -->
+  <section id="session" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge dev"><i></i>Session assessment</span>
+        <h2 class="xh">A shot fires findings; <em>only a session diagnoses</em></h2>
+        <p class="xlede">That sentence divides all the labour. One swing is an observation, and an observation is not a pattern — the whole hard part of this layer is the restraint required not to say more than fourteen swings support, made executable.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>A ledger, not a running total</h4><p>One row per condition per shot: fired or not, confidence, direction, the driving reading's distance from normal, the shot's context. Every tier, trend, chain grade and panel state is a pure reduction over those rows, and the ledger persists beside the session so review rebuilds an identical panel.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Recurrence is the unit of diagnosis</h4><p>Graded by the <strong>Wilson score lower bound</strong> rather than the raw rate, because one-of-two and eight-of-ten have similar rates and utterly different evidence. Three assessable shots minimum before any pattern claim. Below that a firing sits in <em>watching</em> — which <strong>is</strong> the outlier discard, done by evidence weight rather than by deleting data. A single shank stays there forever if it never recurs. And a badly hit shot is never excluded: mishits are the most diagnostic swings in the session.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>What the golfer never sees inflated</h4><p>Trends are Theil&ndash;Sen slopes with a rank-correlation significance test, minimum five points, reported as <em>improving / stable / worsening</em> and nothing finer. Recurrence is always a count — "8 of 12 measurable shots" — because at this sample size a percentage is fabricated precision. And a measure the capture never took is excluded from <em>every</em> denominator, but still drawn, because "we did not look" is a fact you are owed.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Chains are confirmed, never discovered</h4><p>157 conditions imply about ten thousand pairs; mining those over fifteen swings would produce nothing but coincidence. So the authored graph restricts testing to a handful of pre-specified links among <em>this</em> session's patterns — <strong>the causal network is the multiple-comparisons correction</strong>. Links grade upward: present together, coherent in direction and swing order, conditionally dependent in a paired contingency table, and finally <em>moved together</em> — the session's own natural experiment, and the most motivating thing a golfer can be shown.</p></div></li>
+          <li class="point"><span class="pi green">5</span><div><h4>And then something to actually do</h4><p>The recommendation targets the <strong>most upstream confirmed node</strong> — fix the cause and the symptoms come free — with a drill attached. Where a cause is a physical restriction rather than a movement, the panel names a <em>screen</em> instead: a thirty-second test that costs no hardware and would anchor several patterns at once. Causes that can only be established by asking are offered as questions, visually distinct, and never counted as resolving anything.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">TWELVE SHOTS, ONE PICTURE</text>
+          <g font-size="9" fill="var(--paper-dim)">
+            <text x="46" y="66">A</text><text x="46" y="98">B</text><text x="46" y="130">C</text>
+          </g>
+          <g>
+            <rect x="60" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="82" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="104" y="56" width="16" height="14" rx="3" fill="none" stroke="var(--paper-dim)" stroke-width="1"/>
+            <rect x="126" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="148" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="170" y="56" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="192" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="214" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="236" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="258" y="56" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="280" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+            <rect x="302" y="56" width="16" height="14" rx="3" fill="var(--thorax)"/>
+          </g>
+          <text x="330" y="67" fill="var(--thorax)" font-size="9">PATTERN</text>
+          <g>
+            <rect x="60" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="82" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="104" y="88" width="16" height="14" rx="3" fill="var(--pelvis)"/>
+            <rect x="126" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="148" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="170" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="192" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="214" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="236" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="258" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="280" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="302" y="88" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+          </g>
+          <text x="330" y="99" fill="var(--pelvis)" font-size="9">watching</text>
+          <g>
+            <rect x="60" y="120" width="16" height="14" rx="3" fill="none" stroke="var(--paper-dim)" stroke-width="1"/>
+            <rect x="82" y="120" width="16" height="14" rx="3" fill="none" stroke="var(--paper-dim)" stroke-width="1"/>
+            <rect x="104" y="120" width="16" height="14" rx="3" fill="none" stroke="var(--paper-dim)" stroke-width="1"/>
+            <rect x="126" y="120" width="16" height="14" rx="3" fill="var(--arm)"/>
+            <rect x="148" y="120" width="16" height="14" rx="3" fill="var(--arm)"/>
+            <rect x="170" y="120" width="16" height="14" rx="3" fill="var(--arm)"/>
+            <rect x="192" y="120" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="214" y="120" width="16" height="14" rx="3" fill="var(--arm)"/>
+            <rect x="236" y="120" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="258" y="120" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="280" y="120" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+            <rect x="302" y="120" width="16" height="14" rx="3" fill="rgba(242,237,226,.10)"/>
+          </g>
+          <text x="330" y="131" fill="var(--arm)" font-size="9">resolving</text>
+          <g font-size="8" fill="var(--paper-dim)" opacity=".8">
+            <text x="60" y="154">fired</text>
+            <text x="112" y="154">not assessable</text>
+            <text x="212" y="154">clean</text>
+          </g>
+          <line x1="46" y1="172" x2="354" y2="172" stroke="var(--line)" stroke-width="1"/>
+          <text x="200" y="198" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">THE CHAIN, GRADED LINK BY LINK</text>
+          <g stroke-width="1.3">
+            <rect x="46" y="216" width="90" height="34" rx="7" fill="rgba(138,179,137,.14)" stroke="var(--arm)"/>
+            <rect x="155" y="216" width="90" height="34" rx="7" fill="rgba(230,172,84,.14)" stroke="var(--accent)"/>
+            <rect x="264" y="216" width="90" height="34" rx="7" fill="rgba(224,126,100,.14)" stroke="var(--thorax)"/>
+          </g>
+          <g font-size="9.5" text-anchor="middle" fill="var(--paper)">
+            <text x="91" y="237">restriction</text>
+            <text x="200" y="237">hips stall</text>
+            <text x="309" y="237">path out-to-in</text>
+          </g>
+          <g stroke-width="2" fill="none" class="an-flow" stroke-dasharray="5 4">
+            <line x1="136" y1="233" x2="155" y2="233" stroke="var(--accent)"/>
+            <line x1="245" y1="233" x2="264" y2="233" stroke="var(--thorax)"/>
+          </g>
+          <text x="146" y="266" fill="var(--paper-dim)" font-size="8" text-anchor="middle">screen it</text>
+          <text x="254" y="266" fill="var(--paper-dim)" font-size="8" text-anchor="middle">7 of 8 swings</text>
+          <rect x="46" y="292" width="308" height="56" rx="8" fill="rgba(230,172,84,.10)" stroke="var(--accent)" stroke-width="1.3"/>
+          <text x="200" y="314" fill="var(--paper)" font-size="10.5" text-anchor="middle">work the most upstream confirmed node</text>
+          <text x="200" y="334" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">one drill &#183; one screen &#183; the rest follows</text>
+          <text x="200" y="376" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">the session summary is the panel &#8212; there is no second object</text>
+        </svg>
+        <p class="figcap">Illustrative — recurrence, then a chain, then one thing to work on.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- cross-links -->
+  <section class="wrap">
+    <div class="morelink reveal">
+      <a href="swing-scoring.html">
+        <div>
+          <div class="ml-k">Science in practice &middot; Scoring &amp; metrics</div>
+          <h3>The science behind the score</h3>
+        </div>
+        <span class="ml-go">Every metric, explained &#8599;</span>
+      </a>
+    </div>
+    <div class="morelink reveal" style="margin-top:14px;border-top:0;padding-top:0">
+      <a href="validation.html">
+        <div>
+          <div class="ml-k">Science in practice &middot; Validation</div>
+          <h3>How we earn the numbers</h3>
+        </div>
+        <span class="ml-go">The corpus and the harness &#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- closing -->
+  <section class="closing wrap">
+    <span class="eyebrow reveal">Open, inspectable, unfinished</span>
+    <h2 class="reveal" style="--d:1">All of it is <em>readable.</em></h2>
+    <p class="reveal" style="--d:2">Every stage on this page is source you can clone, build and argue with — the constraints, the constants, the corridors and the reasons each of them is what it is. It's a prototype under validation, with a first release targeted for late 2026.</p>
+    <div class="cta-row reveal" style="--d:3">
+      <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">Read the source</a>
+      <a class="btn" href="studio-setup.html">Set up a bay</a>
+      <a class="btn" href="../index.html">&#8592; Back to site</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>PinPoint Studio &middot; open-source golf swing analysis</span>
+    <span><a href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
+  </div>
+</footer>
+</div><!-- /.page -->
+<script src="../assets/science.js"></script>
+</body>
+</html>

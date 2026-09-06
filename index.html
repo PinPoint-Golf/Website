@@ -245,7 +245,7 @@
   .notice p{color:var(--text-2);max-width:72ch;font-size:15.5px;line-height:1.62}
 
   /* ---- science in practice: links to the deep-dive sub-pages ---- */
-  .sci-links{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+  .sci-links{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
   .sci-card{display:flex;flex-direction:column;padding:26px 26px;border:1px solid var(--line);border-radius:13px;
     background:linear-gradient(180deg,rgba(255,255,255,.014),transparent);
     transition:border-color .25s,transform .25s,box-shadow .25s;position:relative;overflow:hidden}
@@ -257,6 +257,7 @@
   .sci-card .sci-go{display:inline-flex;align-items:center;gap:7px;margin-top:16px;
     font-family:var(--font-mono);font-size:13px;letter-spacing:.02em;color:var(--accent);transition:color .2s,gap .2s}
   .sci-card:hover .sci-go{gap:11px;color:#f0c279}
+  @media(max-width:1040px){.sci-links{grid-template-columns:1fr 1fr}}
   @media(max-width:820px){.sci-links{grid-template-columns:1fr}}
 
   /* ---- signals: three channels ---- */
@@ -362,6 +363,7 @@
     <a class="mark" href="index.html"><span class="dot"></span><b>PinPoint Studio</b></a>
     <nav class="navlinks">
       <a class="muted" href="index.html" aria-current="page">Home</a>
+      <a class="muted" href="science/how-it-works.html">How it works</a>
       <a class="muted" href="science/swing-scoring.html">Swing scoring</a>
       <a class="muted" href="science/shaft-detection.html">Shaft detection</a>
       <a class="muted" href="science/studio-setup.html">Studio setup</a>
@@ -478,15 +480,21 @@
       <p>PinPoint Studio is an early prototype under active validation. Every measurement is being checked against a hand-annotated corpus of real swings before it goes anywhere near a release — because results you can't rely on are no use to anyone. There's a beta to try if you want to follow along, but nothing to depend on yet — and there won't be until we're confident the figures hold up. That bar is deliberate, and getting the science right is the whole point.</p>
     </div>
 
-    <p class="sec-lede reveal" style="--d:3;margin-top:42px;margin-bottom:0">Two worked examples of that science in practice — written in plain English, not academic jargon:</p>
+    <p class="sec-lede reveal" style="--d:3;margin-top:42px;margin-bottom:0">Three deep dives into that science in practice — written in plain English, not academic jargon:</p>
     <div class="sci-links">
-      <a class="sci-card reveal" style="--d:4" href="science/swing-scoring.html">
+      <a class="sci-card reveal" style="--d:4" href="science/how-it-works.html">
+        <div class="sci-k"><i style="color:var(--pelvis)"></i>The whole stack</div>
+        <h3>How it works (for the nerds)</h3>
+        <p>The full tour of the machine — devices, calibration, capture, inference, fusion, segmentation, metrics and diagnosis, stage by stage.</p>
+        <span class="sci-go">Read the whole pipeline &#8599;</span>
+      </a>
+      <a class="sci-card reveal" style="--d:5" href="science/swing-scoring.html">
         <div class="sci-k"><i style="color:var(--thorax)"></i>Scoring &amp; metrics</div>
         <h3>The science behind the score</h3>
         <p>How a captured swing becomes an honest number — the movements we measure, and the maths that stops one number hiding a real fault.</p>
         <span class="sci-go">Read how scoring works &#8599;</span>
       </a>
-      <a class="sci-card reveal" style="--d:5" href="science/shaft-detection.html">
+      <a class="sci-card reveal" style="--d:6" href="science/shaft-detection.html">
         <div class="sci-k"><i style="color:var(--club)"></i>Club tracking</div>
         <h3>Finding the shaft in the blur</h3>
         <p>How we track a thin shaft moving past 100&nbsp;mph — leaning on the golfer's anatomy and swing physics rather than fighting the blur.</p>
