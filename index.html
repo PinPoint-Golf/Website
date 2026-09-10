@@ -497,7 +497,7 @@
       <a class="sci-card reveal" style="--d:6" href="science/shaft-detection.html">
         <div class="sci-k"><i style="color:var(--club)"></i>Club tracking</div>
         <h3>Finding the shaft in the blur</h3>
-        <p>How we track a thin shaft moving past 100&nbsp;mph — leaning on the golfer's anatomy and swing physics rather than fighting the blur.</p>
+        <p>How we track a thin shaft moving past 100&nbsp;mph — leaning on the golfer's anatomy and swing physics rather than fighting the blur, and how a bare club becomes its own ruler.</p>
         <span class="sci-go">Read how tracking works &#8599;</span>
       </a>
     </div>
@@ -567,7 +567,7 @@
           <div class="ch-label" style="color:var(--thorax)"><i style="background:var(--thorax)"></i>Launch monitor</div>
           <span class="badge now"><i></i>Built</span>
         </div>
-        <p>A Foresight GCQuad (read via FSX2020) folds its readings into every swing — ball speed, spin, face and path recorded beside our own estimates. It's treated as a reference instrument: measured values sit alongside ours for honest comparison, never replacing them.</p>
+        <p>Studio plays the <strong>GSPro Connect</strong> server, so any monitor with an Open Connect bridge — a Garmin R10, Rapsodo MLM2PRO, SkyTrak+, PiTrac — connects straight to it; a Foresight GCQuad is read the other way, out of FSX2020. Either route, the readings are treated as a reference instrument: ball speed, spin, face and path recorded beside our own estimates, never replacing them. The Open Connect link is new, and so far proven against a simulator built from sixteen real clients rather than a device on a mat.</p>
       </div>
       <div class="channel reveal" style="--d:6;--gw:rgba(148,160,158,.08)">
         <div class="ch-top">
@@ -699,7 +699,7 @@
           <li>Diagnostic model — 157 conditions, 365 causal edges, 178 cited corridors — editable in-app</li>
           <li>Session diagnostics — a cumulative evidence ledger, ranked causes, cast to a second display</li>
           <li>Session review — a finished session read back shot by shot, without rewinding the live one</li>
-          <li>Launch-monitor integration (Foresight GCQuad) — measured values beside our estimates</li>
+          <li>Launch monitors — GSPro Open Connect (R10, MLM2PRO, SkyTrak+, PiTrac&hellip;) and the Foresight GCQuad — measured values beside our estimates</li>
           <li>Shot detection — manual, IMU-impact and acoustic — with per-shot capture, replay &amp; export</li>
           <li>Swing corpus, in-app markup tool &amp; the SwingLab validation harness</li>
           <li>Local speech in &amp; out (Whisper + Kokoro) and a local coaching LLM (Phi-4-mini)</li>
@@ -711,6 +711,7 @@
           <li>Whole-swing 0&ndash;100 score — the scorer &amp; uncertainty maths are built; full-swing bands being seated</li>
           <li>True kinematic-sequence chart from angular-velocity series</li>
           <li>P9 — the one rung of the P1&ndash;P10 ladder still deferred</li>
+          <li>Markerless club tracking — a bare shaft read as its own ruler, so nobody has to tape a club</li>
           <li>Ball-flight tracking — ball speed, launch angle &amp; direction</li>
           <li>Corpus v1 — re-seating the literature-seeded norms from measured swings</li>
           <li>AI coach grounded in your session findings (chat, voice &amp; local LLM already built)</li>
@@ -722,7 +723,7 @@
         <ul>
           <li>Down-the-line camera &amp; two-camera 3D — unlocks the depth-axis metrics (swing plane, club path)</li>
           <li>Ground reaction force — gated on force-plate ground truth (likely late 2027)</li>
-          <li>More launch monitors and more wrist sensors, on the same beside-not-instead-of contract</li>
+          <li>Launch monitors that don't speak Open Connect (Uneekor, Bushnell) and more wrist sensors, on the same beside-not-instead-of contract</li>
         </ul>
       </div>
     </div>
@@ -741,7 +742,7 @@
       <div class="specrow"><span class="k">Swing timing</span><span class="v">P-position ladder, P1&ndash;P8 and P10 (P9 deferred)</span></div>
       <div class="specrow"><span class="k">Metrics</span><span class="v">95-metric catalogue &middot; 52 produced today</span></div>
       <div class="specrow"><span class="k">Diagnostics</span><span class="v">157 conditions &middot; 365 causal edges &middot; 40 cited sources</span></div>
-      <div class="specrow"><span class="k">Launch monitor</span><span class="v">Foresight GCQuad via FSX2020</span></div>
+      <div class="specrow"><span class="k">Launch monitor</span><span class="v">GSPro Open Connect &mdash; R10, MLM2PRO, SkyTrak+, PiTrac &mdash; via <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a> (MIT) &middot; Foresight GCQuad via FSX2020</span></div>
       <div class="specrow"><span class="k">Phone link</span><span class="v">PPCP over WiFi or USB &middot; open spec, MIT reference library</span></div>
       <div class="specrow"><span class="k">Speech</span><span class="v">Whisper STT &middot; Kokoro TTS &middot; on-device</span></div>
       <div class="specrow"><span class="k">Privacy</span><span class="v">Local by default &mdash; cloud only if you configure it</span></div>

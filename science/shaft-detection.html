@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tracking the club — it starts with the room — PinPoint Studio</title>
-<meta name="description" content="How PinPoint Studio tracks a thin golf shaft moving at 100+ mph — why the room it's swung in matters most, how retroreflective shaft tape and a light at the lens lift tracking in dark sim rooms to instrument grade, and how the passive tracker leans on the golfer's anatomy and swing physics for a plain, untaped club. A method under development and validation; first beta shipped September 2026, 1.0 targeted for late in the year.">
+<meta name="description" content="How PinPoint Studio tracks a thin golf shaft moving at 100+ mph — why the room it's swung in matters most, how retroreflective shaft tape lifts tracking in dark sim rooms to instrument grade, how a bare unmarked club is read as its own ruler from the grip end and the hosel, and how the passive tracker leans on the golfer's anatomy and swing physics. A method under development and validation; first beta shipped September 2026, 1.0 targeted for late in the year.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
   <section class="subhero wrap">
     <span class="eyebrow reveal">Science in practice &middot; Club tracking</span>
     <h1 class="reveal" style="--d:1">The club is only as findable as <em>the room.</em></h1>
-    <p class="lede reveal" style="--d:2">A golf shaft is a dark quarter-inch stick moving past 100&nbsp;mph &mdash; the hardest thing in the bay to track. What decides how well we track it isn't really the algorithm; it's <strong>the room it's swung in</strong>. A bright bay with a plain wall gives up the whole swing arc; a dark sim room hides half of it. And where the room can't help, a few grams of <strong>retroreflective tape</strong> on the shaft &mdash; lit by a small ring at the lens &mdash; lift club tracking to instrument grade.</p>
+    <p class="lede reveal" style="--d:2">A golf shaft is a dark quarter-inch stick moving past 100&nbsp;mph &mdash; the hardest thing in the bay to track. What decides how well we track it isn't really the algorithm; it's <strong>the room it's swung in</strong>. A bright bay with a plain wall gives up the whole swing arc; a dark sim room hides half of it. And where the room can't help, a few grams of <strong>retroreflective tape</strong> on the shaft &mdash; lit by a small ring at the lens &mdash; lift club tracking to instrument grade. But tape changes a club's swing weight, so the bare shaft has to get there too: it is now read as <strong>its own ruler</strong>, and against a hand-drawn mark it matches the taped club.</p>
     <div class="notice reveal" style="--d:3">
       <span class="badge dev"><i></i>In development &amp; validation</span>
       <p>Club and ball tracking now runs in the analysis pipeline, on by default — this page explains the <strong>method</strong> behind it. The numbers are produced, not yet signed off: every part of it is still being measured against a hand-annotated corpus of real swings before anything is released. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
@@ -42,6 +42,7 @@
     <nav class="contents reveal" style="--d:4" aria-label="On this page">
       <a href="#environment">The room</a>
       <a href="#tape">Taped clubs</a>
+      <a href="#unmarked">Unmarked clubs</a>
       <a href="#challenge">The challenge</a>
       <a href="#scan">How it looks</a>
       <a href="#blind">Where naive fails</a>
@@ -112,7 +113,7 @@
           <li class="point"><span class="pi green">&#10003;</span><div><h4>A pattern, not a lucky flash</h4><p>Along-shaft distance ratios survive projection, so the pattern reads the same at any club angle. A specular glint is one blob; several bands in a line at the recorded ratios are unmistakably ours &mdash; and because blur smears across the shaft while the gaps run along it, the pattern survives the impact streak.</p></div></li>
           <li class="point"><span class="pi amber">!</span><div><h4>One physical rule</h4><p>Retro tape returns light to its source within a ~1&ndash;2&deg; cone, so the light must sit <em>at the lens</em> &mdash; a small LED ring, not the ceiling. Visible-band only; never IR, which fights launch monitors.</p></div></li>
         </ul>
-        <div class="callout"><p><strong>Optional by design.</strong> The untaped tracker stays the product &mdash; and every taped swing doubles as dense ground truth for proving the unmarked detector, so both improve together. Taping is an opt-in high-accuracy mode for hard rooms, not a requirement. <a class="ulink" href="studio-setup.html#markup">How to mark up a club &#8594;</a></p></div>
+        <div class="callout"><p><strong>Optional by design &mdash; and getting more so.</strong> The untaped tracker stays the product, and every taped swing doubles as dense ground truth for proving the unmarked detector, so both improve together. Taping is an opt-in high-accuracy mode for hard rooms, never a requirement &mdash; and the bare shaft is now closing the gap on its own. <a class="ulink" href="#unmarked">What a bare club gives you &#8594;</a> &middot; <a class="ulink" href="studio-setup.html#markup">How to mark up a club &#8594;</a></p></div>
       </div>
       <div class="xv reveal">
         <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
@@ -143,6 +144,55 @@
           <text x="120" y="305" fill="var(--paper-dim)" font-size="9" text-anchor="start">returns to the lens</text>
         </svg>
         <p class="figcap">Illustrative &mdash; a &ldquo;2&ndash;1&ndash;3&rdquo; band pattern, lit from the lens and read as geometry.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 0c. UNMARKED CLUBS -->
+  <section id="unmarked" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge dev"><i></i>Markerless club tracking &middot; in validation</span>
+        <h2 class="xh">A bare shaft is <em>its own ruler</em></h2>
+        <p class="xlede">Tape works &mdash; but six bands of glass bead on a shaft change the club's swing weight, and a club whose swing weight has changed produces a different swing. That makes the measuring instrument part of what's being measured. So the tape had to become optional in fact, not just in principle: a plain club off the rack has to reach the same grade.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>The tape was never what made the shaft bright</h4><p>Measured on the same iron, the same rig and the same exposure: bare steel between the bands saturates the sensor at address and through the lit downswing exactly as the bands do, and even in the dark arc at the top of the backswing it still reads 35&ndash;90 grey levels over a background of 6&ndash;8. What the tape uniquely supplied was never contrast &mdash; it was <em>metric geometry</em>.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Two landmarks replace six bands</h4><p>A bare shaft carries its own marks at known millimetre positions: the grip end, where black rubber becomes bright steel, and the ferrule and hosel at the far end. Two landmarks at recorded distances pin down exactly the two unknowns the bands used to give &mdash; how many pixels a millimetre is worth <em>in this frame</em>, and how far up the shaft the hands are &mdash; with no which-way-round ambiguity, because the grip end is the one near the hands.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>A lock is a lock</h4><p>What comes out is fed to the tracker at exactly the point the tape's answer was: the same hard anchor for the global solve, the same confidence tier, the same right to publish an address frame or a held finish where the club is barely moving. A taped club still uses its tape &mdash; it just stops being the only route to a measured frame.</p></div></li>
+          <li class="point"><span class="pi green">&#10003;</span><div><h4>What you have to tell it</h4><p>Three numbers per club, taken once with a tape measure: the exposed shaft from the bottom of the grip to the top of the hosel, the hosel's distance from the butt, and where your hands end on the grip. That's the whole setup cost of an unmarked club. <a class="ulink" href="studio-setup.html#markup">How to measure a club &#8594;</a></p></div></li>
+        </ul>
+        <div class="callout"><p><strong>Where it stands.</strong> Scored against hand-drawn marks on seven swings of an unmarked 6-iron, the published shaft direction sits <strong>2.1&deg;</strong> from the mark at the median &mdash; against 2.3&deg; for a <em>taped</em> club put through the same stack, and 4.5&deg; for that same taped club as the tracker shipped. One club, one session and one marker's hand: a promising result, not a claim. The clubhead's exact position on a bare shaft is still short of the taped one, and the whole stack stays off by default until it has been measured properly across the corpus. <a class="ulink" href="validation.html">How we earn the numbers &#8594;</a></p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">NO TAPE &#8212; THE SHAFT ITSELF</text>
+          <line x1="150" y1="70" x2="175" y2="105" stroke="rgba(242,237,226,.12)" stroke-width="10" stroke-linecap="round"/>
+          <text x="134" y="70" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">butt</text>
+          <line x1="175" y1="105" x2="316" y2="300" stroke="rgba(242,237,226,.30)" stroke-width="4"/>
+          <ellipse cx="330" cy="320" rx="15" ry="9" fill="rgba(242,237,226,.10)" stroke="var(--paper-dim)" stroke-width="1.3" transform="rotate(54 330 320)"/>
+          <text x="330" y="356" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">head</text>
+          <circle cx="175" cy="105" r="13" fill="none" stroke="var(--arm)" stroke-width="1.6" class="an-node"/>
+          <circle cx="175" cy="105" r="4" fill="var(--arm)"/>
+          <text x="196" y="99" fill="var(--arm)" font-size="10">grip end</text>
+          <text x="196" y="112" fill="var(--paper-dim)" font-size="9">rubber &#8594; steel</text>
+          <circle cx="316" cy="300" r="13" fill="none" stroke="var(--accent)" stroke-width="1.6" class="an-node"/>
+          <circle cx="316" cy="300" r="4" fill="var(--accent)"/>
+          <text x="336" y="296" fill="var(--accent)" font-size="10">hosel</text>
+          <text x="336" y="308" fill="var(--paper-dim)" font-size="8.5">steel &#8594; ferrule</text>
+          <g stroke="var(--club)" stroke-width="1.3" opacity=".85">
+            <line x1="147" y1="126" x2="288" y2="321" stroke-dasharray="5 4"/>
+            <line x1="139" y1="132" x2="155" y2="120"/>
+            <line x1="280" y1="327" x2="296" y2="315"/>
+          </g>
+          <text x="214" y="216" fill="var(--club)" font-size="10" text-anchor="middle" transform="rotate(54 214 216)">known: exposed shaft (mm)</text>
+          <rect x="24" y="232" width="132" height="86" rx="8" fill="rgba(123,192,219,.08)" stroke="var(--club)" stroke-width="1.2"/>
+          <text x="38" y="254" fill="var(--club)" font-size="9.5">two landmarks &#8594;</text>
+          <text x="38" y="275" fill="var(--paper)" font-size="10.5">scale, px per mm</text>
+          <text x="38" y="293" fill="var(--paper)" font-size="10.5">offset from the butt</text>
+          <text x="38" y="309" fill="var(--paper-dim)" font-size="9">every frame, no tape</text>
+        </svg>
+        <p class="figcap">Illustrative &mdash; the grip end and the hosel sit at known distances; two of them are all the geometry the bands used to supply.</p>
       </div>
     </div>
   </section>
@@ -468,7 +518,7 @@
   <section class="closing wrap">
     <span class="eyebrow reveal">Science-led, kept open</span>
     <h2 class="reveal" style="--d:1">The room, the tape, the <em>physics.</em></h2>
-    <p class="reveal" style="--d:2">Good club tracking starts with the room, leans on a few grams of tape where the room can't help, and &mdash; for every plain shaft in between &mdash; falls back on what a body and a swing can physically do. All of it is drawn from the literature, kept open to inspect, and held against real swings before it ships. The first beta shipped in September 2026; it's still a prototype under validation, with 1.0 targeted for late in the year.</p>
+    <p class="reveal" style="--d:2">Good club tracking starts with the room, leans on a few grams of tape where the room can't help &mdash; and is learning to do without it, reading a bare shaft's own landmarks as geometry &mdash; while for every plain shaft in between it falls back on what a body and a swing can physically do. All of it is drawn from the literature, kept open to inspect, and held against real swings before it ships. The first beta shipped in September 2026; it's still a prototype under validation, with 1.0 targeted for late in the year.</p>
     <div class="cta-row reveal" style="--d:3">
       <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
       <a class="btn" href="validation.html">How we validate</a>
