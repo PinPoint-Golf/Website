@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PinPoint Studio — measure the golfer, not the ball</title>
-<meta name="description" content="PinPoint Studio measures the golfer, not the club or the ball. An open-source desktop app for golf studios that turns the cameras, phone and PC you already own into real body-movement measurement — kinematic sequence, wrist angles, HackMotion support and a cited diagnostic model. In beta and under validation; 1.0 targeted late 2026.">
+<meta name="description" content="PinPoint Studio measures the golfer, not the club or the ball. An open-source desktop app for golf studios that turns the cameras, phone and PC you already own into real body-movement measurement — kinematic sequence, wrist angles, HackMotion support and a cited diagnostic model. Free and open source (GPL v2), local-first and private: no sign-up, no account, no mailing list, no third-party processors — you install it, you use it, your data stays on your machine. In beta and under validation; 1.0 targeted late 2026.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -244,6 +244,30 @@
   .notice h3{font-family:var(--font-display);font-weight:500;font-size:clamp(21px,2.4vw,28px);letter-spacing:-.01em;line-height:1.13;margin-bottom:12px}
   .notice p{color:var(--text-2);max-width:72ch;font-size:15.5px;line-height:1.62}
 
+  /* ---- no strings: free, open, local ---- */
+  .freedom{padding-block:26px 0}
+  .fpanel{border:1px solid var(--line-strong);border-radius:16px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,rgba(138,179,137,.055),var(--ink-2) 42%,transparent);padding:36px 36px 32px}
+  .fpanel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--arm),var(--cool))}
+  .fpanel .eyebrow{display:block;margin-bottom:14px}
+  .fpanel h2{font-family:var(--font-display);font-weight:500;font-size:clamp(26px,3.4vw,42px);letter-spacing:-.018em;line-height:1.06;margin-bottom:16px;max-width:22ch}
+  .fpanel h2 em{font-style:italic;
+    background:linear-gradient(96deg,var(--arm),var(--cool));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .fpanel .fsub{color:var(--text-2);max-width:74ch;font-size:16.5px;line-height:1.62}
+  .fpanel .fsub strong{color:var(--paper);font-weight:600}
+  .fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px}
+  .fitem{padding:19px 20px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.014)}
+  .fitem .fk{font-family:var(--font-mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--arm);
+    display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  .fitem .fk i{width:7px;height:7px;border-radius:50%;flex:none;background:currentColor;box-shadow:0 0 9px currentColor}
+  .fitem p{font-size:14px;color:var(--text-2);line-height:1.52}
+  .fnote{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);
+    font-family:var(--font-mono);font-size:12.5px;line-height:1.7;letter-spacing:.02em;color:var(--paper-dim);max-width:86ch}
+  .fnote b{color:var(--paper);font-weight:400}
+  @media(max-width:980px){.fgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.fgrid{grid-template-columns:1fr}.fpanel{padding:28px 22px 26px}}
+  @media(max-width:560px){.readout{flex-wrap:wrap}.readout .rd{flex:1 1 44%;border-bottom:1px solid var(--line)}}
+
   /* ---- science in practice: links to the deep-dive sub-pages ---- */
   .sci-links{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
   .sci-card{display:flex;flex-direction:column;padding:26px 26px;border:1px solid var(--line);border-radius:13px;
@@ -369,7 +393,7 @@
       <a class="muted" href="science/studio-setup.html">Studio setup</a>
       <a class="muted" href="science/validation.html">Validation</a>
       <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
-      <a class="btn solid" href="#register">Follow along</a>
+      <a class="btn solid" href="#get">Download</a>
     </nav>
   </div>
 </header>
@@ -378,7 +402,7 @@
   <section class="hero wrap">
     <div class="hero-grid">
       <div>
-        <span class="eyebrow reveal">Built for the golf studio &middot; Open source &middot; Local-first</span>
+        <span class="eyebrow reveal">Built for the golf studio &middot; Free &amp; open &middot; No sign-up</span>
         <h1 class="reveal" style="--d:1"><span class="small">Your launch monitor measures the ball.</span><em>We measure you.</em></h1>
         <p class="lede reveal" style="--d:2">If you run a studio, you've already got the cameras, the PC and the launch monitor — so the outcome of every shot is no mystery. What's missing is what your <strong>body</strong> actually did to produce it, and whether you're really making the moves your coach asked for. That's the gap PinPoint Studio fills — and why it's named for the room it's built for.</p>
         <p class="status-line reveal" style="--d:3">
@@ -387,12 +411,13 @@
         </p>
         <div class="cta-row reveal" style="--d:4">
           <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
-          <a class="btn" href="#register">Follow the build</a>
+          <a class="btn" href="#get">Get the beta — no sign-up</a>
         </div>
         <div class="readout reveal" style="--d:5">
           <div class="rd"><span class="rk">Sampling</span><span class="rv">up to 200 Hz</span></div>
           <div class="rd"><span class="rk">Pose</span><span class="rv">on-device</span></div>
           <div class="rd"><span class="rk">Source</span><span class="rv">open &middot; GPL v2</span></div>
+          <div class="rd"><span class="rk">Cost</span><span class="rv">free, always</span></div>
         </div>
         <p class="credit reveal" style="--d:6">From the author of <a class="ulink" href="https://www.goldencheetah.org" target="_blank" rel="noopener">GoldenCheetah</a>.</p>
       </div>
@@ -411,6 +436,34 @@
         </div>
         <p class="scope-note">Illustrative — peak values are indicative; the kinematic sequence chart is in development.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- no strings: free, open, local -->
+  <section class="freedom wrap">
+    <div class="fpanel reveal">
+      <span class="eyebrow">No sign-up &middot; No mailing list &middot; No third parties</span>
+      <h2>You install it, you use it. <em>That's the whole deal.</em></h2>
+      <p class="fsub">There is no registration, no account, no licence key and no trial. We don't ask for your name, your email or your club. There's no mailing list to join and no third-party processor in the loop &mdash; <strong>nothing to unsubscribe from, because there's nothing to subscribe to</strong>. It's free as in <strong>freedom</strong> and free as in <strong>beer</strong>, it is open source, and it will stay that way. Download the build, run it, and your swings stay on your own machine.</p>
+      <div class="fgrid">
+        <div class="fitem">
+          <span class="fk"><i></i>No sign-up</span>
+          <p>No account, no key, no activation, no &ldquo;request access&rdquo;. Download it and it runs.</p>
+        </div>
+        <div class="fitem">
+          <span class="fk"><i></i>Free, both ways</span>
+          <p>Free as in freedom and free as in beer. GPL&nbsp;v2, source in the open &mdash; no paid tier, no pro edition, no upsell.</p>
+        </div>
+        <div class="fitem">
+          <span class="fk"><i></i>Nobody's list</span>
+          <p>No mailing list, no analytics, no tracking, no third-party processors. We hold no details about you because we never collect any.</p>
+        </div>
+        <div class="fitem">
+          <span class="fk"><i></i>Your data, your disk</span>
+          <p>Swings, video and sessions are files on your own machine. Local by default &mdash; nothing goes to a cloud unless you set one up yourself.</p>
+        </div>
+      </div>
+      <p class="fnote"><b>And it stays open.</b> PinPoint Studio is GPL&nbsp;v2; the device libraries (<a class="ulink" href="https://github.com/PinPoint-Golf/libwrist" target="_blank" rel="noopener">libwrist</a>, <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a>) are MIT so anyone can use them; the phone protocol is a published spec. We will always be open source, and we will always back the organisations and standards that are open too.</p>
     </div>
   </section>
 
@@ -766,21 +819,22 @@
   </section>
 
   <!-- closing -->
-  <section id="register" class="closing wrap">
-    <span class="eyebrow reveal">Pre-release</span>
-    <h2 class="reveal" style="--d:1">It's in beta — and it's open.</h2>
-    <p class="reveal" style="--d:2">PinPoint Studio reached its first beta in September 2026, with a 1.0 targeted for late in the year — once we're confident the measurements can be relied upon. It's GPL&nbsp;v2 and built in the open — for golfers, coaches and researchers alike. Watch the repo to follow along, or tell us you want in and we'll let you know when there's something to put your hands on.</p>
+  <section id="get" class="closing wrap">
+    <span id="register" aria-hidden="true"></span>
+    <span class="eyebrow reveal">Pre-release &middot; nothing to sign</span>
+    <h2 class="reveal" style="--d:1">It's in beta — and it's yours.</h2>
+    <p class="reveal" style="--d:2">PinPoint Studio reached its first beta in September 2026, with a 1.0 targeted for late in the year — once we're confident the measurements can be relied upon. There's no form to fill in and no list to join: take the build, run it, keep it. It's GPL&nbsp;v2 and built in the open — for golfers, coaches and researchers alike. Watch the repo if you want to hear when something lands, and bring questions to the issue tracker.</p>
     <div class="cta-row reveal" style="--d:3">
-      <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
-      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio/releases/latest" target="_blank" rel="noopener">Download the latest beta &#8599;</a>
-      <a class="btn" href="mailto:liversedge@gmail.com?subject=PinPoint%20Studio%20%E2%80%94%20register%20interest">Register interest</a>
+      <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio/releases/latest" target="_blank" rel="noopener">Download the latest beta &#8599;</a>
+      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
+      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio/issues" target="_blank" rel="noopener">Ask a question &#8599;</a>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="wrap foot">
-    <span>PinPoint Studio &middot; open-source golf swing analysis</span>
+    <span>PinPoint Studio &middot; open-source golf swing analysis &middot; no sign-up, no tracking</span>
     <span><a href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
   </div>
 </footer>
