@@ -314,6 +314,9 @@
     font-family:var(--font-mono);font-size:13px;letter-spacing:.02em;color:var(--accent);transition:color .2s,gap .2s}
   .vlink:hover{color:#f0c279;gap:11px}
   @media(max-width:820px){.vflow{grid-template-columns:1fr}}
+  .plat{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .plat .vstep h3{margin-bottom:0}
+  @media(max-width:820px){.plat{grid-template-columns:1fr}}
 
   /* ---- four modes ---- */
   .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
@@ -627,7 +630,17 @@
         <p>The clip the phone recorded is asked for, transferred over WiFi or a USB cable, and filed against the swing it belongs to in the library — replaying at the file's own frame rate, for as long as it actually is.</p>
       </div>
     </div>
-    <p class="sec-lede reveal" style="--d:4;margin-top:34px">It talks to Studio over <strong>PPCP</strong>, the PinPoint Capture Protocol — an open specification with an MIT-licensed reference implementation, so any device can implement it and any host can read it. The spec and the library are public alongside the app.</p>
+    <div class="plat">
+      <div class="vstep reveal" style="--d:1">
+        <div class="vstep-top"><h3>iPhone, while we build it</h3><span class="badge now"><i></i>Now</span></div>
+        <p>During initial development PinPoint Capture targets the iPhone &mdash; iOS&nbsp;18 or later, on a phone that records 1080p at 120&nbsp;fps or better. Its first screen checks the camera and tells you plainly whether it's good for capture. Development and hardware testing run on an iPhone&nbsp;16. It goes to the App Store with the first release, at the end of 2026; until then it builds from source with Xcode.</p>
+      </div>
+      <div class="vstep reveal" style="--d:2">
+        <div class="vstep-top"><h3>Android, in time &mdash; not soon</h3><span class="badge soon"><i></i>Later</span></div>
+        <p>Android is coming, but it won't be quick. Its high-speed camera hands frames over in batches rather than one at a time, its camera and microphone don't always share a clock, and rolling-shutter timing has to be profiled model by model &mdash; each of which matters when the point is a millisecond you can trust. So the app is built for the port from day one: the core logic holds no iPhone code, device timing is data rather than code, and the protocol is the same on both. That makes Android a port rather than a rewrite &mdash; but it is still a port.</p>
+      </div>
+    </div>
+    <p class="sec-lede reveal" style="--d:4;margin-top:34px">It talks to Studio over <strong>PPCP</strong>, the PinPoint Capture Protocol — an open specification with an MIT-licensed reference implementation, so any device can implement it and any host can read it. The spec and the library are public alongside the app, and the app's own source is MIT-licensed too.</p>
     <div class="cta-row reveal" style="--d:5;margin-top:22px">
       <a class="btn" href="https://github.com/PinPoint-Golf/PinPointCapture" target="_blank" rel="noopener">PinPoint Capture &#8599;</a>
       <a class="btn" href="https://github.com/PinPoint-Golf/libppcp" target="_blank" rel="noopener">The PPCP protocol &#8599;</a>
@@ -740,7 +753,7 @@
           <li>Ball-flight tracking — ball speed, launch angle &amp; direction</li>
           <li>Corpus v1 — re-seating the literature-seeded norms from measured swings</li>
           <li>AI coach grounded in your session findings (chat, voice &amp; local LLM already built)</li>
-          <li>Android for the capture companion, and offline catch-up when the phone loses the host</li>
+          <li>Offline catch-up for the capture companion when the phone loses the host</li>
         </ul>
       </div>
       <div class="hzcol c-soon reveal" style="--d:3">
@@ -749,6 +762,7 @@
           <li>Down-the-line camera &amp; two-camera 3D — unlocks the depth-axis metrics (swing plane, club path)</li>
           <li>Ground reaction force — gated on force-plate ground truth (likely late 2027)</li>
           <li>Launch monitors that don't speak Open Connect (Uneekor, Bushnell) and more wrist sensors, on the same beside-not-instead-of contract</li>
+          <li>PinPoint Capture on Android — designed for from the start, but a real port, and not a quick one</li>
         </ul>
       </div>
     </div>
@@ -768,7 +782,9 @@
       <div class="specrow"><span class="k">Metrics</span><span class="v">95-metric catalogue &middot; 52 produced today</span></div>
       <div class="specrow"><span class="k">Diagnostics</span><span class="v">157 conditions &middot; 365 causal edges &middot; 40 cited sources</span></div>
       <div class="specrow"><span class="k">Launch monitor</span><span class="v">GSPro Open Connect &mdash; R10, MLM2PRO, SkyTrak+, PiTrac &mdash; via <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a> (MIT) &middot; Foresight GCQuad via FSX2020</span></div>
-      <div class="specrow"><span class="k">Phone link</span><span class="v">PPCP over WiFi or USB &middot; open spec, MIT reference library</span></div>
+      <div class="specrow"><span class="k">Companion app</span><span class="v">PinPoint Capture &middot; iPhone, iOS 18+ &middot; App Store with 1.0, late 2026 &middot; MIT <span class="soon">&middot; Android planned, not soon</span></span></div>
+      <div class="specrow"><span class="k">Phone capture</span><span class="v">1080p at 120&ndash;240 fps &middot; HEVC &middot; 10 s rolling buffer &middot; 30 fps live preview</span></div>
+      <div class="specrow"><span class="k">Phone link</span><span class="v">PPCP over WiFi or USB &middot; clock &sigma; 1.2 ms WiFi, 0.3 ms cable &middot; open spec, MIT reference library</span></div>
       <div class="specrow"><span class="k">Speech</span><span class="v">Whisper STT &middot; Kokoro TTS &middot; on-device</span></div>
       <div class="specrow"><span class="k">Privacy</span><span class="v">Local by default &mdash; cloud only if you configure it</span></div>
       <div class="specrow"><span class="k">Built with</span><span class="v">Qt 6.11 &middot; C++20</span></div>
