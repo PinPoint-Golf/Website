@@ -571,7 +571,7 @@
           <div class="ch-label" style="color:var(--club)"><i style="background:var(--club)"></i>Cameras</div>
           <span class="badge now"><i></i>Built</span>
         </div>
-        <p>USB webcams or GenICam / FLIR industrial cameras — face-on and down-the-line. Every live feed carries an on-device pose skeleton. The cameras you choose, not a locked box.</p>
+        <p>USB webcams or GenICam / FLIR industrial cameras — face-on and down-the-line. Every live feed carries an on-device pose skeleton. And one industrial camera can now take the <strong>impact</strong> view: cropped to a strip at the ball, a Chameleon3 runs at 591 fps on a 70 µs exposure, keeps just the frames around the strike, and loops them picture-in-picture beside the swing. The cameras you choose, not a locked box.</p>
       </div>
       <div class="channel reveal" style="--d:2;--gw:rgba(242,237,226,.08)">
         <div class="ch-top">
@@ -732,6 +732,7 @@
         <div class="hz-head"><span class="badge now"><i></i>Now</span><h3>Working</h3></div>
         <ul>
           <li>Multi-camera capture with live on-device pose overlay</li>
+          <li>Impact camera — an industrial camera cropped to a strip at the ball at 591 fps, the frames around the strike looped picture-in-picture</li>
           <li>iPhone as a capture camera via the PinPoint Capture companion app, over WiFi or USB</li>
           <li>Post-shot analysis — 133-keypoint whole-body pose, shaft, club-head &amp; ball tracking</li>
           <li>Markerless club tracking — a bare steel shaft read as its own ruler, so irons need no tape (graphite woods &amp; hybrids still do)</li>
@@ -754,6 +755,7 @@
           <li>Whole-swing 0&ndash;100 score — the scorer &amp; uncertainty maths are built; full-swing bands being seated</li>
           <li>True kinematic-sequence chart from angular-velocity series</li>
           <li>P9 — the one rung of the P1&ndash;P10 ladder still deferred</li>
+          <li>Club data from the impact camera — club speed, ball speed, angle of attack &amp; low point, read at the ball</li>
           <li>Ball-flight tracking — ball speed, launch angle &amp; direction</li>
           <li>Corpus v1 — re-seating the literature-seeded norms from measured swings</li>
           <li>AI coach grounded in your session findings (chat, voice &amp; local LLM already built)</li>
@@ -777,7 +779,7 @@
     <div class="kicker reveal"><span class="sig amber"></span>Instrument</div>
     <h2 class="reveal" style="--d:1">Built like an instrument.</h2>
     <div class="specwrap reveal" style="--d:2">
-      <div class="specrow"><span class="k">Cameras</span><span class="v">USB webcam &rarr; GenICam / FLIR industrial &middot; iPhone via PinPoint Capture</span></div>
+      <div class="specrow"><span class="k">Cameras</span><span class="v">USB webcam &rarr; GenICam / FLIR industrial &middot; impact camera at 591 fps &middot; iPhone via PinPoint Capture</span></div>
       <div class="specrow"><span class="k">IMUs</span><span class="v">Witmotion WT901BLE67 &middot; BLE &middot; up to 200 Hz</span></div>
       <div class="specrow"><span class="k">Wrist sensor</span><span class="v">HackMotion wG3 &middot; BLE &middot; ISB convention &middot; via <a class="ulink" href="https://github.com/PinPoint-Golf/libwrist" target="_blank" rel="noopener">libwrist</a> (MIT)</span></div>
       <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose 133-keypoint whole-body (analysis)</span></div>
