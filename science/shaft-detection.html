@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tracking the club — it starts with the room — PinPoint Studio</title>
-<meta name="description" content="How PinPoint Studio tracks a thin golf shaft moving at 100+ mph — why the room it's swung in matters most, how retroreflective shaft tape lifts tracking in dark sim rooms to instrument grade, how a bare unmarked steel club is read as its own ruler from the grip end and the hosel (and why graphite shafts still want tape), and how the passive tracker leans on the golfer's anatomy and swing physics. A method under development and validation; first beta shipped September 2026, 1.0 targeted for late in the year.">
+<meta name="description" content="How PinPoint Studio tracks a thin golf shaft moving at 100+ mph — why the room it's swung in matters most, how retroreflective shaft tape lifts tracking in dark sim rooms to instrument grade, how a bare unmarked steel club is read as its own ruler from the grip end and the hosel (and why graphite shafts still want tape), and how the passive tracker leans on the golfer's anatomy and swing physics. A method under development and validation; third beta shipped September 2026, 1.0 targeted for late in the year.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -483,7 +483,7 @@
           <li class="point"><span class="pi green">3</span><div><h4>Handedness, worked out for you</h4><p>Left- or right-handed is read once per swing from the direction the <em>hands</em> travel — which needs no club detection at all, and so is available before the search even starts. Nothing to set.</p></div></li>
           <li class="point"><span class="pi green">4</span><div><h4>Club lifted off the background</h4><p>A still background is estimated and subtracted, and the moving body is masked out, so the faint club smear stands clear of everything else.</p></div></li>
         </ul>
-        <div class="callout"><p><strong>Still being proven.</strong> These refinements are built and improving, not signed off. Next on the bench: projecting the physics through the camera's true 3D geometry, calibrating against motion-sensor ground truth, and extending the model to down-the-line views &mdash; each held to the same validation bar before it ships. <a class="ulink" href="how-it-works.html#shaft">The constraints and the global solve, in engineering terms &#8594;</a></p></div>
+        <div class="callout"><p><strong>Still being proven.</strong> These refinements are built and improving, not signed off. The down-the-line view now has a shaft tracker of its own, timed from the face-on analysis of the same swing: graded against 425 hand-checked frames on six held-out swings, its median error is 0.25&ndash;0.3&deg;, with no frame more than 15&deg; out. With both views, each camera pins the shaft to a plane and the shaft is where the two planes cross &mdash; 3D with no calibration. Next on the bench: projecting the physics through the camera's true 3D geometry and calibrating against motion-sensor ground truth &mdash; each held to the same validation bar before it ships. <a class="ulink" href="how-it-works.html#shaft">The constraints and the global solve, in engineering terms &#8594;</a></p></div>
       </div>
       <div class="xv reveal">
         <svg viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
@@ -519,7 +519,7 @@
   <section class="closing wrap">
     <span class="eyebrow reveal">Science-led, kept open</span>
     <h2 class="reveal" style="--d:1">The room, the tape, the <em>physics.</em></h2>
-    <p class="reveal" style="--d:2">Good club tracking starts with the room, leans on a few grams of tape where the room &mdash; or a black graphite shaft &mdash; can't help, and now does without it on bare steel, reading the shaft's own landmarks as geometry &mdash; while for every plain shaft in between it falls back on what a body and a swing can physically do. All of it is drawn from the literature, kept open to inspect, and held against real swings before it ships. The first beta shipped in September 2026; it's still a prototype under validation, with 1.0 targeted for late in the year.</p>
+    <p class="reveal" style="--d:2">Good club tracking starts with the room, leans on a few grams of tape where the room &mdash; or a black graphite shaft &mdash; can't help, and now does without it on bare steel, reading the shaft's own landmarks as geometry &mdash; while for every plain shaft in between it falls back on what a body and a swing can physically do. All of it is drawn from the literature, kept open to inspect, and held against real swings before it ships. The third beta shipped in September 2026; it's still a prototype under validation, with 1.0 targeted for late in the year.</p>
     <div class="cta-row reveal" style="--d:3">
       <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
       <a class="btn" href="validation.html">How we validate</a>
