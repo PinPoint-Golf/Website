@@ -429,19 +429,19 @@
         <p class="credit reveal" style="--d:6">From the author of <a class="ulink" href="https://www.goldencheetah.org" target="_blank" rel="noopener">GoldenCheetah</a>.</p>
       </div>
 
-      <div class="capture reveal" style="--d:2" aria-label="Concept visualisation of the kinematic sequence — peak angular velocity of the pelvis, thorax, lead arm and club firing in order through the downswing into impact.">
+      <div class="capture reveal" style="--d:2" aria-label="Concept visualisation of the kinematic sequence — angular velocity of the pelvis, thorax, lead arm and club, negative through the backswing, then peaking in turn through the downswing: pelvis about 500, thorax 720, lead arm 1000 and club 2200 degrees per second at impact.">
         <div class="cap-head">
           <span class="rec"><i></i>Kinematic sequence</span>
-          <span class="cap-meta"><b id="pframe">P1</b> &middot; deg/s &middot; concept</span>
+          <span class="cap-meta"><b id="pframe">P1</b> &middot; deg/s &middot; typical swing</span>
         </div>
         <div class="scope"><canvas id="kseq"></canvas></div>
         <div class="peaks">
-          <div class="peak" data-seg="pelvis"><span class="pdot" style="background:var(--pelvis);color:var(--pelvis)"></span><span class="pname">Pelvis</span><span class="pbar"><i style="background:var(--pelvis);color:var(--pelvis)"></i></span><span class="pval" data-max="430"><span class="n">0</span><span class="u">°/s</span></span></div>
-          <div class="peak" data-seg="thorax"><span class="pdot" style="background:var(--thorax);color:var(--thorax)"></span><span class="pname">Thorax</span><span class="pbar"><i style="background:var(--thorax);color:var(--thorax)"></i></span><span class="pval" data-max="610"><span class="n">0</span><span class="u">°/s</span></span></div>
-          <div class="peak" data-seg="arm"><span class="pdot" style="background:var(--arm);color:var(--arm)"></span><span class="pname">Lead arm</span><span class="pbar"><i style="background:var(--arm);color:var(--arm)"></i></span><span class="pval" data-max="840"><span class="n">0</span><span class="u">°/s</span></span></div>
-          <div class="peak" data-seg="club"><span class="pdot" style="background:var(--club);color:var(--club)"></span><span class="pname">Club</span><span class="pbar"><i style="background:var(--club);color:var(--club)"></i></span><span class="pval" data-max="1180"><span class="n">0</span><span class="u">°/s</span></span></div>
+          <div class="peak" data-seg="pelvis"><span class="pdot" style="background:var(--pelvis);color:var(--pelvis)"></span><span class="pname">Pelvis</span><span class="pbar"><i style="background:var(--pelvis);color:var(--pelvis)"></i></span><span class="pval" data-max="500"><span class="n">0</span><span class="u">°/s</span></span></div>
+          <div class="peak" data-seg="thorax"><span class="pdot" style="background:var(--thorax);color:var(--thorax)"></span><span class="pname">Thorax</span><span class="pbar"><i style="background:var(--thorax);color:var(--thorax)"></i></span><span class="pval" data-max="720"><span class="n">0</span><span class="u">°/s</span></span></div>
+          <div class="peak" data-seg="arm"><span class="pdot" style="background:var(--arm);color:var(--arm)"></span><span class="pname">Lead arm</span><span class="pbar"><i style="background:var(--arm);color:var(--arm)"></i></span><span class="pval" data-max="1000"><span class="n">0</span><span class="u">°/s</span></span></div>
+          <div class="peak" data-seg="club"><span class="pdot" style="background:var(--club);color:var(--club)"></span><span class="pname">Club</span><span class="pbar"><i style="background:var(--club);color:var(--club)"></i></span><span class="pval" data-max="2200"><span class="n">0</span><span class="u">°/s</span></span></div>
         </div>
-        <p class="scope-note">Illustrative — peak values are indicative; the live chart plots your own swing, with the order the segments peak in.</p>
+        <p class="scope-note">A typical sequence, drawn to scale: each segment peaks later and faster than the one below it, the club at impact. Time is stretched through the downswing, as these charts always are. The live chart plots your own swing.</p>
       </div>
     </div>
   </section>
@@ -893,14 +893,29 @@
 
   var COL = { paper:'#F2EDE2', dim:'#94A09E', line:'rgba(242,237,226,.11)', strong:'rgba(242,237,226,.22)' };
 
-  /* four channels — peaks placed proximal -> distal across the downswing axis */
+  /* four channels, as a real kinematic sequence reads:
+     negative through the backswing, then proximal -> distal peaks into impact.
+     Control points are (P-position index 0..9, deg/s); the curve is a monotone
+     cubic through them, so it never overshoots and each peak sits on the line. */
   var TR = [
-    {key:'pelvis', col:'#E6AC54', mu:0.26, sg:0.105, amp:0.42, max:430},
-    {key:'thorax', col:'#E07E64', mu:0.43, sg:0.095, amp:0.62, max:610},
-    {key:'arm',    col:'#8AB389', mu:0.60, sg:0.085, amp:0.82, max:840},
-    {key:'club',   col:'#7BC0DB', mu:0.75, sg:0.072, amp:1.00, max:1180}
+    {key:'pelvis', col:'#E6AC54', max:500, pk:4.35, pts:[
+      [0,0],[0.5,-35],[1,-65],[2,-90],[2.6,-75],[3,30],[3.4,150],[3.8,330],
+      [4,430],[4.35,500],[4.8,485],[5.2,455],[5.6,390],[6,300],[6.6,220],[7,185],[7.6,140],[8,110],[8.5,60],[9,0]]},
+    {key:'thorax', col:'#E07E64', max:720, pk:4.8, pts:[
+      [0,0],[0.5,-60],[1,-110],[2,-155],[2.6,-135],[3,-20],[3.4,120],[3.8,380],
+      [4,600],[4.4,690],[4.8,720],[5.2,700],[5.6,600],[6,450],[6.4,360],[7,290],[7.6,200],[8,150],[8.5,80],[9,0]]},
+    {key:'arm',    col:'#8AB389', max:1000, pk:5.2, pts:[
+      [0,0],[0.5,-95],[1,-180],[2,-265],[2.6,-230],[3,-30],[3.4,200],[3.8,520],
+      [4,700],[4.4,850],[4.8,960],[5.2,1000],[5.6,960],[6,800],[6.3,620],[6.7,420],[7,320],[7.6,230],[8,180],[8.5,90],[9,0]]},
+    {key:'club',   col:'#7BC0DB', max:2200, pk:6.0, pts:[
+      [0,0],[0.5,-200],[1,-370],[2,-480],[2.6,-380],[3,-60],[3.3,-10],[3.6,20],
+      [4,150],[4.4,450],[4.8,950],[5.2,1500],[5.6,1900],[6,2200],[6.25,2000],[6.5,1450],
+      [6.8,700],[7,350],[7.4,300],[8,300],[8.5,200],[9,0]]}
   ];
-  var IMPACT = 0.84; /* impact marker, just after the club peaks */
+  var NP = 10;                 /* P1 .. P10 */
+  var IMPACT = 6/9;            /* P7, where the club peaks */
+  var TOPP   = 3/9;            /* P4 */
+  var VMIN = -600, VMAX = 2400;
 
   /* live readout rows */
   var rows = {};
@@ -918,6 +933,29 @@
     return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
   }
 
+  /* monotone cubic (Fritsch-Carlson): no overshoot, so no invented peaks */
+  function pchip(pts){
+    var n=pts.length, h=[], d=[], m=[], i;
+    for(i=0;i<n-1;i++){ h[i]=pts[i+1][0]-pts[i][0]; d[i]=(pts[i+1][1]-pts[i][1])/h[i]; }
+    m[0]=d[0]; m[n-1]=d[n-2];
+    for(i=1;i<n-1;i++){
+      if(d[i-1]*d[i]<=0){ m[i]=0; }
+      else {
+        var w1=2*h[i]+h[i-1], w2=h[i]+2*h[i-1];
+        m[i]=(w1+w2)/(w1/d[i-1]+w2/d[i]);
+      }
+    }
+    return function(x){
+      if(x<=pts[0][0]) return pts[0][1];
+      if(x>=pts[n-1][0]) return pts[n-1][1];
+      var k=0; while(k<n-2 && x>pts[k+1][0]) k++;
+      var t=(x-pts[k][0])/h[k], t2=t*t, t3=t2*t;
+      return (2*t3-3*t2+1)*pts[k][1] + (t3-2*t2+t)*h[k]*m[k]
+           + (-2*t3+3*t2)*pts[k+1][1] + (t3-t2)*h[k]*m[k+1];
+    };
+  }
+  for(var q=0;q<TR.length;q++) TR[q].f=pchip(TR[q].pts);
+
   var W=0,H=0,dpr=1;
   function size(){
     dpr = Math.min(window.devicePixelRatio||1, 2);
@@ -927,16 +965,17 @@
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
 
-  /* precompute trace polylines for current geometry */
   function geom(){
-    var padL=16,padR=16,padT=18,padB=22;
+    var padL=38,padR=14,padT=18,padB=22;
     return {x0:padL, x1:W-padR, yB:H-padB, yT:padT};
   }
+  function yOf(v,g){ return g.yB-(v-VMIN)/(VMAX-VMIN)*(g.yB-g.yT); }
+  function xOf(t,g){ return g.x0+t*(g.x1-g.x0); }        /* t in 0..1 across P1..P10 */
   function pathFor(tr,g){
-    var N=110, pts=[];
-    for(var k=0;k<=N;k++){
-      var t=k/N, v=tr.amp*bell(t,tr.mu,tr.sg);
-      pts.push({x:g.x0+t*(g.x1-g.x0), y:g.yB-v*(g.yB-g.yT)});
+    var N=200, pts=[], k;
+    for(k=0;k<=N;k++){
+      var t=k/N;
+      pts.push({x:xOf(t,g), y:yOf(tr.f(t*9),g)});
     }
     return pts;
   }
@@ -945,56 +984,69 @@
     var g=geom(), x0=g.x0,x1=g.x1,yB=g.yB,yT=g.yT;
     ctx.clearRect(0,0,W,H);
     ctx.globalAlpha=alpha;
-    var scanX=x0+scan*(x1-x0);
+    var scanX=xOf(scan,g), yZero=yOf(0,g);
 
-    /* horizontal grid */
-    ctx.strokeStyle='rgba(123,192,219,.05)'; ctx.lineWidth=1;
-    for(var gy=1;gy<=3;gy++){ var Y=yB-(yB-yT)*gy/4; ctx.beginPath(); ctx.moveTo(x0,Y); ctx.lineTo(x1,Y); ctx.stroke(); }
+    /* gridlines at round values, and what they are worth */
+    ctx.font='8px "DM Mono",monospace'; ctx.textAlign='right';
+    [800,1600,2400].forEach(function(v){
+      var Y=yOf(v,g);
+      ctx.strokeStyle='rgba(123,192,219,.05)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x0,Y); ctx.lineTo(x1,Y); ctx.stroke();
+      ctx.fillStyle='rgba(148,160,158,.55)';
+      ctx.fillText(String(v), x0-5, Y+3);
+    });
+    ctx.fillStyle='rgba(148,160,158,.7)'; ctx.textAlign='left';
+    ctx.font='9px "DM Mono",monospace';
+    ctx.fillText('deg/s', x0-2, yT-6);
 
-    /* axis label */
-    ctx.fillStyle='rgba(148,160,158,.7)'; ctx.font='9px "DM Mono",monospace'; ctx.textAlign='left';
-    ctx.fillText('deg/s', x0, yT-6);
-
-    /* impact marker */
-    var impX=x0+IMPACT*(x1-x0);
+    /* top of the backswing */
+    var topX=xOf(TOPP,g);
     ctx.save();
-    ctx.strokeStyle='rgba(242,237,226,.18)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    ctx.strokeStyle='rgba(242,237,226,.10)'; ctx.lineWidth=1; ctx.setLineDash([2,4]);
+    ctx.beginPath(); ctx.moveTo(topX,yT+4); ctx.lineTo(topX,yB); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle='rgba(148,160,158,.7)'; ctx.font='8.5px "DM Mono",monospace'; ctx.textAlign='center';
+    ctx.fillText('TOP', topX, yT+2);
+
+    /* impact */
+    var impX=xOf(IMPACT,g);
+    ctx.save();
+    ctx.strokeStyle='rgba(242,237,226,.20)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
     ctx.beginPath(); ctx.moveTo(impX,yT-2); ctx.lineTo(impX,yB); ctx.stroke();
     ctx.restore();
     ctx.fillStyle='rgba(148,160,158,.85)'; ctx.font='8.5px "DM Mono",monospace'; ctx.textAlign='center';
     ctx.fillText('IMPACT', impX, yT-6);
 
-    /* baseline */
+    /* zero line — the backswing lives below it */
     ctx.strokeStyle=COL.strong; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(x0,yB); ctx.lineTo(x1,yB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0,yZero); ctx.lineTo(x1,yZero); ctx.stroke();
+    ctx.fillStyle='rgba(148,160,158,.55)'; ctx.font='8px "DM Mono",monospace'; ctx.textAlign='right';
+    ctx.fillText('0', x0-5, yZero+3);
 
-    /* P1..P8 ticks */
+    /* P1..P10 ticks, thinned when there is no room for ten */
+    var every = (x1-x0) < 300 ? 3 : 1;
     ctx.fillStyle=COL.dim; ctx.font='9px "DM Mono",monospace'; ctx.textAlign='center';
-    for(var i=0;i<8;i++){
-      var t=i/7, X=x0+t*(x1-x0);
+    for(var i=0;i<NP;i++){
+      var X=xOf(i/(NP-1),g);
       ctx.strokeStyle=COL.line; ctx.beginPath(); ctx.moveTo(X,yB); ctx.lineTo(X,yB+4); ctx.stroke();
-      ctx.fillText('P'+(i+1), X, yB+15);
+      if(i%every===0 || i===NP-1) ctx.fillText('P'+(i+1), X, yB+15);
     }
 
-    /* traces: dim full, then lit (clipped to scan), area fill, peak marker */
+    /* traces: dim full, then lit to the scan, with the area to the zero line */
     for(var d=0; d<TR.length; d++){
       var tr=TR[d], pts=pathFor(tr,g), m;
-      /* dim full trace */
       ctx.strokeStyle='rgba(242,237,226,.08)'; ctx.lineWidth=1.2; ctx.beginPath();
       for(m=0;m<pts.length;m++){ if(m===0)ctx.moveTo(pts[m].x,pts[m].y); else ctx.lineTo(pts[m].x,pts[m].y); }
       ctx.stroke();
 
-      /* lit portion */
       ctx.save();
       ctx.beginPath(); ctx.rect(x0-1,0,Math.max(0,scanX-x0+1),H); ctx.clip();
-      /* area fill */
-      var grad=ctx.createLinearGradient(0,yT,0,yB);
-      grad.addColorStop(0,rgba(tr.col,0.22)); grad.addColorStop(1,rgba(tr.col,0));
-      ctx.fillStyle=grad; ctx.beginPath(); ctx.moveTo(pts[0].x,yB);
+      var grad=ctx.createLinearGradient(0,yT,0,yZero);
+      grad.addColorStop(0,rgba(tr.col,0.20)); grad.addColorStop(1,rgba(tr.col,0));
+      ctx.fillStyle=grad; ctx.beginPath(); ctx.moveTo(pts[0].x,yZero);
       for(m=0;m<pts.length;m++) ctx.lineTo(pts[m].x,pts[m].y);
-      ctx.lineTo(pts[pts.length-1].x,yB); ctx.closePath(); ctx.fill();
-      /* lit stroke */
-      ctx.strokeStyle=tr.col; ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.lineTo(pts[pts.length-1].x,yZero); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle=tr.col; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round';
       ctx.shadowColor=tr.col; ctx.shadowBlur=10;
       ctx.beginPath();
       for(m=0;m<pts.length;m++){ if(m===0)ctx.moveTo(pts[m].x,pts[m].y); else ctx.lineTo(pts[m].x,pts[m].y); }
@@ -1002,9 +1054,10 @@
       ctx.restore();
 
       /* peak marker — pops as the scan crosses it */
-      if(scan>=tr.mu-0.002){
-        var pulse=bell(scan,tr.mu,0.05);
-        var pkX=x0+tr.mu*(x1-x0), pkY=yB-tr.amp*(yB-yT), rad=2.6+2.6*pulse;
+      var pkT=tr.pk/9;
+      if(scan>=pkT-0.002){
+        var pulse=bell(scan,pkT,0.05);
+        var pkX=xOf(pkT,g), pkY=yOf(tr.max,g), rad=2.6+2.6*pulse;
         ctx.save(); ctx.shadowColor=tr.col; ctx.shadowBlur=10+20*pulse;
         ctx.fillStyle=tr.col; ctx.beginPath(); ctx.arc(pkX,pkY,rad,0,6.2832); ctx.fill();
         ctx.fillStyle='rgba(255,255,255,'+(0.55+0.45*pulse)+')';
@@ -1025,12 +1078,14 @@
   }
 
   function readout(scan){
+    var top=TR[TR.length-1].max;                    /* bars share one scale */
     for(var d=0; d<TR.length; d++){
       var tr=TR[d], r=rows[tr.key]; if(!r) continue;
-      var fill=ease(clamp(scan/tr.mu,0,1));         /* reaches full as scan crosses the peak */
-      if(r.bar) r.bar.style.width=(fill*100).toFixed(1)+'%';
-      if(r.num) r.num.textContent=Math.round(tr.max*fill);
-      if(scan>=tr.mu-0.06) r.el.classList.add('lit'); else r.el.classList.remove('lit');
+      var v=Math.max(0, tr.f(clamp(scan,0,1)*9));   /* the reading under the scan line */
+      var held=scan>=tr.pk/9 ? tr.max : v;          /* past its peak, the peak is what stands */
+      if(r.bar) r.bar.style.width=(clamp(held/top,0,1)*100).toFixed(1)+'%';
+      if(r.num) r.num.textContent=Math.round(held);
+      if(scan>=tr.pk/9-0.02) r.el.classList.add('lit'); else r.el.classList.remove('lit');
     }
   }
 
@@ -1044,13 +1099,13 @@
     else if(p>0.90) alpha=clamp((1-p)/0.10,0,1);    /* fade out before reset */
     render(scan, alpha);
     readout(scan);
-    if(frameLabel) frameLabel.textContent='P'+clamp(Math.floor(scan*7)+1,1,8);
+    if(frameLabel) frameLabel.textContent='P'+clamp(Math.floor(scan*9)+1,1,10);
     requestAnimationFrame(tick);
   }
 
   function staticFrame(){
     render(1,1); readout(1);
-    if(frameLabel) frameLabel.textContent='P8';
+    if(frameLabel) frameLabel.textContent='P10';
   }
 
   function start(){
