@@ -450,18 +450,19 @@
   <section id="tour" class="wrap">
     <div class="kicker reveal"><span class="sig paper"></span>The app</div>
     <h2 class="reveal" style="--d:1">Inside <em>the studio.</em></h2>
-    <p class="sec-lede reveal" style="--d:2">A first look at the desktop app as it stands today — from setting up your kit, through replaying a swing beside its numbers and reading those numbers against a codified diagnostic model, to marking swings up by hand for validation.</p>
+    <p class="sec-lede reveal" style="--d:2">A first look at the desktop app as it stands today — from setting up your kit, through replaying a swing beside its numbers, reading those numbers against a codified diagnostic model and seeing what a whole session adds up to, to marking swings up by hand for validation.</p>
 
     <div id="studio" class="studio reveal" style="--d:3">
       <div class="studio-head">
         <span class="studio-mode"><i></i>Now viewing&nbsp;<b>Home</b></span>
-        <span class="studio-count"><b>1</b>&thinsp;/&thinsp;6</span>
+        <span class="studio-count"><b>1</b>&thinsp;/&thinsp;7</span>
       </div>
       <div class="studio-screen">
         <img class="shot active" src="assets/home.webp" width="1800" height="1230" alt="PinPoint Studio home screen — choosing a player, club and analysis mode to start a session.">
         <img class="shot" src="assets/settings.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio settings — assigning and testing an IMU sensor before capture.">
         <img class="shot" src="assets/replay.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio replay — a captured swing played back beside its wrist metrics.">
         <img class="shot" src="assets/diagnostics.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio diagnostic model — the fault 'early extension' shown as a causal graph of what causes it and what it leads to, beside the measurement that detects it and the citation behind it.">
+        <img class="shot" src="assets/session.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio session diagnostics — a finished fifteen-shot session read as ranked patterns: over the top on 15 of 15 measurable shots, flying trail elbow on 10 of 10, each card carrying the reading that fired it and how far outside its range it was, with limited thoracic rotation named as the likely driver of four of them.">
         <img class="shot" src="assets/markup.webp" width="1800" height="1227" loading="lazy" alt="PinPoint Studio markup — annotating swing positions by hand for validation.">
         <img class="shot" src="assets/system.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio system view — built-in performance profiler showing CPU, memory, threads and per-model GPU use.">
       </div>
@@ -486,13 +487,18 @@
           <p>Swing faults codified from the literature and leading coaching texts — a causal network linking each fault to its causes, the measurements that detect it and the drills that correct it.</p>
           <span class="tprog"><i></i></span>
         </button>
+        <button type="button" class="tstep" data-mode="Session diagnostics" style="--c:#E07E64" aria-current="false">
+          <span class="tnum">05</span><h4>Session diagnostics</h4>
+          <p>What a whole session says, not one swing — patterns ranked by how often they recur and how far out they were, each with the reading behind it, and the one cause that would explain the most of them.</p>
+          <span class="tprog"><i></i></span>
+        </button>
         <button type="button" class="tstep" data-mode="Markup" style="--c:#8AB389" aria-current="false">
-          <span class="tnum">05</span><h4>Markup</h4>
+          <span class="tnum">06</span><h4>Markup</h4>
           <p>Annotate swings by hand — the ground-truth labelling that underpins validation.</p>
           <span class="tprog"><i></i></span>
         </button>
         <button type="button" class="tstep" data-mode="System" style="--c:#F2EDE2" aria-current="false">
-          <span class="tnum">06</span><h4>System</h4>
+          <span class="tnum">07</span><h4>System</h4>
           <p>Built-in profiling of CPU, memory and threads — performance engineered in from the ground up, across Windows, macOS and Linux.</p>
           <span class="tprog"><i></i></span>
         </button>
