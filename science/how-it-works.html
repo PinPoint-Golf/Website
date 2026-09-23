@@ -56,6 +56,7 @@
       <a href="#metrics">Metrics &amp; joints</a>
       <a href="#diagnostics">Diagnostics</a>
       <a href="#session">Session assessment</a>
+      <a href="#storage">What a swing weighs</a>
     </nav>
   </section>
 
@@ -786,7 +787,7 @@
     <div class="xgrid">
       <div class="xcol">
         <span class="badge"><i></i>Metric &amp; joint extraction</span>
-        <h2 class="xh">Ninety-five things, <em>each knowing its own limits</em></h2>
+        <h2 class="xh">A hundred and four things, <em>each knowing its own limits</em></h2>
         <p class="xlede">With a ladder of events and a fused set of streams, extraction is arithmetic — but the honesty lives in the bookkeeping around it. The catalogue owns what a metric <em>is</em>; the producers own how it is computed; and a metric never judges itself.</p>
         <ul class="points">
           <li class="point"><span class="pi green">1</span><div><h4>Joint angles, decomposed deliberately</h4><p>The wrist is read from the relative rotation between forearm and hand: flexion/extension and radial/ulnar deviation from a Tait-Bryan decomposition chosen so that forearm twist drops out on the middle axis, then pronation and elbow flexion from a swing-twist decomposition about the forearm's long axis. Signs are hardware-locked and pinned by tests, because an inverted sign is a fault that fires happily on the wrong swings.</p></div></li>
@@ -993,6 +994,58 @@
           <text x="200" y="376" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle" opacity=".75">the session summary is the panel &#8212; there is no second object</text>
         </svg>
         <p class="figcap">Illustrative — recurrence, then a chain, then one thing to work on.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORAGE -->
+  <section id="storage" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge dev"><i></i>Swing storage</span>
+        <h2 class="xh">The document was bigger <em>than the video</em></h2>
+        <p class="xlede">A recorded swing is a folder: the video, and a document holding the capture manifest, the sensor streams, pose, the club and ball tracks, the phases and the metrics. That document was JSON &mdash; and across a 170-swing corpus it ran to a median of <strong>33.4&nbsp;MB</strong> a swing, against 6&ndash;9&nbsp;MB for the clip beside it. At sixty swings an hour, the bookkeeping was costing about five times what the pictures did.</p>
+        <ul class="points">
+          <li class="point"><span class="pi amber">1</span><div><h4>Where it was all going</h4><p>85% of the document was pose: 133 keypoints a frame, every number written out to seventeen digits. And 58% of the file was indentation. Writing it compact was the stopgap and it shipped &mdash; a median swing fell to <strong>13.9&nbsp;MB</strong>, and the corpus from 4.8 to 2.0&nbsp;GB &mdash; but whitespace was never the real problem.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A format shaped like the data</h4><p><code>.ppsw</code> is a 40-byte header, then zstd-compressed chunks, then a table of contents. Each chunk is a subtree of the document encoded as CBOR; numeric arrays become typed, byte-shuffled ndarrays, and arrays of objects are stored column-wise, so a thousand frames of one keypoint sit together and compress like the smooth signal they are. The median swing lands at <strong>3.1&nbsp;MB</strong> &mdash; 2.6&nbsp;MB face-on, 5.8&nbsp;MB with a down-the-line camera too &mdash; and the corpus at 0.46&nbsp;GB.</p></div></li>
+          <li class="point"><span class="pi cyan">3</span><div><h4>Lossless, and checked swing by swing</h4><p>Every number comes back bit-for-bit: all 170 corpus swings convert and verify equal, through the C++ reader and an independent pure-Python one. A second policy stores the display series as float32 for roughly 1.8&nbsp;MB a swing &mdash; offered as a choice, never as the default, because a measurement archive that quietly rounds is not an archive.</p></div></li>
+          <li class="point"><span class="pi green">4</span><div><h4>Lazy, so the cheap read stays cheap</h4><p>The table of contents means the session list, the review and the metric scalars load without decoding a single pose track. Reading a swing's root costs about <strong>0.7&nbsp;ms</strong>; the whole document parses in 46&nbsp;ms where the JSON took 163&nbsp;ms. Most of what the app does with a swing never needs the heavy chunks at all.</p></div></li>
+          <li class="point"><span class="pi coral">5</span><div><h4>A file anyone can open</h4><p>The format is a written specification, not a private blob, and the reader is <a class="ulink" href="https://github.com/PinPoint-Golf/libppswing" target="_blank" rel="noopener">libppswing</a> &mdash; C++17 and pure Python, MIT-licensed, with a <code>ppsw</code> command line tool that converts, dumps back to JSON, lists the chunks and proves the round trip. If you want to take your swings somewhere else, or write your own analysis over them, nothing here is in the way.</p></div></li>
+        </ul>
+        <div class="callout"><p><strong>Where this stands.</strong> The specification, the library, the converter and the corpus proof are done; the app still writes JSON, and changing it over is the next step. Sizes here are medians over the 170-swing corpus, measured with <code>tools/corpus_check.py</code>.</p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="28" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">ONE SWING, ON DISK</text>
+          <g font-size="9.5" fill="var(--paper-dim)">
+            <text x="24" y="70">swing.json</text>
+            <text x="24" y="124">compact</text>
+            <text x="24" y="178">.ppsw</text>
+            <text x="24" y="232">display f32</text>
+          </g>
+          <g>
+            <rect x="24" y="78" width="300" height="20" rx="4" fill="rgba(224,126,100,.30)" stroke="var(--thorax)" stroke-width="1.2"/>
+            <text x="332" y="93" fill="var(--thorax)" font-size="10">33.4 MB</text>
+            <rect x="24" y="132" width="125" height="20" rx="4" fill="rgba(230,172,84,.26)" stroke="var(--accent)" stroke-width="1.2"/>
+            <text x="157" y="147" fill="var(--accent)" font-size="10">13.9 MB</text>
+            <rect x="24" y="186" width="28" height="20" rx="4" fill="rgba(138,179,137,.34)" stroke="var(--arm)" stroke-width="1.2"/>
+            <text x="60" y="201" fill="var(--arm)" font-size="10">3.1 MB &#183; lossless</text>
+            <rect x="24" y="240" width="16" height="20" rx="4" fill="rgba(123,192,219,.26)" stroke="var(--club)" stroke-width="1.2"/>
+            <text x="48" y="255" fill="var(--club)" font-size="10">1.8 MB</text>
+          </g>
+          <line x1="24" y1="282" x2="376" y2="282" stroke="var(--line)" stroke-width="1"/>
+          <text x="200" y="308" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="1.5">WHAT A READ COSTS</text>
+          <g font-size="9.5">
+            <text x="24" y="334" fill="var(--paper-dim)">parse swing.json</text>
+            <text x="376" y="334" fill="var(--thorax)" text-anchor="end">163 ms</text>
+            <text x="24" y="356" fill="var(--paper-dim)">parse .ppsw</text>
+            <text x="376" y="356" fill="var(--arm)" text-anchor="end">46 ms</text>
+            <text x="24" y="378" fill="var(--paper-dim)">.ppsw root only &#8212; no pose decoded</text>
+            <text x="376" y="378" fill="var(--club)" text-anchor="end">0.7 ms</text>
+          </g>
+        </svg>
+        <p class="figcap">Medians over the 170-swing corpus; all 170 verify bit-for-bit through two independent decoders.</p>
       </div>
     </div>
   </section>
