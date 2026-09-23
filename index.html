@@ -757,6 +757,7 @@
           <li>Whole-swing 0&ndash;100 score — the scorer &amp; uncertainty maths are built; full-swing bands being seated</li>
           <li>P9 — the one rung of the P1&ndash;P10 ladder still deferred</li>
           <li>Club data from the impact camera — club speed, ball speed, angle of attack &amp; low point, read at the ball, once the calibration card arrives</li>
+          <li>Swing files in the new .ppsw binary format &mdash; the library, spec and converter are done; the app changes over next</li>
           <li>Ball-flight tracking — ball speed, launch angle &amp; direction</li>
           <li>Corpus v1 — re-seating the literature-seeded norms from measured swings</li>
           <li>AI coach grounded in your session findings (chat, voice &amp; local LLM already built)</li>
@@ -788,6 +789,7 @@
       <div class="specrow"><span class="k">Swing timing</span><span class="v">P-position ladder, P1&ndash;P8 and P10 (P9 deferred)</span></div>
       <div class="specrow"><span class="k">Metrics</span><span class="v">104-metric catalogue &middot; 65 produced today</span></div>
       <div class="specrow"><span class="k">Diagnostics</span><span class="v">157 conditions &middot; 366 causal edges &middot; 40 cited sources</span></div>
+      <div class="specrow"><span class="k">Swing file</span><span class="v">.ppsw &mdash; chunked binary, lossless, ~2&ndash;4 MB a swing &middot; open spec &middot; C++ &amp; Python readers via <a class="ulink" href="https://github.com/PinPoint-Golf/libppswing" target="_blank" rel="noopener">libppswing</a> (MIT) <span class="soon">&middot; the app switches over next</span></span></div>
       <div class="specrow"><span class="k">Launch monitor</span><span class="v">GSPro Open Connect &mdash; R10, MLM2PRO, SkyTrak+, PiTrac &mdash; via <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a> (MIT) &middot; Foresight GCQuad via FSX2020</span></div>
       <div class="specrow"><span class="k">Companion app</span><span class="v">PinPoint Capture &middot; iPhone, iOS 18+ &middot; App Store with 1.0, late 2026 &middot; MIT <span class="soon">&middot; Android planned, not soon</span></span></div>
       <div class="specrow"><span class="k">Phone capture</span><span class="v">1080p at 120&ndash;240 fps &middot; HEVC &middot; 10 s rolling buffer &middot; 30 fps live preview</span></div>
@@ -834,10 +836,10 @@
         </div>
         <div class="fitem">
           <span class="fk"><i></i>Your data, your disk</span>
-          <p>Swings, video and sessions are files on your own machine. Local by default &mdash; nothing goes to a cloud unless you set one up yourself.</p>
+          <p>Swings, video and sessions are files on your own machine, in a documented format any tool can open. Local by default &mdash; nothing goes to a cloud unless you set one up yourself.</p>
         </div>
       </div>
-      <p class="fnote"><b>Open in every way.</b> PinPoint Studio itself is GPL&nbsp;v2. And when we write something another project could use, we don't leave it buried inside the app &mdash; we package it up as a standalone, MIT-licensed library, specifically so others can benefit from it. Talking to a HackMotion wrist sensor became <a class="ulink" href="https://github.com/PinPoint-Golf/libwrist" target="_blank" rel="noopener">libwrist</a>; speaking GSPro Open Connect to a launch monitor became <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a>; the phone protocol is a published spec. We will always be open source, and we will always back the organisations and standards that are open too.</p>
+      <p class="fnote"><b>Open in every way.</b> PinPoint Studio itself is GPL&nbsp;v2. And when we write something another project could use, we don't leave it buried inside the app &mdash; we package it up as a standalone, MIT-licensed library, specifically so others can benefit from it. Talking to a HackMotion wrist sensor became <a class="ulink" href="https://github.com/PinPoint-Golf/libwrist" target="_blank" rel="noopener">libwrist</a>; speaking GSPro Open Connect to a launch monitor became <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a>; reading and writing a recorded swing became <a class="ulink" href="https://github.com/PinPoint-Golf/libppswing" target="_blank" rel="noopener">libppswing</a>; the phone protocol is a published spec. We will always be open source, and we will always back the organisations and standards that are open too.</p>
     </div>
   </section>
 
