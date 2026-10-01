@@ -587,7 +587,7 @@
       <div class="vstep reveal" style="--d:3">
         <div class="vstep-top"><span class="vnum">03</span><span class="badge dev"><i></i>Ongoing</span></div>
         <h3>SwingLab holds them to it</h3>
-        <p>SwingLab, our validation harness, replays the exact production pipeline over the corpus and scores it against physics invariants and the hand-labelled truth — with byte-identical regression gates, so a change that shifts a single number can't slip through unnoticed.</p>
+        <p>SwingLab, our validation harness, replays the exact production pipeline over the corpus and scores it against physics invariants and the hand-labelled truth — with byte-identical regression gates, so a change that shifts a single number can't slip through unnoticed. It holds the error bars to account as well: a &plusmn; only counts once real errors land inside it as often as it promises.</p>
       </div>
     </div>
     <a class="vlink reveal" style="--d:4" href="science/validation.html">Read the full method — validation &amp; tuning &#8594;</a>
@@ -770,6 +770,7 @@
           <li>iPhone as a capture camera via the PinPoint Capture companion app, over WiFi or USB</li>
           <li>Post-shot analysis — 133-keypoint whole-body pose, shaft, club-head &amp; ball tracking</li>
           <li>Markerless club tracking — a bare steel shaft read as its own ruler, so irons need no tape (graphite woods &amp; hybrids still do)</li>
+          <li>Error bars on the club numbers — every shaft reading and metric carries a &plusmn; calibrated against 996 hand-marked frames, says whether it was checked or only propagated, and flags a reading that may be on the wrong thing</li>
           <li>65 swing metrics extracted today — X-factor, club-head speed, lag, rotation, tempo</li>
           <li>Kinematic sequence chart — pelvis, chest, lead arm and club speeds and the order they peak in, from IMUs, one camera or two</li>
           <li>Calibrated two-camera 3D body — the rest of the depth axis, club path among it</li>

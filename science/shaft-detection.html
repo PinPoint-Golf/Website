@@ -52,6 +52,7 @@
       <a href="#blur">Reading the blur</a>
       <a href="#replay">Self-checking</a>
       <a href="#refine">Built-in care</a>
+      <a href="#trust">Error bars</a>
     </nav>
   </section>
 
@@ -498,6 +499,76 @@
           <text x="200" y="320" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle">Background removed &middot; body masked &middot; club kept</text>
         </svg>
         <p class="figcap">Illustrative — isolating the club from a moving scene.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. HOW FAR TO TRUST IT -->
+  <section id="trust" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>Honest error bars</span>
+        <h2 class="xh">Every reading says <em>how far to trust it</em></h2>
+        <p class="xlede">A tracked shaft isn't equally good everywhere. A band lock at address and a guess carried across the blur of the finish are different kinds of statement, and they used to look identical on a card. Now every sample of the shaft, and every club number built from it, carries an error bar that was <strong>measured against hand-drawn marks</strong>, not assumed.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Two numbers, never one</h4><p>Each sample carries an angle error, a 1&sigma;, and separately the chance that it is on the wrong thing altogether: a forearm, a shadow or the edge of the mat. They are kept apart on purpose. Folding a 5% chance of a 40&deg; miss into the error bar would make every reading look doubtful, when in fact most are good and a few are simply wrong.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Calibrated on 996 hand marks</h4><p>The error bar depends on how the sample was found and where in the swing it sits, and each of those cells was calibrated against 996 hand-marked frames from 58 swings, then checked on swings held out of the fit. On those, 79% of the errors fall within &plusmn;1&sigma; and 96% within &plusmn;2&sigma;. A Gaussian would give 68% and 95%, so the bars are slightly cautious, and that is the safer side to be on. A clean band lock is good to about half a degree. A prediction coasting through the finish carries about 48&deg;, which is the honest way of saying it isn't a measurement.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Carried through to every club number</h4><p>The synthetic swing arc gets its uncertainty from the same solve that fits it, and two hundred plausible arcs are drawn from it to see how much a number like attack angle or clubhead speed could move. The draws use a fixed seed, so re-analysing a swing gives the same error bar. The uncertainty in when impact happened is carried as well, and a club length the app had to assume widens clubhead speed and is named on the card. Every shaft metric now carries its own &plusmn; for each reading.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Checked where there's truth, labelled where there isn't</h4><p>Shaft lean at impact has enough marked swings to check its error bar: on 30 of them, 63% fall within &plusmn;1&sigma; and 90% within &plusmn;2&sigma;. Its +0.7&deg; bias is reported separately rather than hidden inside the &plusmn;. Lean is the only club metric that has been checked this way. Every other club metric's error bar is <em>propagated</em> from calibrated inputs but not yet checked on its own, and the card says which kind each one is. If a reading may be on the wrong structure, it gets a &#9888; as a caveat. The number is never quietly dropped.</p></div></li>
+        </ul>
+        <div class="callout"><p><strong>What it doesn't do yet.</strong> The wrong-structure flag missed the two worst shaft-lean readings in the set, which were 15&deg; and 18&deg; out. Clubhead speed has only six launch-monitor pairs to check it against, and so far its error bar does not cover them. The whole table was calibrated on one golfer, so a second one may need a recalibration. Three refinements that would have changed values failed their gates, so they are switched off. Turning the error bars on changed no value at all: all 90 test swings came out identical. <a class="ulink" href="validation.html#errorbars">How an error bar is itself validated &#8594;</a></p></div>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="420" fill="#0A1216"/>
+          <text x="200" y="28" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">MEDIAN ERROR BAR, BY HOW IT WAS FOUND</text>
+          <g stroke="var(--line)" stroke-width="1">
+            <line x1="130" y1="44" x2="130" y2="230"/>
+            <line x1="218" y1="44" x2="218" y2="230" stroke-dasharray="2 4"/>
+            <line x1="306" y1="44" x2="306" y2="230" stroke-dasharray="2 4"/>
+          </g>
+          <g font-size="10.5" fill="var(--paper)" text-anchor="end">
+            <text x="120" y="64">band lock</text>
+            <text x="120" y="94">ball anchor</text>
+            <text x="120" y="124">segment</text>
+            <text x="120" y="154">ridge ray</text>
+            <text x="120" y="184">wedge edge</text>
+            <text x="120" y="214">prediction</text>
+          </g>
+          <g>
+            <rect x="130" y="54" width="20" height="14" rx="3" fill="var(--arm)"/>
+            <rect x="130" y="84" width="97" height="14" rx="3" fill="var(--club)"/>
+            <rect x="130" y="114" width="100" height="14" rx="3" fill="var(--club)"/>
+            <rect x="130" y="144" width="107" height="14" rx="3" fill="var(--club)"/>
+            <rect x="130" y="174" width="138" height="14" rx="3" fill="var(--accent)"/>
+            <rect x="130" y="204" width="192" height="14" rx="3" fill="var(--thorax)"/>
+          </g>
+          <g font-size="10" fill="var(--paper-dim)" font-family="DM Mono,monospace">
+            <text x="156" y="65">0.5&deg;</text>
+            <text x="233" y="95">4.0&deg;</text>
+            <text x="236" y="125">4.4&deg;</text>
+            <text x="243" y="155">5.3&deg;</text>
+            <text x="274" y="185">12&deg;</text>
+            <text x="328" y="215">48&deg;</text>
+          </g>
+          <g font-size="9" fill="var(--paper-dim)" text-anchor="middle" opacity=".7">
+            <text x="174" y="244">1&deg;</text><text x="218" y="244">3&deg;</text><text x="262" y="244">10&deg;</text><text x="306" y="244">30&deg;</text>
+          </g>
+          <text x="226" y="258" fill="var(--paper-dim)" font-size="9" text-anchor="middle" opacity=".7">log scale &#183; 1&sigma; against 996 hand marks</text>
+          <line x1="40" y1="276" x2="360" y2="276" stroke="var(--line)" stroke-width="1"/>
+          <text x="200" y="300" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">WHAT THE CARD SAYS</text>
+          <rect x="40" y="314" width="150" height="76" rx="8" fill="rgba(138,179,137,.08)" stroke="var(--arm)" stroke-width="1.2"/>
+          <text x="54" y="334" fill="var(--paper-dim)" font-size="10">Shaft lean &#183; impact</text>
+          <text x="54" y="362" fill="var(--paper)" font-size="20" font-family="DM Mono,monospace">6.8&deg;</text>
+          <text x="118" y="362" fill="var(--arm)" font-size="12" font-family="DM Mono,monospace">&plusmn;2.3</text>
+          <text x="54" y="380" fill="var(--arm)" font-size="9">calibrated</text>
+          <rect x="210" y="314" width="150" height="76" rx="8" fill="rgba(230,172,84,.08)" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="5 4"/>
+          <text x="224" y="334" fill="var(--paper-dim)" font-size="10">Clubhead speed</text>
+          <text x="224" y="362" fill="var(--paper)" font-size="20" font-family="DM Mono,monospace">94</text>
+          <text x="256" y="362" fill="var(--accent)" font-size="12" font-family="DM Mono,monospace">&plusmn;5</text>
+          <text x="224" y="380" fill="var(--accent)" font-size="9">propagated &#183; club length assumed</text>
+        </svg>
+        <p class="figcap">The bars show the measured median 1&sigma; for each way of finding the shaft. The two cards are illustrative.</p>
       </div>
     </div>
   </section>
