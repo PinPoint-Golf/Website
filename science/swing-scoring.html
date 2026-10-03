@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The science behind the score — PinPoint Studio</title>
-<meta name="description" content="How PinPoint Studio turns a captured swing into honest, explainable numbers — the measurement pipeline, the movements it reads (X-factor, kinematic sequence, wrist angles, stability), and the maths behind scoring and its confidence intervals. Methods under development and validation; third beta shipped September 2026, 1.0 targeted for late in the year.">
+<meta name="description" content="How PinPoint Studio turns a captured swing into honest, explainable numbers — the measurement pipeline, the movements it reads (X-factor, kinematic sequence, wrist angles, stability), and the maths behind scoring and its confidence intervals. Methods under development and validation; fourth beta shipped October 2026, 1.0 targeted for late in the year.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -37,7 +37,7 @@
     <p class="lede reveal" style="--d:2">A good swing number isn't a verdict handed down from a black box — it's a measurement you can trace back to the movement that produced it. This is how PinPoint Studio reads a swing, the biomechanics it scores against, and the maths that keeps a single number <strong>honest</strong>.</p>
     <div class="notice reveal" style="--d:3">
       <span class="badge dev"><i></i>In development &amp; validation</span>
-      <p>This page explains the <strong>approach</strong>. The wrist analyzer and the full-body kinematics pipeline both produce real output today — 65 of the catalogue's 104 metrics — and are being checked against a hand-annotated corpus of real swings before any of it is released. The whole-swing score is the piece still being seated on real data. Nothing here is a finished, dependable product yet — that's deliberate. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
+      <p>This page explains the <strong>approach</strong>. The wrist analyzer and the full-body kinematics pipeline both produce real output today — 70 of the catalogue's 108 metrics — and are being checked against a hand-annotated corpus of real swings before any of it is released. The whole-swing score is the piece still being seated on real data. Nothing here is a finished, dependable product yet — that's deliberate. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
     </div>
     <nav class="contents reveal" style="--d:4" aria-label="On this page">
       <a href="#pipeline">The pipeline</a>
@@ -172,9 +172,9 @@
   <section id="sequence" class="xsec alt reveal">
     <div class="xgrid">
       <div class="xcol">
-        <span class="badge soon"><i></i>Swing timing &middot; still to come</span>
+        <span class="badge"><i></i>Swing timing</span>
         <h2 class="xh">The kinematic <em>sequence</em></h2>
-        <p class="xlede">Like cracking a whip, speed travels through the body in a specific order. Each segment peaks, then brakes to pass its energy to the next. <strong>This one is not measured yet</strong> — the phase ladder and the tracks it needs are both in place, but the angular-velocity series the sequence is read from are still to be built.</p>
+        <p class="xlede">Like cracking a whip, speed travels through the body in a specific order. Each segment peaks, then brakes to pass its energy to the next. PinPoint Studio measures it from pelvis, chest and arm IMUs, and estimates it from two cameras or from one. A tile under the chart sets the order the four segments should peak in beside the order they did. Each peak carries its time from impact, its speed and its percentage of a professional's peak, and every one of those numbers has its error bar. The sequence is read through to P8, so a segment that peaks after impact is placed rather than missed.</p>
         <ul class="points">
           <li class="point"><span class="pi green">1</span><div><h4>The proper order</h4><p>Energy peaks bottom to top: <strong>hips &#8594; chest &#8594; lead arm &#8594; club</strong>. Each segment acts as a pivot, handing speed forward.</p></div></li>
           <li class="point"><span class="pi cyan">2</span><div><h4>Peak, then brake</h4><p>To transfer speed a segment has to decelerate rapidly. When the hips brake, that energy surges into the chest; when the chest brakes, it snaps into the arms.</p></div></li>
@@ -419,12 +419,13 @@
   <section id="catalogue" class="xsec">
     <div class="kicker reveal"><span class="sig paper"></span>Reference &middot; The full catalogue</div>
     <h2 class="xh reveal" style="font-size:clamp(26px,3.4vw,40px);--d:1">Every metric, <em>in plain terms</em></h2>
-    <p class="xlede reveal" style="max-width:72ch;--d:2">The walk-through above covered the ideas; this is the reference. The app's catalogue holds <strong>104 metrics</strong>, and these are the ones worth knowing by name, grouped by what they tell you. Each is read at the swing's key positions (the <strong>P-position</strong> ladder, address to finish) and, where it is scored, held against a reference band at the phase that matters most.</p>
-    <p class="xlede reveal" style="max-width:72ch;margin-bottom:0;--d:3">A note on honesty: <strong>65 of the 104 produce real output today</strong> — the wrist set, rotation, posture, the head, stance and balance, club delivery and tempo among them. Another 26 are readings a connected launch monitor supplies, and 13 are still to come: the whole-swing score, the depth-axis measures that need a calibrated 3D body, club path among them, and ball flight. The typical ranges are reference targets drawn from the published biomechanics literature and tour datasets, and stay provisional until our own validation completes. Each card flags what it needs:</p>
+    <p class="xlede reveal" style="max-width:72ch;--d:2">The walk-through above covered the ideas; this is the reference. The app's catalogue holds <strong>108 metrics</strong>, and these are the ones worth knowing by name, grouped by what they tell you. Each is read at the swing's key positions (the <strong>P-position</strong> ladder, address to finish) and, where it is scored, held against a reference band at the phase that matters most.</p>
+    <p class="xlede reveal" style="max-width:72ch;margin-bottom:0;--d:3">A note on honesty: <strong>70 of the 108 produce real output today</strong> — the wrist set, rotation, posture, the head, stance and balance, club delivery, the kinematic sequence and tempo among them, and the down-the-line set when a second camera is connected. Another 26 are readings a connected launch monitor supplies, and 12 are still to come: the whole-swing score, the depth-axis measures that still need work on the 3D body, club path among them, and ball flight. The typical ranges are reference targets drawn from the published biomechanics literature and tour datasets, and stay provisional until our own validation completes. Each card flags what it needs:</p>
     <div class="cat-legend reveal" style="--d:4">
       <span><i class="lg-imu"></i>IMU — a worn wrist sensor delivers it</span>
       <span><i class="lg-cam1"></i>1 camera — a single face-on view, today</span>
-      <span><i class="lg-cam2"></i>not yet — needs a second camera, a club sensor or a launch monitor</span>
+      <span><i class="lg-dtl"></i>DTL camera — needs the down-the-line view as well, today</span>
+      <span><i class="lg-cam2"></i>not yet — nothing produces it by any route yet</span>
     </div>
 
     <!-- Family: rotation & power -->
@@ -433,7 +434,7 @@
       <div class="mgrid">
         <div class="mcard"><div class="mtop"><div><h4>Pelvis rotation</h4><span class="mkey">pelvisRotation</span></div><span class="mtag cam1">1 camera</span></div>
           <p>How far the hips turn away from the ball and back through. The base of the coil and the first link in the sequence.</p>
-          <div class="mmeta"><b>Typical</b> ~45&deg; at the top &middot; <b>Route</b> face-on camera today (an estimate); a second camera or torso IMUs sharpen it</div></div>
+          <div class="mmeta"><b>Typical</b> ~45&deg; at the top &middot; <b>Route</b> face-on camera (an estimate); with two cameras it is read from the 3-D skeleton, still as an estimate; torso IMUs measure it directly</div></div>
         <div class="mcard"><div class="mtop"><div><h4>Thorax rotation</h4><span class="mkey">thoraxRotation</span></div><span class="mtag cam1">1 camera</span></div>
           <p>Shoulder turn — the larger of the two rotations, and the one that stretches the core against the hips.</p>
           <div class="mmeta"><b>Typical</b> ~90&deg; at the top &middot; <b>Route</b> as pelvis rotation</div></div>
@@ -446,9 +447,9 @@
         <div class="mcard"><div class="mtop"><div><h4>Shoulder plane angle</h4><span class="mkey">shoulderPlaneAngle</span></div><span class="mtag cam1">1 camera</span></div>
           <p>How steep or flat the shoulders sit at the top. Positive means the trail shoulder is the higher one. As much a consequence of build and setup as of what the golfer did, so it's read beside address posture.</p>
           <div class="mmeta"><b>Reads</b> per-frame curve &middot; the value at the top is the one that matters</div></div>
-        <div class="mcard"><div class="mtop"><div><h4>Kinematic sequence</h4><span class="mkey">kinematicSequence</span></div><span class="mtag cam2">not yet</span></div>
+        <div class="mcard"><div class="mtop"><div><h4>Kinematic sequence</h4><span class="mkey">kinematicSequence</span></div><span class="mtag cam1">1 camera</span></div>
           <p>The order and timing of peak rotational speed up the chain — hips, chest, lead arm, club. Out of order is the classic "casting" pattern.</p>
-          <div class="mmeta"><b>Typical</b> peaks rise ~480 &rarr; 605 &rarr; 1310 deg/s &middot; ~50&nbsp;ms apart &middot; <b>Needs</b> angular-velocity series and pelvis + thorax sensors</div></div>
+          <div class="mmeta"><b>Typical</b> peaks rise ~480 &rarr; 605 &rarr; 1310 deg/s &middot; ~50&nbsp;ms apart &middot; <b>Route</b> torso and arm IMUs measure it; two cameras or one face-on camera estimate it</div></div>
       </div>
     </div>
 
@@ -471,9 +472,9 @@
         <div class="mcard"><div class="mtop"><div><h4>Head tilt</h4><span class="mkey">headTilt</span></div><span class="mtag cam1">1 camera</span></div>
           <p>Change in eye-line angle from address. Small and stable is normal; a large or abrupt change tends to accompany a loss of posture.</p>
           <div class="mmeta"><b>Reads</b> per-frame curve &middot; completes the head picture with sway and lift</div></div>
-        <div class="mcard"><div class="mtop"><div><h4>Spine forward bend</h4><span class="mkey">spineForwardBend</span></div><span class="mtag cam2">not yet</span></div>
+        <div class="mcard"><div class="mtop"><div><h4>Spine forward bend</h4><span class="mkey">spineForwardBend</span></div><span class="mtag dtl">DTL camera</span></div>
           <p>How much the golfer is bent over from the hips, and whether that angle is held. It lives in the sagittal plane — present in a face-on image but foreshortened to noise by the projection.</p>
-          <div class="mmeta"><b>Typical</b> ~30&ndash;40&deg; at address &middot; <b>Needs</b> a down-the-line view</div></div>
+          <div class="mmeta"><b>Typical</b> ~30&ndash;40&deg; at address &middot; <b>Reads</b> square-on from the down-the-line view; trunk IMUs measure it too</div></div>
       </div>
     </div>
 
@@ -525,9 +526,9 @@
         <div class="mcard"><div class="mtop"><div><h4>Lead knee drift</h4><span class="mkey">leadKneeDrift</span></div><span class="mtag cam1">1 camera</span></div>
           <p>The lead knee's sideways travel <em>minus its own hip's</em> — a difference, deliberately, since pelvic rotation carries the hip across anyway. A large value at the top is the observation.</p>
           <div class="mmeta"><b>Reads</b> per-frame curve &middot; measured against stance width</div></div>
-        <div class="mcard"><div class="mtop"><div><h4>Pelvis thrust</h4><span class="mkey">pelvisThrust</span></div><span class="mtag cam2">not yet</span></div>
+        <div class="mcard"><div class="mtop"><div><h4>Pelvis thrust</h4><span class="mkey">pelvisThrust</span></div><span class="mtag dtl">DTL camera</span></div>
           <p>Movement of the hips toward the ball — the classic "early extension" that crowds the arms and forces you upright. It lives on the depth axis a face-on camera is blind to.</p>
-          <div class="mmeta"><b>Needs</b> a down-the-line camera</div></div>
+          <div class="mmeta"><b>Reads</b> the face-on and down-the-line views together</div></div>
       </div>
     </div>
 
@@ -613,9 +614,15 @@
         <div class="mcard"><div class="mtop"><div><h4>Club path</h4><span class="mkey">clubPath</span></div><span class="mtag cam2">not yet</span></div>
           <p>The horizontal direction the clubhead travels through impact relative to the target line — in-to-out (+) or out-to-in (&minus;). The discriminating axis is the one pointing at the camera, which is exactly what a face-on view cannot see.</p>
           <div class="mmeta"><b>Typical</b> near 0 &plusmn; a few degrees &middot; <b>Needs</b> a down-the-line camera</div></div>
-        <div class="mcard"><div class="mtop"><div><h4>Swing plane</h4><span class="mkey">swingPlane</span></div><span class="mtag cam2">not yet</span></div>
+        <div class="mcard"><div class="mtop"><div><h4>Swing plane</h4><span class="mkey">swingPlane</span></div><span class="mtag dtl">DTL camera</span></div>
           <p>The tilt and direction of the best-fit plane the clubhead travels on through the downswing — a genuinely three-dimensional object.</p>
-          <div class="mmeta"><b>Needs</b> a down-the-line camera and the club track</div></div>
+          <div class="mmeta"><b>Reads</b> the shaft in 3D from the two views &middot; <b>Error bar</b> a bootstrap of the plane fit, per reading</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Shaft lie</h4><span class="mkey">shaftLie</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>How upright the shaft stands, seen from down the line: its angle to the ground at address and again at impact. The change says whether the club came back steeper or flatter than it was set up. Most golfers return it a little steeper; a big steepening with the toe digging in is the dynamic-lie fault.</p>
+          <div class="mmeta"><b>Read</b> the change from address to impact &mdash; positive is steeper &middot; the absolute angle depends on where the camera stands, the change does not</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Hand path loop</h4><span class="mkey">handPathLoop</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>Where the hands come down against where they went up. Seen from down the line, hands that come down <em>outside</em> the path they went up on are the over-the-top move, and the most direct picture of it there is &mdash; the club has to come back across the ball from out there.</p>
+          <div class="mmeta"><b>Read</b> positive is over the top, negative the shallowing move good players make &middot; the average gap between 40% and 70% of the way up, as a percentage of the hands' rise</div></div>
       </div>
     </div>
 
@@ -675,7 +682,7 @@
   <section class="closing wrap">
     <span class="eyebrow reveal">Science-led, kept open</span>
     <h2 class="reveal" style="--d:1">Measured, not <em>guessed.</em></h2>
-    <p class="reveal" style="--d:2">Every method here is drawn from the published literature and held against real, hand-annotated swings before it ships. It's an open, inspectable platform — and still a prototype under validation: the third beta shipped in September 2026, with 1.0 targeted for late in the year.</p>
+    <p class="reveal" style="--d:2">Every method here is drawn from the published literature and held against real, hand-annotated swings before it ships. It's an open, inspectable platform — and still a prototype under validation: the fourth beta shipped in October 2026, with 1.0 targeted for late in the year.</p>
     <div class="cta-row reveal" style="--d:3">
       <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
       <a class="btn" href="validation.html">How we validate</a>
