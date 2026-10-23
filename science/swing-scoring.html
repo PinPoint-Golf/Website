@@ -37,7 +37,7 @@
     <p class="lede reveal" style="--d:2">A good swing number isn't a verdict handed down from a black box — it's a measurement you can trace back to the movement that produced it. This is how PinPoint Studio reads a swing, the biomechanics it scores against, and the maths that keeps a single number <strong>honest</strong>.</p>
     <div class="notice reveal" style="--d:3">
       <span class="badge dev"><i></i>In development &amp; validation</span>
-      <p>This page explains the <strong>approach</strong>. The wrist analyzer and the full-body kinematics pipeline both produce real output today — 70 of the catalogue's 108 metrics — and are being checked against a hand-annotated corpus of real swings before any of it is released. The whole-swing score is the piece still being seated on real data. Nothing here is a finished, dependable product yet — that's deliberate. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
+      <p>This page explains the <strong>approach</strong>. The wrist analyzer and the full-body kinematics pipeline both produce real output today — 88 of the catalogue's 126 metrics — and are being checked against a hand-annotated corpus of real swings before any of it is released. The whole-swing score is the piece still being seated on real data. Nothing here is a finished, dependable product yet — that's deliberate. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
     </div>
     <nav class="contents reveal" style="--d:4" aria-label="On this page">
       <a href="#pipeline">The pipeline</a>
@@ -419,8 +419,8 @@
   <section id="catalogue" class="xsec">
     <div class="kicker reveal"><span class="sig paper"></span>Reference &middot; The full catalogue</div>
     <h2 class="xh reveal" style="font-size:clamp(26px,3.4vw,40px);--d:1">Every metric, <em>in plain terms</em></h2>
-    <p class="xlede reveal" style="max-width:72ch;--d:2">The walk-through above covered the ideas; this is the reference. The app's catalogue holds <strong>108 metrics</strong>, and these are the ones worth knowing by name, grouped by what they tell you. Each is read at the swing's key positions (the <strong>P-position</strong> ladder, address to finish) and, where it is scored, held against a reference band at the phase that matters most.</p>
-    <p class="xlede reveal" style="max-width:72ch;margin-bottom:0;--d:3">A note on honesty: <strong>70 of the 108 produce real output today</strong> — the wrist set, rotation, posture, the head, stance and balance, club delivery, the kinematic sequence and tempo among them, and the down-the-line set when a second camera is connected. Another 26 are readings a connected launch monitor supplies, and 12 are still to come: the whole-swing score, the depth-axis measures that still need work on the 3D body, club path among them, and ball flight. The typical ranges are reference targets drawn from the published biomechanics literature and tour datasets, and stay provisional until our own validation completes. Each card flags what it needs:</p>
+    <p class="xlede reveal" style="max-width:72ch;--d:2">The walk-through above covered the ideas; this is the reference. The app's catalogue holds <strong>126 metrics</strong>, and these are the ones worth knowing by name, grouped by what they tell you. Each is read at the swing's key positions (the <strong>P-position</strong> ladder, address to finish) and, where it is scored, held against a reference band at the phase that matters most.</p>
+    <p class="xlede reveal" style="max-width:72ch;margin-bottom:0;--d:3">A note on honesty: <strong>88 of the 126 produce real output today</strong> — the wrist set, rotation, posture, the head, stance and balance, club delivery, the kinematic sequence link by link and tempo among them, and the down-the-line set when a second camera is connected, which now reads posture off the outline of the body. Another 26 are readings a connected launch monitor supplies, and 12 are still to come: the whole-swing score, the depth-axis measures that still need work on the 3D body, club path among them, and ball flight. The typical ranges are reference targets drawn from the published biomechanics literature and tour datasets, and stay provisional until our own validation completes. Each card flags what it needs:</p>
     <div class="cat-legend reveal" style="--d:4">
       <span><i class="lg-imu"></i>IMU — a worn wrist sensor delivers it</span>
       <span><i class="lg-cam1"></i>1 camera — a single face-on view, today</span>
@@ -450,12 +450,22 @@
         <div class="mcard"><div class="mtop"><div><h4>Kinematic sequence</h4><span class="mkey">kinematicSequence</span></div><span class="mtag cam1">1 camera</span></div>
           <p>The order and timing of peak rotational speed up the chain — hips, chest, lead arm, club. Out of order is the classic "casting" pattern.</p>
           <div class="mmeta"><b>Typical</b> peaks rise ~480 &rarr; 605 &rarr; 1310 deg/s &middot; ~50&nbsp;ms apart &middot; <b>Route</b> torso and arm IMUs measure it; two cameras or one face-on camera estimate it</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>The sequence, link by link</h4><span class="mkey">pelvisPeakSpeed &middot; thoraxPeakSpeed &middot; leadArmPeakSpeed &middot; clubPeakSpeed &middot; leadArmPeakTime &middot; clubPeakTime &middot; pelvisReversalTime &middot; thoraxReversalTime</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>The sequence's own numbers, each a metric in its own right: how fast each link peaks, when the arm and club peak against impact, and when the hips and then the chest stop turning back and start down. Each link should be faster than the one before it, and the hips should start down first. A reading is reported only when its peak could be placed; absent means it could not, never zero.</p>
+          <div class="mmeta"><b>Typical</b> pelvis ~480&nbsp;deg/s &middot; the club peaks at impact or just after, last of the four &middot; <b>Route</b> as the kinematic sequence</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Swings in sequence</h4><span class="mkey">ksOrderShare</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>A session reading: the share of swings whose four peaks came in the professional order. It counts only swings whose peaks were all placed, and quotes the generous end of what that count supports, so a short session is never accused of an order it hasn't shown.</p>
+          <div class="mmeta"><b>Read</b> closer to 1 is the same order swing after swing &middot; below about a half, the body fires in a different order each time</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Peak-timing spread</h4><span class="mkey">ksTimingSpread</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>How much the instants of the hips', chest's and lead arm's peaks wander across a session, against how much they wander for touring professionals (19, 14 and 8&nbsp;ms). It says nothing about any one swing's timing, only about how well it repeats.</p>
+          <div class="mmeta"><b>Read</b> 1 is a professional's repeatability, 2 is twice as loose &middot; worn sensors sharpen it</div></div>
       </div>
     </div>
 
     <!-- Family: posture, tilt & head -->
     <div class="mfam">
       <div class="mfam-head"><span class="sig coral"></span><h3>Posture, tilt &amp; the head</h3></div>
+      <p class="xlede" style="max-width:74ch;margin-bottom:20px">Posture is where the down-the-line camera now earns its place. It reads the back and the backside off the outline of the body &mdash; the lines a coach draws &mdash; so they hold when the shoulders and hips turn away from the camera. Several readings are then combined into one judgement of whether posture was lost, and where: going back, or into impact. Head height, hip depth, trunk bend, both knees and pelvis height are read at every position from address to finish and held against good players, in the two patterns they use &mdash; staying level, or squatting and pushing. A part that couldn't be read is shown as missing, with the reason, never counted as zero.</p>
       <div class="mgrid">
         <div class="mcard"><div class="mtop"><div><h4>Secondary axis tilt</h4><span class="mkey">secondaryAxisTilt</span></div><span class="mtag cam1">1 camera</span></div>
           <p>Lean of the spine away from the target at impact — the hip-to-shoulder line measured from vertical in the face-on plane.</p>
@@ -475,6 +485,18 @@
         <div class="mcard"><div class="mtop"><div><h4>Spine forward bend</h4><span class="mkey">spineForwardBend</span></div><span class="mtag dtl">DTL camera</span></div>
           <p>How much the golfer is bent over from the hips, and whether that angle is held. It lives in the sagittal plane — present in a face-on image but foreshortened to noise by the projection.</p>
           <div class="mmeta"><b>Typical</b> ~30&ndash;40&deg; at address &middot; <b>Reads</b> square-on from the down-the-line view; trunk IMUs measure it too</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Trunk bend, back line</h4><span class="mkey">spineBackLine</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>The same forward bend, read along the back from the base of the spine to the back of the neck &mdash; the line a TPI coach draws &mdash; off the outline of the body rather than the hip and shoulder joints. That is what lets it hold at the top, when the shoulders turn away from the camera.</p>
+          <div class="mmeta"><b>Read</b> against your own address value &middot; a lower number means you've stood up &middot; the change is robust, the absolute angle carries the camera's pitch</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Trunk rise</h4><span class="mkey">trunkRise</span></div><span class="mtag cam1">1 camera</span></div>
+          <p>Standing up through the ball, seen face-on. A trunk bent over the ball leans toward the camera and looks shorter; as the golfer stands up it looks longer. So the hip-to-shoulder line's length against address is the face-on view of lost forward bend.</p>
+          <div class="mmeta"><b>Read</b> address to impact &middot; higher is more upright &middot; about +1.2&nbsp;% per degree lost &middot; a percentage, because degrees need the bend this camera can't see</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Head rise, down the line</h4><span class="mkey">headRise</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>How far the head rises or drops against address, from the second camera. A head that comes up on the way back is the golfer standing up out of posture. Read on the midpoint of the ears, which holds its height while the head turns &mdash; the nose alone climbs several centimetres at the top on a head that hasn't moved.</p>
+          <div class="mmeta"><b>Reads</b> per-frame curve in cm &middot; read beside head lift, the same quantity face-on</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Head pitch at address</h4><span class="mkey">headPitch</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>How the head is carried against the trunk at address: chin tucked down toward the chest, or held up and away from it. Measured against the trunk, so bending over the ball doesn't move it.</p>
+          <div class="mmeta"><b>Read</b> positive is chin down &middot; a change is more telling than the number, which carries the shape of the head</div></div>
       </div>
     </div>
 
@@ -529,6 +551,9 @@
         <div class="mcard"><div class="mtop"><div><h4>Pelvis thrust</h4><span class="mkey">pelvisThrust</span></div><span class="mtag dtl">DTL camera</span></div>
           <p>Movement of the hips toward the ball — the classic "early extension" that crowds the arms and forces you upright. It lives on the depth axis a face-on camera is blind to.</p>
           <div class="mmeta"><b>Reads</b> the face-on and down-the-line views together</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Hip depth, butt line</h4><span class="mkey">hipDepthButt</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>How far the backside moves toward or away from the ball against address, in centimetres, read on the back edge of the body at hip height &mdash; the butt line a coach draws. The hips turning doesn't move it the way it moves the hip joints.</p>
+          <div class="mmeta"><b>Read</b> positive is in toward the ball, the early-extension direction &middot; read with pelvis thrust: the two can differ at the top, and should agree by impact</div></div>
       </div>
     </div>
 
@@ -579,6 +604,12 @@
         <div class="mcard"><div class="mtop"><div><h4>Elbow alignment</h4><span class="mkey">elbowAlignment</span></div><span class="mtag cam1">1 camera</span></div>
           <p>Trail elbow against lead elbow, at address and at impact. The change between the two shows how the arms fold, rotate and re-deliver — the trail elbow tucking on the way down, for instance.</p>
           <div class="mmeta"><b>Positive</b> the trail elbow sits above the lead one</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Trail elbow direction</h4><span class="mkey">trailForearmAngle</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>Which way the trail elbow points at the top. On most golfers it points at the ground, under the hands, where it supports the club; a flying elbow points well behind the golfer. The down-the-line view sees it where the face-on shoulder line collapses with the turn.</p>
+          <div class="mmeta"><b>Read</b> at the top &middot; 0&deg; is the elbow directly under the hands, higher points further behind</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Arm hang at address</h4><span class="mkey">armHang</span></div><span class="mtag dtl">DTL camera</span></div>
+          <p>How the arms hang from the shoulders at address, against straight down. Arms that hang naturally sit close to vertical; hands pushed out toward the ball are reaching, and hands pulled in under the body are tucked.</p>
+          <div class="mmeta"><b>Read</b> positive is reaching, negative tucked &middot; an angle, so no ruler is needed</div></div>
       </div>
     </div>
 
@@ -606,8 +637,11 @@
           <p>Whether the clubhead is moving down or up at impact — the vertical angle of its travel, read from the tracked club in the face-on plane.</p>
           <div class="mmeta"><b>Typical</b> driver ~&minus;1&deg; (many good drives are positive) &middot; 7-iron ~&minus;4.5&deg;</div></div>
         <div class="mcard"><div class="mtop"><div><h4>Low point</h4><span class="mkey">lowPointAhead</span></div><span class="mtag cam1">1 camera</span></div>
-          <p>How far target-side of the ball the clubhead bottoms out its arc, signed in inches. Positive is a low point ahead of the ball — the descending, ball-then-turf strike an iron wants; negative sits behind it, wrong for an iron but exactly right hitting up on a driver. A delivery number a launch monitor doesn't give you.</p>
+          <p>How far target-side of the ball the clubhead bottoms out its arc, signed in inches. Positive is a low point ahead of the ball — the descending, ball-then-turf strike an iron wants; negative sits behind it, wrong for an iron but exactly right hitting up on a driver. A delivery number a launch monitor doesn't report directly.</p>
           <div class="mmeta"><b>Honest limit</b> read off the <em>synthesized</em> club arc, since impact is where the head is fastest and most blurred &mdash; about &plusmn;2&nbsp;in of spread on one swing, but unbiased, so several swings average to something trustworthy. Each reading carries its own &plusmn;, propagated from the shaft track and the ball. A projected clubhead is refused outright: its arc vertex would be the grip's, not the club's.</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Low point from attack angle</h4><span class="mkey">lowPointFromAttack</span></div><span class="mtag cam2">launch monitor</span></div>
+          <p>The same low point, worked out instead from a connected launch monitor's attack angle and the radius of the club's arc &mdash; far more precise than the camera's. Each degree of descending attack puts the low point about an inch further ahead with a mid-iron. When a monitor is connected, this is the low point read first.</p>
+          <div class="mmeta"><b>Honest limit</b> the radius is the club's standard length plus an allowance for the arms, not a measurement of this golfer &mdash; that is most of its &plusmn;</div></div>
         <div class="mcard"><div class="mtop"><div><h4>Transition plane delta</h4><span class="mkey">transitionPlaneDelta</span></div><span class="mtag cam1">experimental</span></div>
           <p>Whether the club steepened or shallowed between backswing and downswing — over-the-top, quantified. Positive is steeper.</p>
           <div class="mmeta"><b>Status</b> deliberately normless: its corridor is a placeholder set wider than anything yet observed, so it records and accumulates <em>without grading anyone</em> until it has more than one golfer behind it</div></div>
