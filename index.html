@@ -117,7 +117,8 @@
   .btn.solid{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:500;
     box-shadow:0 6px 22px -10px rgba(230,172,84,.9)}
   .btn.solid:hover{background:#f0c279;border-color:#f0c279;box-shadow:0 10px 30px -10px rgba(230,172,84,1)}
-  @media(max-width:760px){.navlinks a.muted{display:none}}
+  @media(max-width:1180px){.navlinks{gap:16px;font-size:13px}}
+  @media(max-width:1040px){.navlinks a.muted{display:none}}
 
   /* ---- hero ---- */
   .hero{padding-top:72px;padding-bottom:30px;position:relative}
@@ -290,7 +291,7 @@
   @media(max-width:560px){.readout{flex-wrap:wrap}.readout .rd{flex:1 1 44%;border-bottom:1px solid var(--line)}}
 
   /* ---- science in practice: links to the deep-dive sub-pages ---- */
-  .sci-links{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+  .sci-links{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:24px}
   .sci-card{display:flex;flex-direction:column;padding:26px 26px;border:1px solid var(--line);border-radius:13px;
     background:linear-gradient(180deg,rgba(255,255,255,.014),transparent);
     transition:border-color .25s,transform .25s,box-shadow .25s;position:relative;overflow:hidden}
@@ -417,6 +418,7 @@
       <a class="muted" href="index.html" aria-current="page">Home</a>
       <a class="muted" href="science/how-it-works.html">How it works</a>
       <a class="muted" href="science/swing-scoring.html">Swing scoring</a>
+      <a class="muted" href="science/session-diagnostics.html">Diagnostics</a>
       <a class="muted" href="science/shaft-detection.html">Shaft detection</a>
       <a class="muted" href="science/studio-setup.html">Studio setup</a>
       <a class="muted" href="science/validation.html">Validation</a>
@@ -545,7 +547,7 @@
       <p>PinPoint Studio is an early prototype under active validation. Every measurement is being checked against a hand-annotated corpus of real swings before it goes anywhere near a release — because results you can't rely on are no use to anyone. There's a beta to try if you want to follow along, but nothing to depend on yet — and there won't be until we're confident the figures hold up. That bar is deliberate, and getting the science right is the whole point.</p>
     </div>
 
-    <p class="sec-lede reveal" style="--d:3;margin-top:42px;margin-bottom:0">Three deep dives into that science in practice — written in plain English, not academic jargon:</p>
+    <p class="sec-lede reveal" style="--d:3;margin-top:42px;margin-bottom:0">Four deep dives into that science in practice — written in plain English, not academic jargon:</p>
     <div class="sci-links">
       <a class="sci-card reveal" style="--d:4" href="science/how-it-works.html">
         <div class="sci-k"><i style="color:var(--pelvis)"></i>The whole stack</div>
@@ -559,7 +561,13 @@
         <p>How a captured swing becomes an honest number — the movements we measure, and the maths that stops one number hiding a real fault.</p>
         <span class="sci-go">Read how scoring works &#8599;</span>
       </a>
-      <a class="sci-card reveal" style="--d:6" href="science/shaft-detection.html">
+      <a class="sci-card reveal" style="--d:6" href="science/session-diagnostics.html">
+        <div class="sci-k"><i style="color:var(--arm)"></i>Diagnosis &amp; coaching</div>
+        <h3>From a session to what to work on</h3>
+        <p>The diagnostic model in full, how evidence builds swing by swing into patterns and causes, how the work-on list is ordered — and what the app is entitled to call true.</p>
+        <span class="sci-go">Read how diagnosis works &#8599;</span>
+      </a>
+      <a class="sci-card reveal" style="--d:7" href="science/shaft-detection.html">
         <div class="sci-k"><i style="color:var(--club)"></i>Club tracking</div>
         <h3>Finding the shaft in the blur</h3>
         <p>How we track a thin shaft moving past 100&nbsp;mph — leaning on the golfer's anatomy and swing physics rather than fighting the blur, and how a bare club becomes its own ruler.</p>
@@ -779,7 +787,7 @@
           <li>P-position timeline — P1–P8 and P10 resolved from the club track</li>
           <li>Live lead-arm wrist analysis, scored against coaching bands</li>
           <li>HackMotion wG3 wrist sensor as the criterion instrument, published in ISB convention</li>
-          <li>Diagnostic model — 157 conditions, 366 causal edges, 180 cited corridors — editable in-app</li>
+          <li>Diagnostic model — 182 conditions, 622 causal edges, 259 norms — editable in-app</li>
           <li>Session diagnostics — a cumulative evidence ledger, ranked causes, cast to a second display; This shot, Session and Watching tabs, each finding carrying the probability it really fired</li>
           <li>Work-ons on the home screen — each session's top faults, causes before symptoms, added up across sessions; a fault clears only when a later session measured it quiet</li>
           <li>Session review — a finished session read back shot by shot, without rewinding the live one</li>
@@ -826,7 +834,7 @@
       <div class="specrow"><span class="k">Wrist kinematics</span><span class="v">IMU-quaternion joint angles, per P-position</span></div>
       <div class="specrow"><span class="k">Swing timing</span><span class="v">P-position ladder, P1&ndash;P8 and P10 (P9 deferred)</span></div>
       <div class="specrow"><span class="k">Metrics</span><span class="v">126-metric catalogue &middot; 88 produced today</span></div>
-      <div class="specrow"><span class="k">Diagnostics</span><span class="v">160 conditions &middot; 391 causal edges &middot; 40 cited sources</span></div>
+      <div class="specrow"><span class="k">Diagnostics</span><span class="v">182 conditions &middot; 622 causal edges &middot; 46 cited sources</span></div>
       <div class="specrow"><span class="k">Swing file</span><span class="v">.ppsw &mdash; chunked binary, lossless, ~3 MB a swing &middot; open spec &middot; C++ &amp; Python readers via <a class="ulink" href="https://github.com/PinPoint-Golf/libppswing" target="_blank" rel="noopener">libppswing</a> (MIT)</span></div>
       <div class="specrow"><span class="k">Launch monitor</span><span class="v">GSPro Open Connect &mdash; R10, MLM2PRO, SkyTrak+, PiTrac &mdash; via <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a> (MIT) &middot; Foresight GCQuad via FSX2020</span></div>
       <div class="specrow"><span class="k">Companion app</span><span class="v">PinPoint Capture &middot; iPhone, iOS 18+ &middot; App Store with 1.0, late 2026 &middot; MIT <span class="soon">&middot; Android planned, not soon</span></span></div>

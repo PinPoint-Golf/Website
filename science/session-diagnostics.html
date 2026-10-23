@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session diagnostics — from a session to what to work on — PinPoint Studio</title>
+<meta name="description" content="How PinPoint Studio turns a session of swings into a diagnosis and a short list of what to work on — the diagnostic model in full (measures, norms, conditions and the causal graph), how evidence builds shot by shot, how causes are ranked, and how the app decides what it is entitled to call true. Fourth beta shipped October 2026; the content is still being seated on measured swings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/science.css">
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="wrap bar">
+    <a class="mark" href="../index.html"><span class="dot"></span><b>PinPoint Studio</b></a>
+    <nav class="navlinks">
+      <a class="muted" href="../index.html">Home</a>
+      <a class="muted" href="how-it-works.html">How it works</a>
+      <a class="muted" href="swing-scoring.html">Swing scoring</a>
+      <a class="muted" href="session-diagnostics.html" aria-current="page">Diagnostics</a>
+      <a class="muted" href="shaft-detection.html">Shaft detection</a>
+      <a class="muted" href="studio-setup.html">Studio setup</a>
+      <a class="muted" href="validation.html">Validation</a>
+      <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub &#8599;</a>
+      <a class="btn solid" href="../index.html#get">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- hero -->
+  <section class="subhero wrap">
+    <span class="eyebrow reveal">Science in practice &middot; Diagnosis &amp; coaching</span>
+    <h1 class="reveal" style="--d:1">From a session to <em>what to work on.</em></h1>
+    <p class="lede reveal" style="--d:2">A number tells you what a swing did. A diagnosis tells you why it keeps doing it, and what to change first. This is how PinPoint Studio gets from one to the other: the model it reasons with, how evidence builds swing by swing through a session, how it picks what you should work on, and the rules that decide what it is entitled to call <strong>true</strong>.</p>
+    <div class="notice reveal" style="--d:3">
+      <span class="badge dev"><i></i>Shipped in beta &middot; content still being seated</span>
+      <p>Session diagnostics shipped with the fourth beta in October 2026. Everything on this page runs in the app today: the ledger, the patterns, the chains, the likely driver, the work-on list and the session report. The <strong>content</strong> behind it is another matter. Most of the normal ranges are starting figures, most causal links are coaching consensus rather than tested science, and 84 of the 182 conditions are still marked draft. The page says which is which as it goes. <a class="ulink" href="validation.html">See how we earn the numbers &#8594;</a></p>
+    </div>
+    <nav class="contents reveal" style="--d:4" aria-label="On this page">
+      <a href="#chain">The chain of words</a>
+      <a href="#norms">What normal is</a>
+      <a href="#conditions">The library</a>
+      <a href="#graph">Causes</a>
+      <a href="#composites">Composites</a>
+      <a href="#uncertainty">Uncertainty</a>
+      <a href="#ledger">The ledger</a>
+      <a href="#recurrence">Patterns</a>
+      <a href="#chains">Chains</a>
+      <a href="#driver">The likely driver</a>
+      <a href="#intent">Focus &amp; intent</a>
+      <a href="#workons">Work-ons</a>
+      <a href="#report">The report</a>
+      <a href="#truth">How truth works</a>
+      <a href="#vocabulary">Every word</a>
+    </nav>
+  </section>
+
+  <!-- ===================== PART ONE: THE MODEL ===================== -->
+  <section class="xsec" style="padding-bottom:0">
+    <div class="kicker reveal"><span class="sig amber"></span>Part one &middot; The diagnostic model</div>
+    <h2 class="xh reveal" style="font-size:clamp(26px,3.4vw,40px);--d:1">A coach's knowledge, <em>written down</em></h2>
+    <p class="xlede reveal" style="max-width:72ch;margin-bottom:0;--d:2">Before a single ball is struck, the app already holds a model of the golf swing: what can be measured, what normal looks like, the named habits a coach would recognise, and how they cause one another. None of it is compiled into the program. It is content, stored as reviewable files a coach can read, argue with and edit in the app, and it is deliberately written ahead of what the cameras can see today. A complete model is what tells us which measurement to build next.</p>
+  </section>
+
+  <!-- 1. THE CHAIN -->
+  <section id="chain" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The model &middot; 1</span>
+        <h2 class="xh">Seven words, <em>one chain</em></h2>
+        <p class="xlede">Every finding the app ever makes travels the same chain, and each link has a name. You need the names to follow the rest of this page, so here they are once, in order.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>A metric, then a measure</h4><p>A <strong>metric</strong> is something the analysis extracts: lead wrist angle, pelvis sway, ball position. Most change continuously through the swing, so before anything can be judged you have to say <em>which reading</em> you mean. That decision is a <strong>measure</strong>: the value at impact, the change from address to the top, the peak between two positions. "Lead wrist at impact" and "how far the lead wrist moved from address to impact" are two measures, with two different ideas of normal. The library holds 206 of them.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A norm, then a grade</h4><p>A <strong>norm</strong> says what normal looks like for one measure on one kind of shot: a centre, and a tolerance either side. Held against it, a reading gets a <strong>grade</strong>: Ideal, Good, Watch or Action, or <em>Not measured</em> when there was nothing to grade.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>A signal, then a condition</h4><p>A <strong>signal</strong> is a small rule that watches one side of one measure: "tell me when ball position is unusually far back". When it fires, its <strong>condition</strong> (a named habit in a coach's words, such as <em>Ball too far back</em>) becomes a finding on that swing. There are 166 signals and 182 conditions.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Causes</h4><p>Conditions are joined by 622 authored links: what tends to produce what. That graph is what turns a list of complaints into an explanation, because several things you can see often trace back to one thing worth working on.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">ONE READING, SEVEN STEPS</text>
+          <g font-size="11.5">
+            <rect x="70" y="42" width="260" height="34" rx="7" fill="rgba(123,192,219,.10)" stroke="var(--club)"/>
+            <text x="86" y="63" fill="var(--club)">metric</text><text x="314" y="63" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">ball position</text>
+            <rect x="70" y="92" width="260" height="34" rx="7" fill="rgba(123,192,219,.10)" stroke="var(--club)"/>
+            <text x="86" y="113" fill="var(--club)">measure</text><text x="314" y="113" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">&hellip; at address (P1)</text>
+            <rect x="70" y="142" width="260" height="34" rx="7" fill="rgba(138,179,137,.10)" stroke="var(--arm)"/>
+            <text x="86" y="163" fill="var(--arm)">norm</text><text x="314" y="163" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">iron: 33 % &plusmn; 10</text>
+            <rect x="70" y="192" width="260" height="34" rx="7" fill="rgba(138,179,137,.10)" stroke="var(--arm)"/>
+            <text x="86" y="213" fill="var(--arm)">grade</text><text x="314" y="213" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">60 % &rarr; 2.7 tolerances: Watch</text>
+            <rect x="70" y="242" width="260" height="34" rx="7" fill="rgba(230,172,84,.10)" stroke="var(--accent)"/>
+            <text x="86" y="263" fill="var(--accent)">signal</text><text x="314" y="263" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">"too far back" side fires</text>
+            <rect x="70" y="292" width="260" height="34" rx="7" fill="rgba(230,172,84,.16)" stroke="var(--accent)" stroke-width="1.6"/>
+            <text x="86" y="313" fill="var(--accent)">condition</text><text x="314" y="313" fill="var(--paper)" font-size="9.5" text-anchor="end">Ball too far back</text>
+            <rect x="70" y="342" width="260" height="34" rx="7" fill="rgba(224,126,100,.12)" stroke="var(--thorax)"/>
+            <text x="86" y="363" fill="var(--thorax)">causes</text><text x="314" y="363" fill="var(--paper-dim)" font-size="9.5" text-anchor="end">&rarr; closed shoulders at address</text>
+          </g>
+          <g stroke="rgba(242,237,226,.28)" stroke-width="1.4">
+            <line x1="200" y1="76" x2="200" y2="92"/><line x1="200" y1="126" x2="200" y2="142"/><line x1="200" y1="176" x2="200" y2="192"/>
+            <line x1="200" y1="226" x2="200" y2="242"/><line x1="200" y1="276" x2="200" y2="292"/><line x1="200" y1="326" x2="200" y2="342"/>
+          </g>
+        </svg>
+        <p class="figcap">Ball position on a 7 iron, from the number to the habit and what it tends to cause.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. NORMS -->
+  <section id="norms" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The model &middot; 2</span>
+        <h2 class="xh">What normal looks like, and <em>for whom</em></h2>
+        <p class="xlede">A norm is drawn on screen as a <em>corridor</em>, a band most golfers' readings fall inside. It describes a population, never a person: it is "what golfers' readings look like", not your target, and nothing in it is keyed to you.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Two tolerances, not one</h4><p>Each side of the centre has its own tolerance, because the two directions are rarely equally interesting. A ball a little forward is common and harmless; a ball a long way back is neither. A reading is graded by how many tolerances out it sits <strong>on its own side</strong>: inside one is Ideal, inside two is Good, inside three is Watch, and beyond that is Action. Those multiples are one policy for the whole library (Lenient, Standard or Strict), never a slider per corridor, so Ideal means the same thing everywhere.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A signal fires on a deviation</h4><p>Not on merely leaving Ideal. Ideal is the middle of normal, so roughly a third of perfectly ordinary golfers sit outside it on any one measurement, and an app that spoke up every time would flag something on every swing. A signal fires at Watch or Action, past two tolerances: about one swing in 44 from a normal population, on the side it watches.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>The kind of shot decides which norm</h4><p>A driver is played off the lead heel and a wedge from the middle of the stance, so one "normal ball position" would be wrong for both. Norms hang on a tree of 31 shot contexts: any shot at the root, then full swing, the clubs, partial shots, bunker. The app starts at the shot's own context and walks upward until it finds a norm, so only what genuinely differs has to be written. The same tree carries <strong>styles</strong>: a bowed or cupped lead wrist at the top, which are both how tour players swing, and the two posture patterns good players use, staying level or squatting and pushing.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Context informs; it never silences</h4><p>The app will not decide that a habit doesn't matter on your bunker shot and quietly skip it. It measures, grades and reports. A norm can be narrowed to a <em>cohort</em> (a segmented population, say men aged 55&ndash;64), which moves the corridor but can never flip what counts as good. 259 norms ship today.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">ONE CORRIDOR, FOUR GRADES</text>
+          <!-- asymmetric bands: left tolerance 22px, right tolerance 34px; centre at 170 -->
+          <rect x="16" y="70" width="38" height="120" fill="url(#hatch)"/>
+          <rect x="54" y="70" width="50" height="120" fill="rgba(224,126,100,.16)"/>
+          <rect x="104" y="70" width="22" height="120" fill="rgba(230,172,84,.16)"/>
+          <rect x="126" y="70" width="22" height="120" fill="rgba(138,179,137,.10)"/>
+          <rect x="148" y="70" width="56" height="120" fill="rgba(138,179,137,.24)"/>
+          <rect x="204" y="70" width="34" height="120" fill="rgba(138,179,137,.10)"/>
+          <rect x="238" y="70" width="34" height="120" fill="rgba(230,172,84,.16)"/>
+          <rect x="272" y="70" width="84" height="120" fill="rgba(224,126,100,.16)"/>
+          <rect x="356" y="70" width="30" height="120" fill="url(#hatch)"/>
+          <defs>
+            <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(242,237,226,.18)" stroke-width="2"/>
+            </pattern>
+          </defs>
+          <line x1="170" y1="62" x2="170" y2="198" stroke="var(--paper)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
+          <text x="170" y="56" fill="var(--paper-dim)" font-size="9" text-anchor="middle">centre</text>
+          <g font-size="8.5" text-anchor="middle" fill="var(--paper-dim)">
+            <text x="176" y="212">ideal</text><text x="221" y="212">good</text><text x="255" y="212">watch</text><text x="314" y="212">action</text>
+            <text x="137" y="212">good</text><text x="115" y="226">watch</text><text x="79" y="212">action</text>
+          </g>
+          <g font-size="8" fill="var(--paper-dim)" text-anchor="middle">
+            <text x="35" y="240">not</text><text x="35" y="250">believed</text>
+            <text x="371" y="240">not</text><text x="371" y="250">believed</text>
+          </g>
+          <text x="104" y="250" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">a short side&hellip;</text>
+          <text x="270" y="250" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">&hellip;and a long side</text>
+          <circle cx="252" cy="130" r="7" fill="var(--accent)"/>
+          <circle cx="252" cy="130" r="14" fill="none" stroke="var(--accent)" stroke-width="1.4" class="an-node"/>
+          <text x="252" y="104" fill="var(--accent)" font-size="9" text-anchor="middle">fires</text>
+          <rect x="30" y="282" width="340" height="96" rx="10" fill="rgba(0,0,0,.28)" stroke="var(--line)"/>
+          <text x="46" y="306" fill="var(--paper)" font-size="10.5">Past 2 tolerances, on its own side &rarr; a finding</text>
+          <text x="46" y="328" fill="var(--paper-dim)" font-size="9.5">Inside the plausible range but no norm &rarr; Not measured</text>
+          <text x="46" y="348" fill="var(--paper-dim)" font-size="9.5">Outside the plausible range &rarr; a capture fault,</text>
+          <text x="46" y="364" fill="var(--paper-dim)" font-size="9.5">graded in neither direction</text>
+        </svg>
+        <p class="figcap">Illustrative: an asymmetric corridor under the Standard policy.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CONDITIONS -->
+  <section id="conditions" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The model &middot; 3</span>
+        <h2 class="xh">Not everything is a <em>swing fault</em></h2>
+        <p class="xlede">The library names 182 conditions, and it keeps them apart by what sort of thing each one is, because a coach does. Getting this wrong is how a mobility screen ends up being called your swing fault.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Seven kinds</h4><p>A <strong>fault</strong> is a movement error, what a lesson is about (94). A <strong>setup</strong> position is fixed before the swing starts (25). A <strong>delivery</strong> number is what the club did at the ball: path, face, attack, low point (15). Those are the scoreboard of the downswing rather than a fault in themselves. An <strong>outcome</strong> is what the ball did: slice, thin, shank (20). A <strong>capacity</strong> is what your body can and cannot do, settled by a physical test, never a camera (17). An <strong>intent</strong> is what you are trying to do, which only you can confirm (10). And there is one piece of <strong>equipment</strong>.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Seen, or only inferred</h4><p>154 conditions can be seen in a swing. 28 are <em>latent</em>: a tight hip or a habit of mind has no signal of its own, and can only be inferred from what it explains. Separately, each condition records how it is <strong>established today</strong>: measured by a signal (153), settled by a physical screen (17), or knowable only by asking (12). The first two describe the movement; the last one is allowed to change, and does, every time a new measurement lands.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Written for the golfer</h4><p>Every condition carries its consequence in plain words, and every one that can reach your work-on list must also carry a goal written as an instruction, one feel, a way to check it without the studio, which still to show you, and at least one drill. A test fails the build if any is missing. Each also lists the other names coaches use for it, so <em>flip</em> finds Scooping and <em>standing up</em> finds Early extension.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>How common, in our judgement</h4><p>Each condition has a <em>prominence</em>, from rare to ubiquitous. No study has ever counted named swing faults across golfers, so this is the library's own editorial judgement, used as a starting prior and labelled as such. Seven sit at ubiquitous: over the top, early extension, casting, an out-to-in path, an open face, the slice, and trying to lift the ball.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">182 CONDITIONS, BY KIND</text>
+          <g font-size="10.5" fill="var(--paper)">
+            <text x="30" y="70">fault</text><text x="30" y="110">setup</text><text x="30" y="150">outcome</text><text x="30" y="190">capacity</text>
+            <text x="30" y="230">delivery</text><text x="30" y="270">intent</text><text x="30" y="310">equipment</text>
+          </g>
+          <g>
+            <rect x="110" y="58" width="235" height="16" rx="3" fill="var(--thorax)"/>
+            <rect x="110" y="98" width="63" height="16" rx="3" fill="var(--accent)"/>
+            <rect x="110" y="138" width="50" height="16" rx="3" fill="var(--club)"/>
+            <rect x="110" y="178" width="43" height="16" rx="3" fill="var(--arm)"/>
+            <rect x="110" y="218" width="38" height="16" rx="3" fill="var(--club)" opacity=".6"/>
+            <rect x="110" y="258" width="25" height="16" rx="3" fill="none" stroke="var(--paper-dim)" stroke-dasharray="3 2"/>
+            <rect x="110" y="298" width="3" height="16" rx="1" fill="var(--paper-dim)"/>
+          </g>
+          <g font-size="10" fill="var(--paper-dim)">
+            <text x="352" y="71">94</text><text x="180" y="111">25</text><text x="167" y="151">20</text><text x="160" y="191">17</text>
+            <text x="155" y="231">15</text><text x="142" y="271">10</text><text x="120" y="311">1</text>
+          </g>
+          <g font-size="8.5" fill="var(--paper-dim)">
+            <text x="200" y="191">screened, never filmed</text>
+            <text x="200" y="271">asked, never concluded</text>
+            <text x="200" y="231">the downswing's scoreboard</text>
+          </g>
+          <rect x="30" y="336" width="340" height="44" rx="9" fill="rgba(0,0,0,.28)" stroke="var(--line)"/>
+          <text x="200" y="354" fill="var(--paper)" font-size="9.5" text-anchor="middle">Only faults and setup make the work-on list.</text>
+          <text x="200" y="370" fill="var(--paper-dim)" font-size="9" text-anchor="middle">Delivery numbers only fill a thin list up to three.</text>
+        </svg>
+        <p class="figcap">The shipped library, counted from the pack itself.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. CAUSAL GRAPH -->
+  <section id="graph" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The model &middot; 4</span>
+        <h2 class="xh">Causes, written in <em>words</em></h2>
+        <p class="xlede">The 622 links between conditions form one graph: 591 say one thing tends to cause another, 25 say two readings corroborate each other, and 6 say two findings cannot both describe the same swing. The library refuses to load if the causes ever form a loop.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Strength is a word, and the word is a number</h4><p>Each cause link is authored as <em>rarely</em>, <em>sometimes</em>, <em>often</em>, <em>usually</em> or <em>always</em>, and read back in those words, never as a percentage. Underneath, each word is a probability that the cause produces the effect: 0.10, 0.30, 0.60, 0.80, 0.95. Neither end reaches 0 or 1, because no coaching claim has earned certainty. Prominence works the same way, as the prior chance a cause is present at all: 0.05 for rare up to 0.60 for ubiquitous.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A symptom is never called the root</h4><p>Ranking explains the findings by greedily choosing the causes that cover the most of them. One rule outranks the arithmetic: <strong>a condition that has a cause in the library is never presented as a root.</strong> Early extension causes loss of posture, and casting causes scooping. Handing a coach the symptom and calling it the diagnosis is the failure this whole layer exists to prevent.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>What didn't happen counts too</h4><p>For a cause nobody could measure, the app works out how likely it is from what it would explain: its prominence as the starting point, then each of its effects. An effect that showed raises it. An effect that was <em>measured and absent</em> lowers it, since a cause that "usually" produces something which never appeared is less likely to be there. That negative evidence is what stops a cause with few authored effects winning by default.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>An observation beats an inference</h4><p>A cause the session actually measured keeps its own measured likelihood; its effects never argue it up or down. A first version let inference overrule a measured pattern, and it read zero for something plainly on screen. Causes that can only be established by asking (trying to lift the ball, say) are <strong>offered as questions, never concluded</strong>, and never count as explaining anything.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">EARLY EXTENSION, IN CONTEXT</text>
+          <g stroke-width="1.4" fill="none">
+            <path d="M80 92 L180 182" stroke="var(--arm)"/>
+            <path d="M200 92 L200 178" stroke="var(--accent)"/>
+            <path d="M320 92 L220 182" stroke="var(--accent)" stroke-dasharray="5 4"/>
+            <path d="M184 222 L84 304" stroke="var(--thorax)"/>
+            <path d="M196 224 L170 304" stroke="var(--thorax)" stroke-dasharray="5 4"/>
+            <path d="M206 224 L240 304" stroke="var(--thorax)"/>
+            <path d="M216 222 L320 304" stroke="var(--thorax)" stroke-dasharray="5 4"/>
+          </g>
+          <g font-size="8" fill="var(--paper-dim)">
+            <text x="136" y="150" text-anchor="end">usually</text><text x="206" y="140">usually</text><text x="262" y="150">often</text>
+            <text x="118" y="270" text-anchor="end">usually</text><text x="176" y="270" text-anchor="end">often</text><text x="230" y="270">usually</text><text x="284" y="270">often</text>
+          </g>
+          <g font-size="8.5" text-anchor="middle">
+            <rect x="22" y="58" width="116" height="34" rx="7" fill="rgba(138,179,137,.12)" stroke="var(--arm)" stroke-dasharray="4 3"/>
+            <text x="80" y="73" fill="var(--paper)">tight lead hip</text><text x="80" y="85" fill="var(--paper-dim)">screened</text>
+            <rect x="148" y="58" width="104" height="34" rx="7" fill="rgba(230,172,84,.10)" stroke="var(--accent)"/>
+            <text x="200" y="73" fill="var(--paper)">pelvis and chest</text><text x="200" y="85" fill="var(--paper-dim)">move as one</text>
+            <rect x="262" y="58" width="116" height="34" rx="7" fill="rgba(230,172,84,.10)" stroke="var(--accent)"/>
+            <text x="320" y="73" fill="var(--paper)">ball too close</text><text x="320" y="85" fill="var(--paper-dim)">setup</text>
+          </g>
+          <rect x="130" y="180" width="140" height="44" rx="9" fill="rgba(224,126,100,.20)" stroke="var(--thorax)" stroke-width="1.8"/>
+          <text x="200" y="201" fill="var(--paper)" font-size="11" text-anchor="middle">Early extension</text>
+          <text x="200" y="215" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">fault &middot; ubiquitous</text>
+          <g font-size="8.5" text-anchor="middle" fill="var(--paper)">
+            <rect x="30" y="304" width="96" height="30" rx="7" fill="rgba(224,126,100,.10)" stroke="var(--thorax)"/>
+            <text x="78" y="323">coming out of it</text>
+            <rect x="128" y="304" width="84" height="30" rx="7" fill="rgba(224,126,100,.10)" stroke="var(--thorax)"/>
+            <text x="170" y="323">heel strike</text>
+            <rect x="214" y="304" width="62" height="30" rx="7" fill="rgba(123,192,219,.10)" stroke="var(--club)"/>
+            <text x="245" y="323">shank</text>
+            <rect x="278" y="304" width="96" height="30" rx="7" fill="rgba(224,126,100,.10)" stroke="var(--thorax)"/>
+            <text x="326" y="323">steep lie</text>
+          </g>
+          <text x="200" y="362" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">causes above &middot; what it tends to produce below</text>
+          <text x="200" y="380" fill="var(--paper-dim)" font-size="9" text-anchor="middle">solid = usually (0.80) &middot; dashed = often (0.60)</text>
+        </svg>
+        <p class="figcap">A slice of the shipped graph: four of early extension's nineteen authored causes, and four of its effects.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. COMPOSITES -->
+  <section id="composites" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>The model &middot; 5 &middot; new in October</span>
+        <h2 class="xh">Several readings, <em>one judgement</em></h2>
+        <p class="xlede">Some habits aren't one movement. "Losing your posture" is the trunk standing up, the hips moving toward the ball, the head rising and the pelvis lifting, and no one of them has to be large. So a few conditions read a <em>composite</em>: several graded readings combined into one.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Two ways to combine</h4><p>When the parts all push one way (posture held into impact, and to the top) they are added with weights and signs, corrected for how much the parts move together, so a compensation cancels: bend lost while height drops is not counted twice. When any departure matters in any direction (posture at address) the distance from normal is combined across all parts. Either way the result is calibrated to trip a clean swing about <strong>2.3% of the time</strong>, the same rate a single reading trips its own line.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Too few parts is a refusal, not a zero</h4><p>If the parts that could be read carry too little of the composite's weight, there is no reading, and the app says why. A composite built from three of its four parts is calibrated as a three-part reading. How strongly the parts move together was measured on three golfers' swings, not assumed.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>It says which part did it</h4><p>Each part's share of the result is kept, so the finding reads "loss of posture, mostly the trunk" rather than a bare verdict. The specific moves keep their own conditions too. When early extension and loss of posture are both patterns, the work-on list names the specific move and treats the family as its symptom.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Against good players, position by position</h4><p>Head height, hip depth, trunk bend, both knees and pelvis height are now also read at every position from address to the follow-through, against bands drawn from published measurement of tour players where it exists. Two patterns are graded separately, staying level and squatting and pushing, because both are how good players swing. Departures like standing up or an early dip are never treated as a pattern.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">POSTURE HELD INTO IMPACT</text>
+          <g font-size="10" fill="var(--paper)">
+            <text x="30" y="72">trunk</text><text x="30" y="112">hips to the ball</text><text x="30" y="152">head</text><text x="30" y="192">pelvis height</text>
+          </g>
+          <g font-size="8.5" fill="var(--paper-dim)">
+            <text x="30" y="84">weight 0.9</text><text x="30" y="124">weight 0.8</text><text x="30" y="164">weight 0.6</text><text x="30" y="204">weight 0.4 &middot; not read</text>
+          </g>
+          <line x1="200" y1="56" x2="200" y2="210" stroke="rgba(242,237,226,.25)"/>
+          <rect x="200" y="62" width="118" height="16" rx="3" fill="var(--thorax)"/>
+          <rect x="200" y="102" width="62" height="16" rx="3" fill="var(--thorax)" opacity=".75"/>
+          <rect x="178" y="142" width="22" height="16" rx="3" fill="var(--arm)" opacity=".8"/>
+          <rect x="200" y="182" width="60" height="16" rx="3" fill="none" stroke="var(--paper-dim)" stroke-dasharray="3 3"/>
+          <g font-size="9" fill="var(--paper-dim)"><text x="324" y="74">58 %</text><text x="268" y="114">31 %</text><text x="132" y="154">&minus;11 %</text></g>
+          <text x="200" y="228" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">each part's share of the result</text>
+          <rect x="30" y="248" width="340" height="40" rx="8" fill="rgba(242,237,226,.04)" stroke="var(--line)"/>
+          <rect x="30" y="248" width="246" height="40" rx="8" fill="rgba(224,126,100,.20)"/>
+          <line x1="230" y1="242" x2="230" y2="294" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="3 3"/>
+          <text x="230" y="306" fill="var(--accent)" font-size="8.5" text-anchor="middle">fault line</text>
+          <text x="46" y="273" fill="var(--paper)" font-size="11">combined: 2.4 tolerances</text>
+          <text x="200" y="338" fill="var(--paper)" font-size="11" text-anchor="middle">"Loss of posture, mostly the trunk"</text>
+          <text x="200" y="358" fill="var(--paper-dim)" font-size="9" text-anchor="middle">the head held its height, and partly offsets it;</text>
+          <text x="200" y="372" fill="var(--paper-dim)" font-size="9" text-anchor="middle">three of four parts read: enough weight to judge</text>
+        </svg>
+        <p class="figcap">Illustrative numbers: how a composite reports its parts.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. UNCERTAINTY -->
+  <section id="uncertainty" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>The model &middot; 6</span>
+        <h2 class="xh">A probability on every <em>verdict</em></h2>
+        <p class="xlede">Every reading now carries an error bar. A signal that fires on 12 against a line at 10 should not fire as hard when the reading is 12&nbsp;&plusmn;&nbsp;3 as when it is 12&nbsp;&plusmn;&nbsp;0.1. So beside its yes or no, every finding carries the probability that it really fired.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Two different spreads</h4><p>The norm's tolerance says how much <em>golfers</em> vary; it places the line. The measurement error says how wrong <em>this reading</em> might be; it decides how sure we are which side of the line you really were. Only the second turns a verdict into a probability: <span class="formula">P(fire) = &Phi;((v &minus; e) / &sigma;)</span>. For 12&nbsp;&plusmn;&nbsp;3 against 10, that is about 0.75: a one-in-four chance the true value never crossed.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A reading may also be simply wrong</h4><p>Separately from its error bar, a reading carries the chance it is on the wrong thing altogether: the shaft tracker locked onto a shadow, say. That share of the shot counts as assessing nothing. Where no error bar was stated, none is invented. The verdict stays a plain yes or no, and is marked as unquantified.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>The verdict itself never changes</h4><p>Fired, not fired and not measurable are computed exactly as before. A gate checks that on every row of every session in the library. The probability only adds information, and feeds the session's counts and rankings.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>You see words, not the number</h4><p>The session re-runs its whole picture 200 times, each time letting every borderline reading fall either way by its own odds, and counts how often each pattern and each likely cause survives. That share becomes a word: <strong>firm</strong> (at least 80% of runs), <strong>likely</strong> (at least half) or <strong>fragile</strong>. No percentage for anything inferred is ever shown.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">12 &plusmn; 3 AGAINST A LINE AT 10</text>
+          <line x1="40" y1="250" x2="360" y2="250" stroke="rgba(242,237,226,.18)"/>
+          <!-- bell centred at x=230 (value 12), sigma 3 = 48px; edge 10 at x=198 -->
+          <path d="M198 250 L198 116 C214 84 222 76 230 76 C238 76 246 84 262 112 C282 150 298 196 322 228 C338 246 350 249 360 250 Z" fill="rgba(224,126,100,.24)"/>
+          <path d="M100 250 C112 249 124 246 138 228 C162 196 178 150 198 116 L198 250 Z" fill="rgba(138,179,137,.18)"/>
+          <path d="M100 250 C112 249 124 246 138 228 C162 196 178 150 198 116 C214 84 222 76 230 76 C238 76 246 84 262 112 C282 150 298 196 322 228 C338 246 350 249 360 250" fill="none" stroke="var(--paper)" stroke-width="1.6"/>
+          <line x1="198" y1="58" x2="198" y2="262" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 3"/>
+          <text x="198" y="52" fill="var(--accent)" font-size="9.5" text-anchor="middle">the line, 10</text>
+          <line x1="230" y1="76" x2="230" y2="250" stroke="var(--paper-dim)" stroke-width="1" stroke-dasharray="2 3"/>
+          <text x="230" y="276" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">reading, 12</text>
+          <text x="282" y="180" fill="var(--thorax)" font-size="11">crossed: 0.75</text>
+          <text x="96" y="180" fill="var(--arm)" font-size="11">didn't: 0.25</text>
+          <rect x="30" y="300" width="340" height="80" rx="10" fill="rgba(0,0,0,.28)" stroke="var(--line)"/>
+          <text x="46" y="324" fill="var(--paper)" font-size="10">verdict: fired (unchanged)</text>
+          <text x="46" y="344" fill="var(--paper-dim)" font-size="9.5">counted in the session as 0.75 of a firing</text>
+          <text x="46" y="364" fill="var(--paper-dim)" font-size="9.5">shown to you as a count, and later as a word</text>
+        </svg>
+        <p class="figcap">The engine's arithmetic, drawn. The app shows words, not this number.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART TWO: THE SESSION ===================== -->
+  <section class="xsec" style="padding-bottom:0">
+    <div class="kicker reveal"><span class="sig coral"></span>Part two &middot; In the session</div>
+    <h2 class="xh reveal" style="font-size:clamp(26px,3.4vw,40px);--d:1">A shot fires findings; <em>only a session diagnoses</em></h2>
+    <p class="xlede reveal" style="max-width:72ch;margin-bottom:0;--d:2">That one sentence divides all the labour. A single swing is an observation, and one observation is not a habit. The hard part of this layer is the restraint not to say more than fifteen swings support, written down as rules the app has to follow.</p>
+  </section>
+
+  <!-- 7. LEDGER -->
+  <section id="ledger" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The session &middot; 1</span>
+        <h2 class="xh">A ledger, not a <em>running total</em></h2>
+        <p class="xlede">After every swing, every condition the capture could speak to is checked, and the result is written down: one row per condition per swing. Nothing is summarised on the way in. Every pattern, trend, link and ranking on screen is worked out afresh from those rows.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>What a row holds</h4><p>Whether it fired, didn't, or couldn't be assessed; the probability it really fired; which way it went; how far the driving reading sat from normal; and which club and context it was judged against. The ledger is saved beside the session, so reopening it later rebuilds exactly the same picture.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Every measurable swing counts, and only those</h4><p>A badly hit swing is never thrown out; mishits are the most diagnostic swings in the session. A reading the app doesn't believe (outside its plausible range) contributes nothing for that measure, because it is a capture fault rather than a swing fault. A swing the capture couldn't judge is left out of that condition's count altogether, so "8 of 12" always means 12 swings that could have shown it.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>The first three swings count half</h4><p>Warm-up swings aren't representative and would seed early patterns badly, so the first three are down-weighted rather than excluded. It matters: a habit that fired on 5 of 8 swings, including all three warm-ups, drops from a pattern back to <em>watching</em> once they are weighted.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>The panel matures in one direction</h4><p>It opens <strong>cold</strong> ("too few swings to call a pattern"), becomes <strong>forming</strong> once patterns appear, and <strong>established</strong> once two of them are linked by evidence, when the cards reorganise into causal chains. It never steps back down within a session, so you never watch the app change its mind mid-thought. At the end it freezes, and becomes the session summary.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">TWELVE SWINGS, THREE HABITS</text>
+          <g font-size="9" fill="var(--paper-dim)" text-anchor="middle">
+            <text x="98" y="56">1</text><text x="122" y="56">2</text><text x="146" y="56">3</text><text x="170" y="56">4</text><text x="194" y="56">5</text><text x="218" y="56">6</text>
+            <text x="242" y="56">7</text><text x="266" y="56">8</text><text x="290" y="56">9</text><text x="314" y="56">10</text><text x="338" y="56">11</text><text x="362" y="56">12</text>
+          </g>
+          <rect x="86" y="62" width="72" height="200" rx="5" fill="rgba(242,237,226,.03)"/>
+          <text x="122" y="276" fill="var(--paper-dim)" font-size="8.5" text-anchor="middle">warm-up, half weight</text>
+          <g font-size="9.5" fill="var(--paper)">
+            <text x="22" y="92">A</text><text x="22" y="152">B</text><text x="22" y="212">C</text>
+          </g>
+          <g font-size="8" fill="var(--paper-dim)">
+            <text x="36" y="92">sway</text><text x="36" y="152">ball back</text><text x="36" y="212">hip depth</text>
+          </g>
+          <!-- row A: fired mostly -->
+          <g fill="var(--thorax)">
+            <rect x="91" y="80" width="14" height="14" rx="3"/><rect x="115" y="80" width="14" height="14" rx="3"/><rect x="163" y="80" width="14" height="14" rx="3"/>
+            <rect x="187" y="80" width="14" height="14" rx="3"/><rect x="211" y="80" width="14" height="14" rx="3"/><rect x="259" y="80" width="14" height="14" rx="3"/>
+            <rect x="283" y="80" width="14" height="14" rx="3"/><rect x="307" y="80" width="14" height="14" rx="3"/><rect x="355" y="80" width="14" height="14" rx="3"/>
+          </g>
+          <g fill="none" stroke="var(--paper-dim)" stroke-width="1">
+            <rect x="139.5" y="80.5" width="13" height="13" rx="3"/><rect x="235.5" y="80.5" width="13" height="13" rx="3"/><rect x="331.5" y="80.5" width="13" height="13" rx="3"/>
+          </g>
+          <!-- row B: fired twice -->
+          <g fill="none" stroke="var(--paper-dim)" stroke-width="1">
+            <rect x="91.5" y="140.5" width="13" height="13" rx="3"/><rect x="139.5" y="140.5" width="13" height="13" rx="3"/><rect x="163.5" y="140.5" width="13" height="13" rx="3"/>
+            <rect x="187.5" y="140.5" width="13" height="13" rx="3"/><rect x="235.5" y="140.5" width="13" height="13" rx="3"/><rect x="259.5" y="140.5" width="13" height="13" rx="3"/>
+            <rect x="283.5" y="140.5" width="13" height="13" rx="3"/><rect x="331.5" y="140.5" width="13" height="13" rx="3"/><rect x="355.5" y="140.5" width="13" height="13" rx="3"/>
+            <rect x="307.5" y="140.5" width="13" height="13" rx="3"/>
+          </g>
+          <g fill="var(--thorax)"><rect x="115" y="140" width="14" height="14" rx="3"/><rect x="211" y="140" width="14" height="14" rx="3"/></g>
+          <!-- row C: unmeasurable on many -->
+          <g fill="rgba(242,237,226,.10)">
+            <rect x="91" y="200" width="14" height="14" rx="3"/><rect x="115" y="200" width="14" height="14" rx="3"/><rect x="139" y="200" width="14" height="14" rx="3"/>
+            <rect x="163" y="200" width="14" height="14" rx="3"/><rect x="187" y="200" width="14" height="14" rx="3"/><rect x="211" y="200" width="14" height="14" rx="3"/>
+            <rect x="235" y="200" width="14" height="14" rx="3"/><rect x="259" y="200" width="14" height="14" rx="3"/>
+          </g>
+          <g fill="var(--thorax)"><rect x="283" y="200" width="14" height="14" rx="3"/><rect x="307" y="200" width="14" height="14" rx="3"/><rect x="331" y="200" width="14" height="14" rx="3"/></g>
+          <rect x="355.5" y="200.5" width="13" height="13" rx="3" fill="none" stroke="var(--paper-dim)"/>
+          <g font-size="9" fill="var(--paper-dim)">
+            <text x="91" y="116">9 of 12 &rarr; pattern</text>
+            <text x="91" y="176">2 of 12 &rarr; watching</text>
+            <text x="91" y="236">3 of 4 measurable &rarr; pattern</text>
+          </g>
+          <g font-size="9" fill="var(--paper-dim)">
+            <rect x="34" y="306" width="12" height="12" rx="3" fill="var(--thorax)"/><text x="54" y="316">fired</text>
+            <rect x="120.5" y="306.5" width="11" height="11" rx="3" fill="none" stroke="var(--paper-dim)"/><text x="140" y="316">clean</text>
+            <rect x="206" y="306" width="12" height="12" rx="3" fill="rgba(242,237,226,.10)"/><text x="226" y="316">not measurable</text>
+          </g>
+          <text x="200" y="354" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">C was only seen once a second camera joined:</text>
+          <text x="200" y="370" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">its denominator is four swings, not twelve</text>
+        </svg>
+        <p class="figcap">Illustrative: the ledger as the session report's swing-by-swing grid draws it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. RECURRENCE -->
+  <section id="recurrence" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The session &middot; 2</span>
+        <h2 class="xh">Recurrence is the unit of <em>diagnosis</em></h2>
+        <p class="xlede">A habit is something you keep doing. So the question for each condition is how often it fires on the swings that could show it, judged by how much a session that size can actually support.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>The cautious end of the evidence</h4><p>One of two and eight of ten are both "most of the time", and they are nothing like the same evidence. So the rate is graded by the <strong>Wilson score lower bound</strong>: the lowest firing rate the swings are still consistent with, at 95% confidence. A condition becomes a <strong>pattern</strong> when that bound reaches 0.30, from at least three measurable swings. Three of three clears it (0.44). Two of three doesn't (0.21), and neither does one of two (0.10).</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Watching is the outlier discard</h4><p>Something that fired but hasn't earned a pattern sits in <strong>watching</strong>: seen, not yet evidence, and it never headlines. A single shank stays there forever if it never recurs. The outliers are set aside by weight of evidence, and no data is deleted to do it.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Which way, and is it consistent</h4><p>Among a pattern's firings the app tracks direction. If fewer than 70% agree, the pattern is presented as <em>inconsistency</em> ("an inconsistent shaft plane"), which is itself something a coach wants to know, and the directional story is withheld.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Getting better, and fixed</h4><p>Once a pattern has five readings, its trend is a Theil&ndash;Sen slope with a rank test of significance, immune to one wild swing by construction, reported as <em>improving</em>, <em>stable</em> or <em>worsening</em> and nothing finer. A pattern that hasn't fired in the last five measurable swings is shown as <strong>resolving</strong>: the panel rewards the fix rather than punishing the history.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">THE RATE, AND WHAT IT SUPPORTS</text>
+          <!-- x scale: 0 at 120, 1.0 at 360 (240 px) -->
+          <line x1="192" y1="52" x2="192" y2="290" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <text x="192" y="306" fill="var(--accent)" font-size="9" text-anchor="middle">pattern line, 0.30</text>
+          <g font-size="10.5" fill="var(--paper)">
+            <text x="36" y="84">1 of 2</text><text x="36" y="144">2 of 3</text><text x="36" y="204">3 of 3</text><text x="36" y="264">8 of 10</text>
+          </g>
+          <g fill="rgba(242,237,226,.10)">
+            <rect x="120" y="66" width="120" height="10" rx="2"/><rect x="120" y="126" width="160" height="10" rx="2"/>
+            <rect x="120" y="186" width="240" height="10" rx="2"/><rect x="120" y="246" width="192" height="10" rx="2"/>
+          </g>
+          <rect x="120" y="80" width="23" height="10" rx="2" fill="var(--paper-dim)"/>
+          <rect x="120" y="140" width="50" height="10" rx="2" fill="var(--paper-dim)"/>
+          <rect x="120" y="200" width="105" height="10" rx="2" fill="var(--thorax)"/>
+          <rect x="120" y="260" width="118" height="10" rx="2" fill="var(--thorax)"/>
+          <g font-size="9" fill="var(--paper-dim)">
+            <text x="364" y="89" text-anchor="end">0.10 &middot; watching</text><text x="364" y="149" text-anchor="end">0.21 &middot; watching</text>
+            <text x="364" y="209" text-anchor="end" fill="var(--thorax)">0.44 &middot; pattern</text><text x="364" y="269" text-anchor="end" fill="var(--thorax)">0.49 &middot; pattern</text>
+          </g>
+          <g font-size="9" fill="var(--paper-dim)">
+            <rect x="60" y="330" width="22" height="8" rx="2" fill="rgba(242,237,226,.16)"/><text x="90" y="338">raw rate</text>
+            <rect x="200" y="330" width="22" height="8" rx="2" fill="var(--thorax)"/><text x="230" y="338">lower bound</text>
+          </g>
+          <text x="200" y="370" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">shown to you as a count: "3 of 3 measurable swings"</text>
+        </svg>
+        <p class="figcap">Wilson lower bounds at 95%, computed, not illustrative.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. CHAINS -->
+  <section id="chains" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The session &middot; 3</span>
+        <h2 class="xh">Chains are confirmed, <em>never discovered</em></h2>
+        <p class="xlede">182 conditions make about sixteen thousand possible pairs. Search those for links across fifteen swings and you will find nothing but coincidence. So the session never searches. It only tests the few links the library already wrote down between <em>this</em> session's patterns: a handful of hypotheses fixed before the first ball. <strong>The causal graph is the multiple-comparisons correction.</strong></p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Four grades of link</h4><p><strong>Present together:</strong> both ends are patterns. Necessary, nowhere near sufficient. <strong>Coherent:</strong> the directions match the link, and within single swings the two fire in the swing's own order. <strong>Conditionally dependent:</strong> on at least eight paired swings, the effect shows more often when the cause did, by a one-sided exact test. That reads as a coach's sentence: "path was out-to-in on 7 of the 8 swings where the hips stalled, and on none of the 3 where they cleared". <strong>Moved together:</strong> the cause improved, and the effect followed.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>Limits are states, not secrets</h4><p>A cause that fires on <em>every</em> swing has nothing to compare against, so its links stop at Coherent, shown as "present on every swing, coupling untestable today". Two conditions read from the same measurement can't be tested against each other either, and say so. A step in the chain the cameras can't yet measure is drawn as a <strong>ghost link</strong>, never silently bridged.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>No chain probability</h4><p>The links aren't independent, so multiplying their strengths would be precision nobody could defend. A chain's confidence is simply its grade at each link. When two authored causes could explain the same thing and the session can't tell them apart, the more consistent chain is shown with the rival one tap away. Neither is ever claimed to be the only explanation.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">A CHAIN, LINK BY LINK</text>
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="var(--arm)"/></marker>
+          </defs>
+          <g font-size="9.5" text-anchor="middle">
+            <rect x="120" y="46" width="160" height="34" rx="8" fill="rgba(138,179,137,.14)" stroke="var(--arm)"/>
+            <text x="200" y="67" fill="var(--paper)">hips stall in the downswing</text>
+            <rect x="120" y="128" width="160" height="34" rx="8" fill="rgba(230,172,84,.12)" stroke="var(--accent)"/>
+            <text x="200" y="149" fill="var(--paper)">over the top</text>
+            <rect x="120" y="210" width="160" height="34" rx="8" fill="rgba(242,237,226,.03)" stroke="var(--paper-dim)" stroke-dasharray="4 3"/>
+            <text x="200" y="231" fill="var(--paper-dim)">shoulders open to the line</text>
+            <rect x="120" y="292" width="160" height="34" rx="8" fill="rgba(123,192,219,.12)" stroke="var(--club)"/>
+            <text x="200" y="313" fill="var(--paper)">out-to-in path</text>
+          </g>
+          <line x1="200" y1="80" x2="200" y2="124" stroke="var(--arm)" stroke-width="3" marker-end="url(#arr)"/>
+          <line x1="200" y1="162" x2="200" y2="210" stroke="var(--accent)" stroke-width="1.6" opacity=".35" stroke-dasharray="2 4"/>
+          <line x1="200" y1="244" x2="200" y2="292" stroke="var(--paper-dim)" stroke-width="1.6" stroke-dasharray="2 4"/>
+          <g font-size="8.5" fill="var(--paper-dim)">
+            <text x="212" y="100" fill="var(--arm)">moved together</text><text x="212" y="112">under a focus</text>
+            <text x="212" y="186">ghost link</text><text x="212" y="198">not yet measurable</text>
+            <text x="212" y="268">ghost link</text>
+          </g>
+          <g font-size="8.5" fill="var(--paper-dim)">
+            <line x1="30" y1="352" x2="58" y2="352" stroke="var(--paper)" stroke-width="1.2" stroke-dasharray="2 3"/><text x="64" y="355">present together</text>
+            <line x1="214" y1="352" x2="242" y2="352" stroke="var(--paper)" stroke-width="1.2"/><text x="248" y="355">coherent</text>
+            <line x1="30" y1="374" x2="58" y2="374" stroke="var(--paper)" stroke-width="2.6"/><text x="64" y="377">conditionally dependent</text>
+            <line x1="214" y1="374" x2="242" y2="374" stroke="var(--arm)" stroke-width="3"/><text x="248" y="377">moved together</text>
+          </g>
+        </svg>
+        <p class="figcap">Illustrative: link grades as the chain rail draws them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. DRIVER -->
+  <section id="driver" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The session &middot; 4</span>
+        <h2 class="xh">The likely <em>driver</em></h2>
+        <p class="xlede">Once the session's patterns have settled, the app asks which upstream cause would explain the most of them, and puts that at the foot of the panel. "Fix the hip clearance and the path fix comes free" is the whole value of a causal model over a list of faults.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Ranked over patterns, not swings</h4><p>The explanation runs over the session's <em>patterns</em>, and re-runs only when their membership changes; ranking per swing would reshuffle on every ball. It waits until the pattern set has held still for three swings. An empty footer is better than a flickering one. When a session's patterns share no authored cause, it says exactly that.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>It says how firm, and how it knows</h4><p>The driver carries how many of your patterns it would explain, and its stability word: firm, likely or fragile. A driver nothing in the session measured, and no screen has confirmed, is labelled <strong>"inferred, not measured"</strong> under its name. That label was chosen over demoting such causes, because an unmeasured cause is often exactly what is worth checking next.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>A thirty-second test instead of more kit</h4><p>Many of the strongest causes in the library are physical (a tight trail hip, a stiff upper back) and no camera will ever see them. For those the app names a <strong>screen</strong>, one of 17 physical tests with a protocol and a pass criterion: "a hip test would anchor this chain; it would explain three of your patterns". Enter the result and it counts straight away, as the only ground truth the model has about a hidden cause.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Questions, kept as questions</h4><p>Causes only you can confirm, such as trying to help the ball into the air, appear as questions, visually distinct, and are never counted as having explained anything. The report doesn't model intent and doesn't excuse anything: a habit can be deliberate, and the app reports what it saw either way.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">THE FOOTER, AT THE END</text>
+          <rect x="24" y="50" width="352" height="196" rx="12" fill="rgba(242,237,226,.03)" stroke="var(--line-strong)"/>
+          <text x="44" y="78" fill="var(--paper-dim)" font-size="9" letter-spacing="1.5">LIKELY DRIVER</text>
+          <rect x="296" y="66" width="64" height="18" rx="9" fill="none" stroke="var(--accent)"/>
+          <text x="328" y="79" fill="var(--accent)" font-size="9" text-anchor="middle">likely</text>
+          <text x="44" y="108" fill="var(--paper)" font-size="15" font-family="Fraunces,Georgia,serif">Limited trail hip rotation</text>
+          <text x="44" y="128" fill="var(--paper-dim)" font-size="9.5">inferred, not measured</text>
+          <text x="44" y="156" fill="var(--paper)" font-size="10">would explain 3 of your patterns:</text>
+          <text x="44" y="174" fill="var(--paper-dim)" font-size="9.5">sway &middot; reverse spine at the top &middot; early extension</text>
+          <rect x="44" y="194" width="200" height="30" rx="8" fill="rgba(230,172,84,.14)" stroke="var(--accent)"/>
+          <text x="144" y="213" fill="var(--accent)" font-size="10" text-anchor="middle">RUN THE HIP SCREEN &#9656;</text>
+          <rect x="24" y="266" width="352" height="64" rx="12" fill="rgba(242,237,226,.02)" stroke="var(--line)" stroke-dasharray="4 3"/>
+          <text x="44" y="290" fill="var(--paper-dim)" font-size="9" letter-spacing="1.5">WORTH ASKING</text>
+          <text x="44" y="312" fill="var(--paper)" font-size="10">Are you trying to help the ball up?</text>
+          <text x="200" y="362" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">a screened "yes" turns the inference</text>
+          <text x="200" y="378" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">into the one thing the model knows for sure</text>
+        </svg>
+        <p class="figcap">Illustrative: the driver footer, with a screen recommended.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. INTENT -->
+  <section id="intent" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge"><i></i>The session &middot; 5</span>
+        <h2 class="xh">What you tell it, and what it <em>never changes</em></h2>
+        <p class="xlede">Two optional declarations turn watching into practice. Neither one ever changes what is detected or how it is graded. Intent shapes what the app pays attention to and how the session is structured, and never the evidence.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>The miss you came in with</h4><p>Declare your usual bad shot at the start, as you would to a coach, and the app walks upstream from it through the graph, so the chains that could produce it are ready to be tested. When a launch monitor is connected, it checks your miss against what the ball actually did.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A focus turns the session into an experiment</h4><p>Say "working on this" about one habit, and every swing before becomes the baseline and every swing after the intervention: an experiment with a sample size of one, which is what practice is. The panel then reports the habit you're working on <em>and what happens downstream of it</em> ("hip clearance improving; path following"). Only under a focus can a link honestly earn <em>moved together</em>.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Feedback, not after every ball</h4><p>Motor-learning research is consistent that feedback after every attempt can hurt retention compared with feedback that comes less often. So by default the panel surfaces a swing only when it fired one of the session's patterns, or broke a clean run; otherwise it acknowledges quietly. "Every swing" is there for a coach-led assessment. The evidence engine runs at full rate either way. This setting only changes what is shown.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>No session score</h4><p>Deliberately. A single number invites you to swing <em>at the panel</em>, and nobody can answer "why 74?". The chain is the headline. The ten-second glance between balls has one job: did that swing add a tick or a cross to <em>my</em> things?</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">A FOCUS, DECLARED AT SWING 7</text>
+          <rect x="40" y="52" width="150" height="250" fill="rgba(242,237,226,.03)"/>
+          <text x="115" y="68" fill="var(--paper-dim)" font-size="9" text-anchor="middle">baseline</text>
+          <text x="275" y="68" fill="var(--arm)" font-size="9" text-anchor="middle">after the focus</text>
+          <line x1="190" y1="52" x2="190" y2="302" stroke="var(--arm)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <line x1="40" y1="176" x2="360" y2="176" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>
+          <text x="356" y="170" fill="var(--accent)" font-size="8.5" text-anchor="end">fault line</text>
+          <!-- upstream (hips) -->
+          <polyline points="52,110 76,120 100,104 124,116 148,108 172,114 196,138 220,166 244,188 268,200 292,206 316,214 340,210" fill="none" stroke="var(--arm)" stroke-width="2"/>
+          <!-- downstream (path) lags -->
+          <polyline points="52,132 76,140 100,128 124,136 148,130 172,134 196,136 220,144 244,160 268,182 292,196 316,206 340,212" fill="none" stroke="var(--club)" stroke-width="2" stroke-dasharray="6 3"/>
+          <g font-size="9">
+            <text x="52" y="96" fill="var(--arm)">hips stall (focus)</text>
+            <text x="356" y="234" fill="var(--club)" text-anchor="end">path follows, a few swings later</text>
+          </g>
+          <text x="200" y="318" fill="var(--paper-dim)" font-size="9" text-anchor="middle">each swing's distance from normal, in tolerances</text>
+          <rect x="30" y="334" width="340" height="44" rx="9" fill="rgba(138,179,137,.08)" stroke="var(--arm)"/>
+          <text x="200" y="352" fill="var(--paper)" font-size="10" text-anchor="middle">hip clearance improving; path following</text>
+          <text x="200" y="368" fill="var(--paper-dim)" font-size="9" text-anchor="middle">the link earns "moved together"</text>
+        </svg>
+        <p class="figcap">Illustrative: five swings either side of a declared focus.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. WORK-ONS -->
+  <section id="workons" class="xsec alt reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>The session &middot; 6 &middot; what to work on</span>
+        <h2 class="xh">Three to five things, <em>in order</em></h2>
+        <p class="xlede">Every session records its <strong>work-ons</strong>: up to five habits you keep producing and can practise your way out of. "Work-on 1" means the same habit on the panel, on the home screen, in the charts and in the report, because all of them read one ranking function.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>What may be listed</h4><p>Only patterns, so never something merely watched. Only faults and setup positions, because outcomes, physical limits and intentions aren't things you drill. Delivery numbers may only fill a thin list up to three. A habit whose reading isn't trusted enough to headline is held off every list. The face-on camera can't yet tell a folding lead arm from a normal release, so <em>chicken wing</em> is still measured but never listed.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>The order, rule by rule</h4><p>Each rule is consulted only when every earlier one ties. <strong>Still happening</strong> before resolving. <strong>The root before what it causes</strong>, but only where this session's own swings support the link. <strong>Sharp findings first</strong>, such as the sequence out of order or the hips peaking after impact. Then, when the session couldn't test any link (the usual case, because a habitual golfer shows every habit on every swing), <strong>earlier in the swing first</strong>, setup before backswing before impact, which is how coaches sequence work. Last, <strong>the bigger miss</strong>. Every entry records which rule placed it, so the report can explain the order.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Across sessions: easing and cleared</h4><p>The home screen adds the session records up. For each habit, each session says one of four things: <em>pattern</em>; <em>quiet</em> (the cautious <em>upper</em> bound on its rate is under a half, so 0 of 4 or 1 of 8); <em>inconclusive</em>; or <em>not measured</em>. A work-on is <strong>active</strong> while the latest session that could tell found it, <strong>easing</strong> once a later one found it quiet, and <strong>cleared</strong> after two quiet sessions running.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Absence is not improvement</h4><p>Only a session that measured a habit can ease it. A habit only the down-the-line camera can see isn't marked down for sessions without that camera. It stays active, saying "not measured since 4 Jul". Older evidence counts for less, each session's swings weighted by 0.75 for every substantive session since, so fifteen of fifteen a month ago counts for less than fifteen of fifteen today. It may still be there; it may equally have gone.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">ONE SESSION'S WORK-ONS</text>
+          <g font-size="10.5">
+            <rect x="24" y="46" width="352" height="44" rx="9" fill="rgba(230,172,84,.12)" stroke="var(--accent)" stroke-width="1.4"/>
+            <text x="42" y="66" fill="var(--accent)" font-family="DM Mono,monospace">1</text><text x="62" y="66" fill="var(--paper)">Ball too far back</text>
+            <text x="62" y="81" fill="var(--paper-dim)" font-size="8.5">setup &middot; P1 &middot; 9 of 12 swings</text>
+            <rect x="24" y="98" width="352" height="44" rx="9" fill="rgba(242,237,226,.03)" stroke="var(--line-strong)"/>
+            <text x="42" y="118" fill="var(--paper-dim)" font-family="DM Mono,monospace">2</text><text x="62" y="118" fill="var(--paper)">Stance too narrow</text>
+            <text x="62" y="133" fill="var(--paper-dim)" font-size="8.5">setup &middot; P1 &middot; 8 of 12</text>
+            <rect x="24" y="150" width="352" height="44" rx="9" fill="rgba(242,237,226,.03)" stroke="var(--line-strong)"/>
+            <text x="42" y="170" fill="var(--paper-dim)" font-family="DM Mono,monospace">3</text><text x="62" y="170" fill="var(--paper)">Reverse spine angle at the top</text>
+            <text x="62" y="185" fill="var(--paper-dim)" font-size="8.5">fault &middot; P4 &middot; 12 of 12</text>
+            <rect x="24" y="202" width="352" height="44" rx="9" fill="rgba(242,237,226,.03)" stroke="var(--line-strong)"/>
+            <text x="42" y="222" fill="var(--paper-dim)" font-family="DM Mono,monospace">4</text><text x="62" y="222" fill="var(--paper)">Trail elbow behind the body</text>
+            <text x="62" y="237" fill="var(--paper-dim)" font-size="8.5">fault &middot; P4 &middot; 7 of 12</text>
+          </g>
+          <g font-size="8.5" fill="var(--paper-dim)" text-anchor="end">
+            <text x="364" y="66">swing order</text><text x="364" y="118">swing order</text><text x="364" y="170">same position,</text><text x="364" y="182">bigger miss</text>
+          </g>
+          <text x="40" y="276" fill="var(--paper-dim)" font-size="9" letter-spacing="1.5">THE ORDER</text>
+          <g font-size="9.5" fill="var(--paper)">
+            <text x="40" y="298">1  still happening, before resolving</text>
+            <text x="40" y="316">2  a root before what it causes</text>
+            <text x="40" y="334">3  sharp findings first</text>
+            <text x="40" y="352">4  earlier in the swing first</text>
+            <text x="40" y="370">5  the bigger miss</text>
+          </g>
+          <text x="360" y="352" fill="var(--paper-dim)" font-size="8" text-anchor="end">when no link</text>
+          <text x="360" y="363" fill="var(--paper-dim)" font-size="8" text-anchor="end">can be tested</text>
+        </svg>
+        <p class="figcap">Illustrative: a habitual golfer's session, where no link could be tested.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. REPORT -->
+  <section id="report" class="xsec reveal">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge now"><i></i>The session &middot; 7 &middot; new in October</span>
+        <h2 class="xh">One thing to <em>send the golfer</em></h2>
+        <p class="xlede">At the end of a session a coach can make a branded PDF report and send it straight from their own mail account. Page one alone tells the golfer three things: what went well, what we found, and what to do first. The pages behind it are for anyone who wants to know why.</p>
+        <ul class="points">
+          <li class="point"><span class="pi cyan">1</span><div><h4>Going well means well inside</h4><p>A strength is something the golfer did comfortably: the median reading across the session sits inside the Ideal band. A posture held right at the edge of its range on every swing isn't called a strength. An outcome counts only when both ends of its range were clean.</p></div></li>
+          <li class="point"><span class="pi green">2</span><div><h4>A page per work-on</h4><p>What we saw, as a count and a run of dots against the target range, one per swing, so every claim can be checked against the page. Then why it matters, what came with it, the feel, a drill in full with what to do if it doesn't work, and still frames from the golfer's own swings.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>What might be behind it, all of it</h4><p>Every cause the library authors for the habit, sorted into three groups: <strong>spotted</strong> in this session, <strong>could be</strong> (with how it could be checked), and <strong>ruled out</strong>. When the evidence for a cause is thin, the causes we couldn't check are the most useful thing the report can give: other things for the golfer and coach to consider.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Seen together is not cause</h4><p>A link between two habits is described as "fits the coaching model", or "followed it in the right order on 7 swings", and never as cause. The single exception is a link the session's own swings support, and even then it reads only "goes away when the first one does". At the back, once, the report says what we couldn't check, in plain words.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <rect x="62" y="22" width="276" height="358" rx="4" fill="#F2EDE2" opacity=".95"/>
+          <rect x="78" y="38" width="22" height="22" rx="4" fill="#1a1206" opacity=".85"/>
+          <text x="108" y="49" fill="#1a1206" font-size="7.5" opacity=".7">STUDIO &middot; SESSION REPORT</text>
+          <text x="108" y="59" fill="#1a1206" font-size="7" opacity=".5">7 iron &middot; 12 swings &middot; two cameras</text>
+          <text x="78" y="88" fill="#1a1206" font-size="10.5">Three habits showed on almost</text>
+          <text x="78" y="104" fill="#1a1206" font-size="10.5">every swing. We start with setup.</text>
+          <rect x="78" y="118" width="244" height="40" rx="3" fill="#1a1206" opacity=".06"/>
+          <text x="86" y="134" fill="#1a1206" font-size="7.5" opacity=".75">Coach's note, typed at the end and signed.</text>
+          <g font-size="7" fill="#1a1206" opacity=".55" letter-spacing="1"><text x="78" y="180">GOING WELL</text><text x="162" y="180">WHAT WE FOUND</text><text x="246" y="180">TO WORK ON</text></g>
+          <g fill="#1a1206" opacity=".22">
+            <rect x="78" y="190" width="70" height="5" rx="2"/><rect x="78" y="200" width="56" height="5" rx="2"/><rect x="78" y="216" width="66" height="5" rx="2"/><rect x="78" y="226" width="48" height="5" rx="2"/>
+            <rect x="162" y="190" width="70" height="5" rx="2"/><rect x="162" y="200" width="60" height="5" rx="2"/><rect x="162" y="216" width="68" height="5" rx="2"/><rect x="162" y="226" width="40" height="5" rx="2"/>
+            <rect x="246" y="200" width="60" height="5" rx="2"/><rect x="246" y="216" width="70" height="5" rx="2"/><rect x="246" y="226" width="52" height="5" rx="2"/>
+          </g>
+          <rect x="246" y="188" width="76" height="8" rx="2" fill="#E6AC54"/>
+          <line x1="78" y1="252" x2="322" y2="252" stroke="#1a1206" opacity=".15"/>
+          <text x="78" y="270" fill="#1a1206" font-size="7" opacity=".55" letter-spacing="1">THE BALL</text>
+          <g fill="#1a1206" opacity=".7" font-size="10" font-family="DM Mono,monospace">
+            <text x="78" y="292">152</text><text x="140" y="292">104</text><text x="202" y="292">1.37</text><text x="264" y="292">&minus;3.1&deg;</text>
+          </g>
+          <g fill="#1a1206" opacity=".45" font-size="6.5"><text x="78" y="304">carry, yd</text><text x="140" y="304">ball, mph</text><text x="202" y="304">smash</text><text x="264" y="304">club path</text></g>
+          <text x="200" y="340" fill="#1a1206" font-size="7.5" text-anchor="middle" opacity=".6">page 1: the whole report for a golfer</text><text x="200" y="352" fill="#1a1206" font-size="7.5" text-anchor="middle" opacity=".6">who reads nothing else</text>
+        </svg>
+        <p class="figcap">Illustrative: the shape of the report's first page.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART THREE: HOW TRUTH WORKS ===================== -->
+  <section id="truth" class="xsec">
+    <div class="kicker reveal"><span class="sig green"></span>Part three &middot; How truth works here</div>
+    <h2 class="xh reveal" style="font-size:clamp(26px,3.4vw,40px);--d:1">What the app is entitled to <em>call true</em></h2>
+    <p class="xlede reveal" style="max-width:72ch;--d:2">A diagnosis is a chain of claims, and each link in it is a different kind of claim. A reading is a measurement. A norm is a statement about golfers. A causal link is coaching knowledge. A likely driver is an inference. The app keeps those apart everywhere, because the easiest way to mislead a golfer is to let a strong claim lend its authority to a weak one. These are the rules it follows.</p>
+  </section>
+  <section class="xsec alt reveal" style="padding-top:0">
+    <div class="xgrid">
+      <div class="xcol">
+        <span class="badge accent"><i></i>The ladder of evidence</span>
+        <h2 class="xh">Measured, estimated, inferred, <em>asked</em></h2>
+        <p class="xlede">Every statement the app makes sits on one rung of this ladder, and it says which. A claim never travels up a rung by being repeated, summed or ranked.</p>
+        <ul class="points">
+          <li class="point"><span class="pi green">1</span><div><h4>Measured</h4><p>An instrument read it directly: a pelvis sensor's turn, a launch monitor's club path. Where a launch monitor measures something the cameras also estimate, the monitor is <strong>read first</strong>, and the camera's estimate is the fallback, so club path is judged on the monitor's number when there is one.</p></div></li>
+          <li class="point"><span class="pi cyan">2</span><div><h4>Estimated</h4><p>Worked out from what a camera can see, such as rotation from how narrow the shoulders look as they turn away. That's a real reading and a weaker one, and it is labelled <em>estimated</em>, with its error bar. If better kit is added later, the same reading becomes a measurement with nothing else changing.</p></div></li>
+          <li class="point"><span class="pi amber">3</span><div><h4>Inferred</h4><p>Reasoned through the graph from what was seen: the likely driver when nothing measured it. It is labelled "inferred, not measured", it ranks below an observation of the same thing, and it is never the headline of a report.</p></div></li>
+          <li class="point"><span class="pi coral">4</span><div><h4>Asked</h4><p>Knowable only from you: what you were trying to do. It is offered as a question and never concluded. And one rung stands apart from the rest: a <strong>screen</strong>, a physical test you actually ran, is the only ground truth the model has about a hidden cause.</p></div></li>
+        </ul>
+      </div>
+      <div class="xv reveal">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#0A1216"/>
+          <text x="200" y="26" fill="var(--paper-dim)" font-size="10.5" text-anchor="middle" letter-spacing="2">FOUR RUNGS, NEVER MERGED</text>
+          <g font-size="11.5">
+            <rect x="40" y="48" width="320" height="58" rx="9" fill="rgba(138,179,137,.16)" stroke="var(--arm)" stroke-width="1.6"/>
+            <text x="58" y="72" fill="var(--arm)">MEASURED</text>
+            <text x="58" y="92" fill="var(--paper-dim)" font-size="9.5">a sensor, a launch monitor, a screen you ran</text>
+            <rect x="60" y="120" width="280" height="58" rx="9" fill="rgba(123,192,219,.12)" stroke="var(--club)"/>
+            <text x="78" y="144" fill="var(--club)">ESTIMATED</text>
+            <text x="78" y="164" fill="var(--paper-dim)" font-size="9.5">a camera's reading, with its error bar</text>
+            <rect x="80" y="192" width="240" height="58" rx="9" fill="rgba(230,172,84,.10)" stroke="var(--accent)" stroke-dasharray="5 3"/>
+            <text x="98" y="216" fill="var(--accent)">INFERRED</text>
+            <text x="98" y="236" fill="var(--paper-dim)" font-size="9.5">through the graph; labelled so</text>
+            <rect x="100" y="264" width="200" height="58" rx="9" fill="rgba(224,126,100,.08)" stroke="var(--thorax)" stroke-dasharray="2 3"/>
+            <text x="118" y="288" fill="var(--thorax)">ASKED</text>
+            <text x="118" y="308" fill="var(--paper-dim)" font-size="9.5">a question, never a verdict</text>
+          </g>
+          <line x1="370" y1="64" x2="370" y2="310" stroke="rgba(242,237,226,.25)" stroke-width="1.2"/>
+          <path d="M366 70 L370 60 L374 70" fill="none" stroke="rgba(242,237,226,.4)" stroke-width="1.2"/>
+          <text x="200" y="352" fill="var(--paper)" font-size="10" text-anchor="middle">an observation is never overruled by an inference</text>
+          <text x="200" y="372" fill="var(--paper-dim)" font-size="9.5" text-anchor="middle">and an absent reading is never a pass</text>
+        </svg>
+        <p class="figcap">Every claim says which rung it stands on.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="xsec" style="padding-top:20px">
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig green"></span><h3>Rules about readings</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Not measured is never fine</h4><span class="mkey">the single most important branch in the engine</span></div><span class="mtag imu">rule</span></div>
+          <p>If no camera saw it, no sensor was worn, or the swing couldn't be split into positions, the answer is "we could not assess this", never "clean". The two are kept apart on every screen and in every count. Silence is not a clean bill of health.</p>
+          <div class="mmeta"><b>On screen</b> a dash, a stub in the grid, and a reason: "needs a down-the-line camera"</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Three states, never merged</h4><span class="mkey">gap &middot; finding &middot; fault</span></div><span class="mtag imu">rule</span></div>
+          <p>A capture <em>gap</em> (nothing arrived), a swing <em>finding</em> (something arrived and was poor), and a capture <em>fault</em> (something arrived that the instrument can't produce). A smash factor of 1.62 is a mis-tracked ball. Grading it in either direction would launder a hardware problem into a confident diagnosis.</p>
+          <div class="mmeta"><b>Mechanism</b> every norm carries plausible bounds; outside them a reading is not believed</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>A reading that fails validation is held</h4><span class="mkey">trunkRise &middot; 22 October 2026</span></div><span class="mtag imu">rule</span></div>
+          <p>Before a measure may diagnose anything, it has to agree with an independent reading of the same thing. Trunk rise, the face-on view of standing up, was tested against the down-the-line forward bend on two-camera swings. It ranked swings with a correlation of 0.12, 0.15 and 0.23 on three golfers, against a bar of 0.7 for each. Swing-to-swing noise was bigger than the change it had to see.</p>
+          <div class="mmeta"><b>So</b> it is still drawn, and held out of every diagnosis: a face-on-only session cannot judge posture held into impact, and says so</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>A new rule is checked on real golfers</h4><span class="mkey">lead knee folding going back</span></div><span class="mtag imu">rule</span></div>
+          <p>A new fault is run over the library before it ships, and its firing table is the evidence. The lead knee folding going back fired on 21 of 23 swings for the golfer it was written for, and on none of 127 and none of 28 for two golfers who don't do it. No other condition's result changed.</p>
+          <div class="mmeta"><b>Why</b> a rule that fires on everyone, or on no one, is broken, however sensible it sounds</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Uncertainty never changes a verdict</h4><span class="mkey">the verdicts-identical gate</span></div><span class="mtag imu">rule</span></div>
+          <p>The probability that a finding really fired is added beside the verdict, never substituted for it. A gate re-runs the library with and without it and requires every swing's fired, clean and not-measurable to match. A borderline reading may count as less than a whole firing, but only a borderline reading can.</p>
+          <div class="mmeta"><b>Gate</b> a tier may move only on a condition with a swing between 0.2 and 0.8 sure, or a real chance of a gross error</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>No number is invented</h4><span class="mkey">no fabricated precision</span></div><span class="mtag imu">rule</span></div>
+          <p>Where a reading has no stated error, none is made up. Where a session has fifteen swings, recurrence is a count ("8 of 12 measurable swings"), never a percentage. Readings are shown in whole units or the model's own decimals, and anything inferred is shown as a word. A count is something you can check against the dots.</p>
+          <div class="mmeta"><b>Never shown</b> a session score, a chain probability, a percentage for anything inferred</div></div>
+      </div>
+    </div>
+
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig amber"></span><h3>Rules about knowledge</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>The library grades its own evidence</h4><span class="mkey">supported &middot; indirect &middot; practice</span></div><span class="mtag cam1">provenance</span></div>
+          <p>Every condition and every link records whether anyone has tested it, and when the search was made. <strong>Supported:</strong> a study measured the thing itself (6 conditions, 6 links). <strong>Indirect:</strong> a study measured the mechanism underneath, and the named claim is our reading of it (34 conditions, 47 links). <strong>Practice:</strong> searched for, coaching consensus found, no peer-reviewed test of the named claim (142 conditions, 569 links).</p>
+          <div class="mmeta"><b>Plainly</b> most of the causal graph is what good coaches agree on, not what science has proven, and it says so row by row</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Norms say where they came from</h4><span class="mkey">literature &middot; measured &middot; heuristic</span></div><span class="mtag cam1">provenance</span></div>
+          <p>Of 259 norms, 22 are taken from a published results table: tour-player trunk and knee angles at each position, and head height among them. 3 were measured from our own swings. The other 234 are authored starting figures, marked as such, with no sample behind them. They are expected to move as measured swings accumulate.</p>
+          <div class="mmeta"><b>Rule</b> "literature" means someone read the table; a figure that ought to come from a paper stays heuristic until it does</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Population, never person</h4><span class="mkey">a norm is never keyed to a golfer</span></div><span class="mtag cam1">provenance</span></div>
+          <p>A norm describes golfers, not you. Widening a corridor because your own swings fall outside it doesn't improve your swing. It only removes the app's ability to tell you about it. Your history is used for ranking and presentation, never for firing or grading.</p>
+          <div class="mmeta"><b>Cohorts</b> a segmented population (age, sex) may shift a corridor, and can never invert what counts as good</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Words that can be checked</h4><span class="mkey">calibration against screens</span></div><span class="mtag cam1">provenance</span></div>
+          <p>The posterior that ranks likely drivers is built from authored words, so the app checks how much those words matter. It moves every strength and prominence one step either way and names any link whose single word decides a top cause. Across sessions it compares what screens found against what the words predicted, and flags links that disagree.</p>
+          <div class="mmeta"><b>Honestly</b> that calibration table fills as screens are entered, and it is empty today</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>The library checks itself</h4><span class="mkey">the health list</span></div><span class="mtag cam1">provenance</span></div>
+          <p>The app audits its own knowledge and reports, in plain words, anything that can't work as written. That covers a condition watching a measure with no norm (it can never fire), a shot context that nothing grades, a corridor that puts nearly every stored swing in one band, mismatched units, and one condition watching both ends of a range.</p>
+          <div class="mmeta"><b>And it counts</b> "nothing found" always says how many swings it looked at</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>The model leads the cameras</h4><span class="mkey">138 of 182 can fire today</span></div><span class="mtag cam1">provenance</span></div>
+          <p>The library describes more than can be captured, on purpose. A complete model is something a coach can review, and it is what decides which measurement gets built next. What can't yet be seen is reported as coverage (one quiet line saying how many of the library's conditions this capture could speak to), never as the absence of a fault.</p>
+          <div class="mmeta"><b>Read as</b> a roadmap, not a defect list: the commonest faults are whole-body movements that need depth</div></div>
+      </div>
+    </div>
+
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig coral"></span><h3>Rules about conclusions</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Facts, not judgements</h4><span class="mkey">what a session may assert</span></div><span class="mtag dtl">rule</span></div>
+          <p>A session asserts that readings deviated, that the deviations recurred, and that they are consistent with an authored chain. It never asserts that it has proved a cause, and the kind of shot never flips whether something counts as good. Everything statistical is used as a gate for ordering things, never as a hypothesis test with a verdict.</p>
+          <div class="mmeta"><b>Because</b> swings aren't independent: fatigue, adjustment and the feedback itself see to that</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Report, never soften</h4><span class="mkey">materiality weights ranking only</span></div><span class="mtag dtl">rule</span></div>
+          <p>A finding that matters less on this shot is still recorded, listed and counted. It just adds nothing to the ranking. Not a fraction, because a fraction would be a number nobody could defend. Nothing is hidden because it is inconvenient or unlikely to matter.</p>
+          <div class="mmeta"><b>Likewise</b> a suppressed contradiction is recorded with its reason, never made to vanish</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>The golfer's own swings are the evidence</h4><span class="mkey">every claim checkable</span></div><span class="mtag dtl">rule</span></div>
+          <p>Every claim on a work-on page can be checked against the dots on that page: one per swing, against the target range. If the report says "9 of 10 swings", the reader can count nine. A claim that cannot be traced to swings the golfer can see doesn't make the page.</p>
+          <div class="mmeta"><b>One order</b> work-on 1 is the same habit everywhere it appears</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Measured before inferred, and the unmeasured named</h4><span class="mkey">never dropped</span></div><span class="mtag dtl">rule</span></div>
+          <p>A cause the cameras couldn't see is never a headline. It isn't dropped either. When the evidence is thin, the causes nobody could check are often the most useful thing to hand a coach: other things to consider, each with how it could be checked.</p>
+          <div class="mmeta"><b>In the report</b> spotted &middot; could be &middot; ruled out, for every authored cause</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REFERENCE: EVERY WORD ===================== -->
+  <section id="vocabulary" class="xsec">
+    <div class="kicker reveal"><span class="sig paper"></span>Reference &middot; Every word</div>
+    <h2 class="xh reveal" style="font-size:clamp(26px,3.4vw,40px);--d:1">Every word on the panel, <em>in plain terms</em></h2>
+    <p class="xlede reveal" style="max-width:72ch;margin-bottom:0;--d:2">The app speaks in a small, fixed vocabulary, and every word in it has an exact rule behind it. These are the ladders, from weakest to strongest, with the rule each word stands for. All of the thresholds are settings the developers can tune against the corpus, not constants of nature.</p>
+
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig green"></span><h3>A single reading</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Ideal &middot; Good &middot; Watch &middot; Action</h4><span class="mkey">grade</span></div><span class="mtag imu">per reading</span></div>
+          <p>Within one, two, three or more than three tolerances of the centre, on the reading's own side, under the Standard policy. Lenient and Strict move all four together.</p>
+          <div class="mmeta"><b>Fires</b> at Watch or Action &middot; <b>Not measured</b> is a fifth state, never a grade</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Fired &middot; clean &middot; not measurable</h4><span class="mkey">one swing, one condition</span></div><span class="mtag imu">per swing</span></div>
+          <p>What the ledger records for each condition on each swing, with the probability it really fired beside it. A condition that doesn't apply to the shot is left out entirely, and not marked clean.</p>
+          <div class="mmeta"><b>Not believed</b> outside the plausible range: a capture fault, contributing nothing</div></div>
+      </div>
+    </div>
+
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig amber"></span><h3>A session</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>This shot &middot; watching &middot; pattern</h4><span class="mkey">tier</span></div><span class="mtag cam1">per session</span></div>
+          <p>One observation; fired at least once but not yet evidence; and a habit, when the Wilson lower bound on its rate reaches 0.30 over at least three measurable swings.</p>
+          <div class="mmeta"><b>Warm-up</b> the first three swings count half</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Improving &middot; stable &middot; worsening &middot; resolving</h4><span class="mkey">trend</span></div><span class="mtag cam1">per session</span></div>
+          <p>A Theil&ndash;Sen slope with a rank test at the 5% level, from five readings up. <em>Resolving</em> means a pattern that hasn't fired in its last five measurable swings.</p>
+          <div class="mmeta"><b>Inconsistent</b> when fewer than 70% of its firings agree on direction</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Cold &middot; forming &middot; established &middot; closed</h4><span class="mkey">the panel's stage</span></div><span class="mtag cam1">per session</span></div>
+          <p>Too few swings; at least one pattern; at least two patterns joined by a link graded coherent or better; and frozen as the session summary. One way only.</p>
+          <div class="mmeta"><b>Driver</b> appears once the pattern set has held for three swings</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Firm &middot; likely &middot; fragile</h4><span class="mkey">stability</span></div><span class="mtag cam1">per session</span></div>
+          <p>How often a pattern or a likely driver survives 200 re-runs of the session with every borderline reading allowed to fall either way: at least 80%, at least half, or less.</p>
+          <div class="mmeta"><b>Never</b> shown as a percentage</div></div>
+      </div>
+    </div>
+
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig coral"></span><h3>A link between two habits</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Present together &middot; coherent</h4><span class="mkey">link grade, lower</span></div><span class="mtag dtl">per link</span></div>
+          <p>Both ends are patterns. Then: their directions match the link, and within single swings they fire in the swing's own order.</p>
+          <div class="mmeta"><b>Capped here</b> when the cause fires on every swing, or both ends read the same measurement</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Conditionally dependent &middot; moved together</h4><span class="mkey">link grade, upper</span></div><span class="mtag dtl">per link</span></div>
+          <p>The effect fires more often when the cause did, by a one-sided exact test at 5% over at least eight paired swings. Then: under a declared focus, the cause improved and the effect followed, five swings either side.</p>
+          <div class="mmeta"><b>Ghost link</b> a step the cameras can't measure yet, drawn and never bridged</div></div>
+      </div>
+    </div>
+
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig cyan"></span><h3>Authored knowledge</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Rarely &middot; sometimes &middot; often &middot; usually &middot; always</h4><span class="mkey">link strength</span></div><span class="mtag cam2">authored</span></div>
+          <p>How often the cause produces the effect: 0.10, 0.30, 0.60, 0.80 and 0.95. The shipped graph uses the middle three: 96 sometimes, 367 often, 159 usually.</p>
+          <div class="mmeta"><b>Never</b> 0 or 1: no coaching claim has earned certainty</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Rare &middot; uncommon &middot; occasional &middot; common &middot; ubiquitous</h4><span class="mkey">prominence</span></div><span class="mtag cam2">authored</span></div>
+          <p>The prior chance a cause is present at all: 0.05, 0.10, 0.20, 0.35 and 0.60. Editorial judgement, re-seatable once the swing library can count prevalence.</p>
+          <div class="mmeta"><b>Shipped</b> 3 rare &middot; 28 uncommon &middot; 69 occasional &middot; 75 common &middot; 7 ubiquitous</div></div>
+      </div>
+    </div>
+
+    <div class="mfam">
+      <div class="mfam-head"><span class="sig paper"></span><h3>Across sessions</h3></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mtop"><div><h4>Pattern &middot; quiet &middot; inconclusive &middot; not measured</h4><span class="mkey">what one session says about a work-on</span></div><span class="mtag">per session</span></div>
+          <p>A pattern; at least three measurable swings with the cautious <em>upper</em> bound on its rate under a half; looked at but neither; and never looked at.</p>
+          <div class="mmeta"><b>Example</b> 0 of 4 is quiet &middot; 0 of 3 is inconclusive: three swings can't say "gone"</div></div>
+        <div class="mcard"><div class="mtop"><div><h4>Active &middot; easing &middot; cleared</h4><span class="mkey">a work-on's status</span></div><span class="mtag">across sessions</span></div>
+          <p>A pattern in the latest session that could tell; quiet there after being a pattern before; and quiet in two such sessions running, when it leaves the list. A later pattern makes it active again.</p>
+          <div class="mmeta"><b>Only</b> sessions that measured it move it</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- cross-link -->
+  <section class="wrap">
+    <div class="morelink reveal">
+      <a href="swing-scoring.html">
+        <div>
+          <div class="ml-k">Science in practice &middot; Scoring &amp; metrics</div>
+          <h3>The science behind the score</h3>
+        </div>
+        <span class="ml-go">Every metric the model reads &#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- closing -->
+  <section class="closing wrap">
+    <span class="eyebrow reveal">Science-led, kept open</span>
+    <h2 class="reveal" style="--d:1">Diagnosed, not <em>declared.</em></h2>
+    <p class="reveal" style="--d:2">Every norm, condition and causal link on this page is content you can open in the app, read, and change, with the evidence behind it named row by row. It's still a beta: the fourth shipped in October 2026, with 1.0 targeted for late in the year, and the numbers are being seated on measured swings as they accumulate.</p>
+    <div class="cta-row reveal" style="--d:3">
+      <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
+      <a class="btn" href="validation.html">How we validate</a>
+      <a class="btn" href="../index.html">&#8592; Back to site</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>PinPoint Studio &middot; open-source golf swing analysis &middot; no sign-up, no tracking</span>
+    <span><a href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">GitHub</a> &middot; GPL v2 &middot; Windows / macOS / Linux</span>
+  </div>
+</footer>
+</div><!-- /.page -->
+<script src="../assets/science.js"></script>
+</body>
+</html>
