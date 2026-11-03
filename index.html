@@ -320,6 +320,7 @@
   .channel .ch-label i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 9px currentColor}
   .channel p{font-size:15px;color:var(--text-2);line-height:1.58}
   @media(max-width:820px){.channels{grid-template-columns:1fr}}
+  @media(min-width:821px){.channels.two{grid-template-columns:repeat(2,1fr)}}
 
   /* ---- validation flow ---- */
   .vflow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -436,8 +437,8 @@
         <h1 class="reveal" style="--d:1"><span class="small">Your launch monitor measures the ball.</span><em>We measure you.</em></h1>
         <p class="lede reveal" style="--d:2">If you run a studio, you've already got the cameras, the PC and the launch monitor — so the outcome of every shot is no mystery. What's missing is what your <strong>body</strong> actually did to produce it, and whether you're really making the moves your coach asked for. That's the gap PinPoint Studio fills — and why it's named for the room it's built for.</p>
         <p class="status-line reveal" style="--d:3">
-          <span class="badge dev"><i></i>Beta 4 — October 2026</span>
-          <span>Fourth beta out now · the first meant for other golfers · still validating · 1.0 targeted late 2026</span>
+          <span class="badge dev"><i></i>Beta 6 — November 2026</span>
+          <span>Sixth beta out now · a session report coaches can send · still validating · 1.0 targeted late 2026</span>
         </p>
         <div class="cta-row reveal" style="--d:4">
           <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
@@ -473,27 +474,28 @@
   <section id="tour" class="wrap">
     <div class="kicker reveal"><span class="sig paper"></span>The app</div>
     <h2 class="reveal" style="--d:1">Inside <em>the studio.</em></h2>
-    <p class="sec-lede reveal" style="--d:2">A first look at the desktop app as it stands today — from setting up your kit, through replaying a swing beside its numbers and turning it round in 3-D, reading those numbers against a codified diagnostic model and seeing what a whole session adds up to, to marking swings up by hand for validation.</p>
+    <p class="sec-lede reveal" style="--d:2">A first look at the desktop app as it stands today — from setting up your kit, through replaying a swing beside its numbers, turning it round in 3-D and charting a whole session's swings together, reading those numbers against a codified diagnostic model and seeing what a whole session adds up to, to marking swings up by hand for validation.</p>
 
     <div id="studio" class="studio reveal" style="--d:3">
       <div class="studio-head">
         <span class="studio-mode"><i></i>Now viewing&nbsp;<b>Home</b></span>
-        <span class="studio-count"><b>1</b>&thinsp;/&thinsp;8</span>
+        <span class="studio-count"><b>1</b>&thinsp;/&thinsp;9</span>
       </div>
       <div class="studio-screen" role="button" tabindex="0" aria-label="View screenshots full screen">
-        <img class="shot active" src="assets/home.webp" width="1800" height="1230" alt="PinPoint Studio home screen — choosing a player, club and analysis mode to start a session.">
+        <img class="shot active" src="assets/home.webp" width="1800" height="1230" alt="PinPoint Studio home screen — the golfer at the top, a Start session card with the club to hit, a panel saying what this rig can measure today, and the Your swing tab counting habits in each area of the swing: sequence, posture, arms and club, lateral motion and impact, each with its trend, biggest fault and active work-ons.">
         <img class="shot" src="assets/settings.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio settings — assigning and testing an IMU sensor before capture.">
-        <img class="shot" src="assets/replay.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio replay — a captured swing played back beside its wrist metrics.">
+        <img class="shot" src="assets/replay.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio replay — a gap-wedge swing at address from the down-the-line and face-on cameras, under the P1–P10 position ladder, beside the launch monitor panel for the same shot: club speed 77.6 mph, ball speed 86.1 mph, carry 105.4 yards, with each figure&#39;s session average and spread, and drawings of path, spin, loft and impact.">
         <img class="shot" src="assets/swing3d.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio 3-D swing — a 7-iron swing rebuilt as a figure on a floor grid, seen face-on at the finish, with the club's path traced as a fan of shaft positions through the swing and the target line in orange; preset views for down the line, top, target side, behind and each camera sit above it.">
+        <img class="shot" src="assets/charts.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio charts — the Posture view of a 31-shot gap-wedge session: spine forward bend, pelvis thrust, head rise, pelvis lift, head lift and trail knee flexion from address, every shot lined up on its P-positions from P1 to P10 with the middle half of the shots shaded, a headline saying where the shots part most, each curve's median peak and widest point listed beside the plot, and a How far can I trust this? line beneath.">
         <img class="shot" src="assets/diagnostics.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio diagnostic model — the fault 'early extension' shown as a causal graph of what causes it and what it leads to, beside the measurement that detects it and the citation behind it.">
-        <img class="shot" src="assets/session.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio session diagnostics — a finished fifteen-shot session read as ranked patterns: over the top on 15 of 15 measurable shots, flying trail elbow on 10 of 10, each card carrying the reading that fired it and how far outside its range it was, with limited thoracic rotation named as the likely driver of four of them.">
+        <img class="shot" src="assets/session.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio session diagnostics — a finished 31-shot gap-wedge session read as seventeen patterns, led by the hips peaking after impact on 12 of 13 measurable shots and an out-of-order sequence on 10 of 13, each row with its run across the shots, trend, median and an explanation, under a How far can I trust this? line listing what could not be read.">
         <img class="shot" src="assets/markup.webp" width="1800" height="1227" loading="lazy" alt="PinPoint Studio markup — annotating swing positions by hand for validation.">
         <img class="shot" src="assets/system.webp" width="1800" height="1230" loading="lazy" alt="PinPoint Studio system view — built-in performance profiler showing CPU, memory, threads and per-model GPU use.">
       </div>
       <div class="tourbar">
         <button type="button" class="tstep" data-mode="Home" style="--c:#E6AC54" aria-current="true">
           <span class="tnum">01</span><h4>Home</h4>
-          <p>The starting point — pick a player, a club and an analysis mode to begin a session, and see what that player is working on.</p>
+          <p>The starting point — who's on, what the rig can capture today and a Start card, with Coaching, Your swing and Matchups tabs showing where that player stands.</p>
           <span class="tprog"><i></i></span>
         </button>
         <button type="button" class="tstep" data-mode="Settings" style="--c:#7BC0DB" aria-current="false">
@@ -503,7 +505,7 @@
         </button>
         <button type="button" class="tstep" data-mode="Replay" style="--c:#E07E64" aria-current="false">
           <span class="tnum">03</span><h4>Replay</h4>
-          <p>Play a captured swing back frame-by-frame, beside the key metrics it produced.</p>
+          <p>Play a captured swing back frame by frame from every camera, beside the launch monitor&#39;s reading of the same shot.</p>
           <span class="tprog"><i></i></span>
         </button>
         <button type="button" class="tstep" data-mode="3-D swing" style="--c:#7BC0DB" aria-current="false">
@@ -511,23 +513,28 @@
           <p>The swing rebuilt in three dimensions — rotate and zoom it freely, let the view track the body through the motion, and trace the club's path from address to finish. Snap to face-on, down the line, top, target side, behind or either camera's own view.</p>
           <span class="tprog"><i></i></span>
         </button>
+        <button type="button" class="tstep" data-mode="Charts" style="--c:#8AB389" aria-current="false">
+          <span class="tnum">05</span><h4>Charts</h4>
+          <p>Every shot of a session lined up on its P-positions and overlaid, with the typical swing and its spread — posture, sequence, club delivery and the wrist — and the readings, relations and kinds of swing behind them.</p>
+          <span class="tprog"><i></i></span>
+        </button>
         <button type="button" class="tstep" data-mode="Diagnostic model" style="--c:#f0c279" aria-current="false">
-          <span class="tnum">05</span><h4>Diagnostic model</h4>
+          <span class="tnum">06</span><h4>Diagnostic model</h4>
           <p>Swing faults codified from the literature and leading coaching texts — a causal network linking each fault to its causes, the measurements that detect it and the drills that correct it.</p>
           <span class="tprog"><i></i></span>
         </button>
         <button type="button" class="tstep" data-mode="Session diagnostics" style="--c:#E07E64" aria-current="false">
-          <span class="tnum">06</span><h4>Session diagnostics</h4>
+          <span class="tnum">07</span><h4>Session diagnostics</h4>
           <p>What a whole session says, not one swing — patterns ranked by how often they recur and how far out they were, each with the reading behind it, and the one cause that would explain the most of them.</p>
           <span class="tprog"><i></i></span>
         </button>
         <button type="button" class="tstep" data-mode="Markup" style="--c:#8AB389" aria-current="false">
-          <span class="tnum">07</span><h4>Markup</h4>
+          <span class="tnum">08</span><h4>Markup</h4>
           <p>Annotate swings by hand — the ground-truth labelling that underpins validation.</p>
           <span class="tprog"><i></i></span>
         </button>
         <button type="button" class="tstep" data-mode="System" style="--c:#F2EDE2" aria-current="false">
-          <span class="tnum">08</span><h4>System</h4>
+          <span class="tnum">09</span><h4>System</h4>
           <p>Built-in profiling of CPU, memory and threads — performance engineered in from the ground up, across Windows, macOS and Linux.</p>
           <span class="tprog"><i></i></span>
         </button>
@@ -610,9 +617,9 @@
       <div class="channel reveal" style="--d:1;--gw:rgba(123,192,219,.10)">
         <div class="ch-top">
           <div class="ch-label" style="color:var(--club)"><i style="background:var(--club)"></i>Cameras</div>
-          <span class="badge now"><i></i>New in beta 4</span>
+          <span class="badge now"><i></i>Built</span>
         </div>
-        <p>USB webcams or GenICam / FLIR industrial cameras — face-on and down-the-line. Every live feed carries an on-device pose skeleton. The <strong>down-the-line</strong> camera now pulls its weight: it tracks its own skeleton, shaft and ball, sees the posture face-on can't — forward bend, pelvis thrust, trail knee flex — and with face-on it puts the shaft in 3D, with no calibration. And one industrial camera can now take the <strong>impact</strong> view: cropped to a strip at the ball, a Chameleon3 runs at 591 fps on a 70 µs exposure, keeps just the frames around the strike, and loops them picture-in-picture beside the swing. With two cameras the body is now fitted in <strong>3-D</strong>, standing on the floor with the club at its recorded length, and hip and chest turn, X-factor and stretch are read from it with no sensors worn. The down-the-line view also reads shaft lie and over the top from the hand path. The cameras you choose, not a locked box.</p>
+        <p>USB webcams or GenICam / FLIR industrial cameras — face-on and down-the-line. Every live feed carries an on-device pose skeleton. The <strong>down-the-line</strong> camera now pulls its weight: it tracks its own skeleton, shaft and ball, sees the posture face-on can't — forward bend, pelvis thrust, trail knee flex — and with face-on it puts the shaft in 3D, with no calibration. And one industrial camera can now take the <strong>impact</strong> view: cropped to a strip at the ball, a Chameleon3 runs at 591 fps on a 70 µs exposure, keeps just the frames around the strike, and loops them picture-in-picture beside the swing. With two cameras the body is now fitted in <strong>3-D</strong>, standing on the floor with the club at its recorded length, and hip and chest turn, X-factor and stretch are read from it with no sensors worn. The down-the-line view also reads shaft lie and over the top from the hand path. Session setup has a <strong>Framing</strong> step that shows each camera live with the pose on and checks there's headroom at the top of the swing, and a swing whose video starts too late to see the strike is held back rather than analysed. The cameras you choose, not a locked box.</p>
       </div>
       <div class="channel reveal" style="--d:2;--gw:rgba(242,237,226,.08)">
         <div class="ch-top">
@@ -624,9 +631,9 @@
       <div class="channel reveal" style="--d:3;--gw:rgba(230,172,84,.10)">
         <div class="ch-top">
           <div class="ch-label" style="color:var(--pelvis)"><i style="background:var(--pelvis)"></i>Motion</div>
-          <span class="badge now"><i></i>Built</span>
+          <span class="badge now"><i></i>New in beta 6</span>
         </div>
-        <p>Off-the-shelf BLE IMUs (Witmotion WT901BLE67) at up to 200 Hz capture the wrist flexion, deviation and rotation a camera can't see cleanly — fused into joint angles on-device.</p>
+        <p>Off-the-shelf BLE IMUs (Witmotion WT901BLE67) at up to 200 Hz capture the wrist flexion, deviation and rotation a camera can't see cleanly — fused into joint angles on-device. Now they go on the <strong>hips and chest</strong> too: worn on the back, calibrated hands-free in session setup with spoken golf-term cues, and fed straight into the kinematic sequence.</p>
       </div>
       <div class="channel reveal" style="--d:4;--gw:rgba(138,179,137,.10)">
         <div class="ch-top">
@@ -640,7 +647,7 @@
           <div class="ch-label" style="color:var(--thorax)"><i style="background:var(--thorax)"></i>Launch monitor</div>
           <span class="badge now"><i></i>Built</span>
         </div>
-        <p>Studio plays the <strong>GSPro Connect</strong> server, so any monitor with an Open Connect bridge — a Garmin R10, Rapsodo MLM2PRO, SkyTrak+, PiTrac — connects straight to it; a Foresight GCQuad is read the other way, out of FSX2020. Either route, the readings are treated as a reference instrument: ball speed, spin, face and path recorded beside our own estimates, never replacing them. The Open Connect link is new, and so far proven against a simulator built from sixteen real clients rather than a device on a mat.</p>
+        <p>Studio plays the <strong>GSPro Connect</strong> server, so any monitor with an Open Connect bridge — a Garmin R10, Rapsodo MLM2PRO, SkyTrak+, PiTrac — connects straight to it; a Foresight GCQuad is read the other way, from the files FSX2020 writes — and, from the build after beta 6, Foresight Premier too, following the club selected there. Either route, the readings are treated as a reference instrument: ball speed, spin, face and path recorded beside our own estimates, never replacing them. The Open Connect link is new, and so far proven against a simulator built from sixteen real clients rather than a device on a mat.</p>
       </div>
       <div class="channel reveal" style="--d:6;--gw:rgba(148,160,158,.08)">
         <div class="ch-top">
@@ -692,11 +699,11 @@
     </div>
   </section>
 
-  <!-- four modes -->
+  <!-- analysis -->
   <section id="modes" class="wrap">
     <div class="kicker reveal"><span class="sig coral"></span>Analysis</div>
     <h2 class="reveal" style="--d:1">Four ways to see a swing.</h2>
-    <p class="sec-lede reveal" style="--d:2">PinPoint Studio is built around four analysis modes. Wrist Motion and full Swing Analysis both produce real output today — under validation, not yet released; Ground Force and the AI Coach follow on the same capture pipeline.</p>
+    <p class="sec-lede reveal" style="--d:2">There are no session modes to pick between any more: a session simply records whatever the rig in the bay can see, and can carry a focus. Swing analysis and wrist motion both produce real output today — under validation, not yet released; ground force and the AI coach follow on the same capture pipeline.</p>
     <div class="screens">
       <div class="screen reveal" style="--d:1">
         <div class="screen-top">
@@ -704,7 +711,7 @@
           <span class="badge now"><i></i>Built</span>
         </div>
         <h3>Swing Analysis</h3>
-        <p>Full-body kinematics from the captured frames — a 133-keypoint whole-body pose, shaft, club-head and ball tracking, and 88 swing metrics extracted today from a 126-metric catalogue: X-factor, club-head speed, lag, hip and shoulder rotation, tempo and more. Swing timing now speaks in P-positions: P1–P8 and P10 are resolved from the club track itself, arbitrated on what a reading <em>is</em> rather than which producer got there first. The whole-swing score is the piece still being built.</p>
+        <p>Full-body kinematics from the captured frames — a 133-keypoint whole-body pose, shaft, club-head and ball tracking, and 95 swing metrics extracted today from a 133-metric catalogue: X-factor, club-head speed, lag, hip and shoulder rotation, tempo, posture at every position and the swing plane — the shaft, hand and shoulder planes fitted across the golfer's day — and more. Swing timing now speaks in P-positions: P1–P8 and P10 are resolved from the club track itself, arbitrated on what a reading <em>is</em> rather than which producer got there first. The whole-swing score is the piece still being built.</p>
       </div>
       <div class="screen reveal" style="--d:2">
         <div class="screen-top">
@@ -712,7 +719,7 @@
           <span class="badge now"><i></i>Built</span>
         </div>
         <h3>Wrist Motion</h3>
-        <p>Lead-arm flexion/extension, radial/ulnar deviation and rotation read straight from the sensors, segmented across the swing and scored against coaching bands — the cupping, cocking and flipping a coach watches for. Works from our strap-on IMUs or from a HackMotion wG3, whose readings are kept beside ours rather than replacing them. The first full analyzer; its results are in validation now, not yet released.</p>
+        <p>Lead-arm flexion/extension, radial/ulnar deviation and rotation read straight from the sensors, segmented across the swing and scored against coaching bands — the cupping, cocking and flipping a coach watches for. Works from our strap-on IMUs or from a HackMotion wG3, whose readings are kept beside ours rather than replacing them. No longer a separate mode: the wrist sits in every shot and session it was recorded in, and gets its own page in the session report. The first full analyzer; its results are in validation now, not yet released.</p>
       </div>
       <div class="screen reveal" style="--d:1">
         <div class="screen-top">
@@ -738,27 +745,34 @@
     <div class="kicker reveal"><span class="sig amber"></span>Diagnosis</div>
     <h2 class="reveal" style="--d:1">From numbers to a <em>diagnosis.</em></h2>
     <p class="sec-lede reveal" style="--d:2">Measurements alone don't coach. PinPoint Studio codifies the swing-fault literature into a causal model, then reads every session against it — so a number out of range becomes a named fault, a likely cause and a drill to work on.</p>
-    <div class="channels">
+    <div class="channels two">
       <div class="channel reveal" style="--d:1;--gw:rgba(240,194,121,.10)">
         <div class="ch-top">
           <div class="ch-label" style="color:var(--pelvis)"><i style="background:var(--pelvis)"></i>Diagnostic model</div>
           <span class="badge now"><i></i>Built</span>
         </div>
-        <p>160 swing conditions linked by 391 causal edges, 140 measures, 133 detection signals and 183 reference corridors, plus 17 physical screens and a drill library — drawn from a 40-source bibliography, every claim carrying its provenance. Browsable and editable inside the app, causal graph and all.</p>
+        <p>186 swing conditions linked by 639 causal edges, 208 measures, 170 detection signals and 271 reference corridors, plus 17 physical screens and 45 drills — drawn from a 49-source bibliography, every claim carrying its provenance. The kinematic sequence, posture at every position and the swing plane are all part of it. Browsable and editable inside the app, causal graph and all — down to the words the session report prints.</p>
       </div>
       <div class="channel reveal" style="--d:2;--gw:rgba(123,192,219,.10)">
         <div class="ch-top">
           <div class="ch-label" style="color:var(--club)"><i style="background:var(--club)"></i>Session diagnostics</div>
           <span class="badge now"><i></i>Built</span>
         </div>
-        <p>A shot fires findings; only a session diagnoses. Evidence accumulates shot by shot into a session ledger, patterns that recur are held to honest statistics — within a club, and counting only the shots that could actually be assessed — and causes are ranked along the model's authored chains. Because it is cumulative by construction, the ledger <em>is</em> the session summary at close: a finished session can be reviewed shot by shot in its own right without rewinding the live one, and the live panel casts to a second screen for the athlete. The panel reads as three tabs, <em>This shot</em>, <em>Session</em> and <em>Watching</em>; <em>This shot</em> follows the swing you pick. Each session's top faults are carried to the home screen as the athlete's <strong>work-ons</strong>, and a fault clears only when a later session measured it and found it quiet.</p>
+        <p>A shot fires findings; only a session diagnoses. Evidence accumulates shot by shot into a session ledger, patterns that recur are held to honest statistics — within a club, and counting only the shots that could actually be assessed — and causes are ranked along the model's authored chains. Because it is cumulative by construction, the ledger <em>is</em> the session summary at close: a finished session can be reviewed shot by shot in its own right without rewinding the live one, and the live panel casts to a second screen for the athlete. The panel reads as three tabs, <em>This shot</em>, <em>Session</em> and <em>Watching</em>; <em>This shot</em> follows the swing you pick. Across sessions it adds up on the home screen: <em>Coaching</em> gives one focus to practise in plain words, <em>Your swing</em> counts the habits in each area of the swing with any fault opening in place, and <em>Matchups</em> shows the faults that travel together. A work-on clears only when a later session measured it and found it quiet.</p>
       </div>
       <div class="channel reveal" style="--d:3;--gw:rgba(138,179,137,.10)">
         <div class="ch-top">
           <div class="ch-label" style="color:var(--arm)"><i style="background:var(--arm)"></i>Honest by construction</div>
           <span class="badge now"><i></i>Built</span>
         </div>
-        <p>Every verdict carries its receipt — the measurement behind it and the corridor it broke — and a finding with no number behind it says so rather than passing as fact. A reading outside its corridor says so, and never claims it is fine; where something can't be read, the panel says exactly why. The error bars on the readings reach the verdicts too: each finding carries the probability that it really fired, and the likely driver says how firm it is and whether it was measured or only inferred. Today's corridors are literature-seeded; re-seating them from measured swings is what the validation corpus is for.</p>
+        <p>Every verdict carries its receipt — the measurement behind it and the corridor it broke — and a finding with no number behind it says so rather than passing as fact. A reading outside its corridor says so, and never claims it is fine; where something can't be read, the panel says exactly why. The error bars on the readings reach the verdicts too: each finding carries the probability that it really fired, and the likely driver says how firm it is and whether it was measured or only inferred. Every shot and session answers <em>How far can I trust this?</em>, a refused reading names the check that refused it, and the diagnostic model lists every check and how often it fires. Today's corridors are literature-seeded; re-seating them from measured swings is what the validation corpus is for.</p>
+      </div>
+      <div class="channel reveal" style="--d:4;--gw:rgba(224,126,100,.10)">
+        <div class="ch-top">
+          <div class="ch-label" style="color:var(--thorax)"><i style="background:var(--thorax)"></i>Session report</div>
+          <span class="badge now"><i></i>New in beta 6</span>
+        </div>
+        <p>A coach turns a session into a branded PDF — posture, wrist and club delivery pages, and a launch monitor appendix with every shot and the session's figures with their spread — and sends it to the player straight from their own mail account, or hands it to their mail app. What the report can't check, it says, in the model's own words.</p>
       </div>
     </div>
   </section>
@@ -767,7 +781,7 @@
   <section id="roadmap" class="wrap">
     <div class="kicker reveal"><span class="sig green"></span>Timeline</div>
     <h2 class="reveal" style="--d:1">Where it is, and where it's going.</h2>
-    <p class="sec-lede reveal" style="--d:2">PinPoint Studio reached its fourth beta in October 2026, the first one meant for golfers other than its author: it now tells you what to work on, and says how sure it is. Capture — cameras, phones, wrist sensors and a launch monitor — full-swing metric extraction, the kinematic sequence, the diagnostic model and session diagnostics are all working, and the down-the-line camera now counts; the whole-swing score, ball flight and club data from the impact camera come next. It is still a beta, and we're still proving the numbers.</p>
+    <p class="sec-lede reveal" style="--d:2">PinPoint Studio reached its sixth beta on 1 November 2026: Home is rebuilt around one screen per job with no session modes to choose, coaches can send a branded session report, the hip and chest sensors join the kinematic sequence, and every refused reading says which check refused it and why. Capture — cameras, phones, wrist sensors and a launch monitor — full-swing metric extraction, the kinematic sequence, the diagnostic model and session diagnostics are all working, and the down-the-line camera now counts; the whole-swing score, ball flight and club data from the impact camera come next. It is still a beta, and we're still proving the numbers.</p>
     <div class="horizon">
       <div class="hzcol c-now reveal" style="--d:1">
         <div class="hz-head"><span class="badge now"><i></i>Now</span><h3>Working</h3></div>
@@ -776,22 +790,28 @@
           <li>Down-the-line camera with its own tracking — posture face-on can't see, and the shaft in 3D where the two views' shaft planes cross</li>
           <li>Impact camera — an industrial camera cropped to a strip at the ball at 591 fps, the frames around the strike looped picture-in-picture</li>
           <li>iPhone as a capture camera via the PinPoint Capture companion app, over WiFi or USB</li>
-          <li>Post-shot analysis — 133-keypoint whole-body pose, shaft, club-head &amp; ball tracking</li>
+          <li>Post-shot analysis — 133-keypoint whole-body pose, shaft, club-head &amp; ball tracking, its stages run in parallel so a studio re-analysis takes about 8 seconds, down from 19</li>
           <li>Markerless club tracking — a bare steel shaft read as its own ruler, so irons need no tape (graphite woods &amp; hybrids still do)</li>
           <li>Error bars on the club numbers — every shaft reading and metric carries a &plusmn; calibrated against 996 hand-marked frames, says whether it was checked or only propagated, and flags a reading that may be on the wrong thing; a club track the evidence contradicts is refused, with its reason</li>
-          <li>88 swing metrics extracted today — X-factor, club-head speed, lag, rotation, tempo, the kinematic sequence link by link, and from down the line shaft lie, over the top and posture off the outline of the body</li>
-          <li>Kinematic sequence chart — pelvis, chest, lead arm and club speeds from IMUs, one camera or two, read through to P8, with a tile setting the order they peaked in beside the order they should, each peak as a percentage of a professional's</li>
+          <li>95 swing metrics extracted today — X-factor, club-head speed, lag, rotation, tempo, the kinematic sequence link by link, and from down the line shaft lie, over the top and posture off the outline of the body</li>
+          <li>Posture at every position, P1&ndash;P8, against good players by pattern — including loss of posture and poor posture at address</li>
+          <li>Club delivery — the swing plane graded as an absolute angle back and down, with the hand plane and the shoulder plane at address, fitted across the golfer's day</li>
+          <li>Kinematic sequence chart — pelvis, chest, lead arm and club speeds from IMUs on the arm, hips and chest, one camera or two, read through to P8, with a tile setting the order they peaked in beside the order they should, each peak as a percentage of a professional's</li>
           <li>Calibrated two-camera 3D body — a jointed skeleton standing on the floor, with hip and chest turn and X-factor read from it without IMUs</li>
           <li>3-D swing view — rotate, zoom, track and trace the swing from any angle, or snap to either camera's view; now a panel on the Wrist screen too</li>
           <li>Coach lines placed automatically — head circle, hip lines, the rear line and the address plane — and a synthetic club on replay</li>
           <li>P-position timeline — P1–P8 and P10 resolved from the club track</li>
           <li>Live lead-arm wrist analysis, scored against coaching bands</li>
           <li>HackMotion wG3 wrist sensor as the criterion instrument, published in ISB convention</li>
-          <li>Diagnostic model — 182 conditions, 622 causal edges, 259 norms — editable in-app</li>
+          <li>Diagnostic model — 186 conditions, 639 causal edges, 271 norms — editable in-app, down to the report's words</li>
+          <li>&ldquo;How far can I trust this?&rdquo; on every shot and session — a refused reading names the check that refused it, everywhere it appears</li>
           <li>Session diagnostics — a cumulative evidence ledger, ranked causes, cast to a second display; This shot, Session and Watching tabs, each finding carrying the probability it really fired</li>
-          <li>Work-ons on the home screen — each session's top faults, causes before symptoms, added up across sessions; a fault clears only when a later session measured it quiet</li>
+          <li>Home rebuilt — a Start card, what the rig can capture, and Coaching, Your swing and Matchups tabs; one focus in plain words, faults opening in place, a work-on cleared only when a later session measured it quiet</li>
+          <li>Session report — a branded PDF with posture, wrist and club delivery pages and a launch monitor appendix, sent from the coach's own mail account</li>
+          <li>Session setup — one flow for every session, its steps taken from the hardware connected, with a Framing check and hands-free hip and chest sensor calibration</li>
+          <li>Sessions table — filters, multi-select and bulk actions, and the devices each session was recorded with</li>
           <li>Session review — a finished session read back shot by shot, without rewinding the live one</li>
-          <li>Launch monitors — GSPro Open Connect (R10, MLM2PRO, SkyTrak+, PiTrac&hellip;) and the Foresight GCQuad — measured values beside our estimates</li>
+          <li>Launch monitors — GSPro Open Connect (R10, MLM2PRO, SkyTrak+, PiTrac&hellip;) and the Foresight GCQuad through FSX2020, with Foresight Premier in the build after beta 6 — measured values beside our estimates</li>
           <li>Shot detection — manual, IMU-impact and acoustic — with per-shot capture, replay &amp; export</li>
           <li>Swing files as .ppsw &mdash; a documented binary format, lossless and about a tenth the size, with MIT C++ and Python readers</li>
           <li>Archiving &mdash; finished sessions out of the library and back, verified byte for byte, with the hours of capture you have left</li>
@@ -828,15 +848,15 @@
     <h2 class="reveal" style="--d:1">Built like an instrument.</h2>
     <div class="specwrap reveal" style="--d:2">
       <div class="specrow"><span class="k">Cameras</span><span class="v">USB webcam &rarr; GenICam / FLIR industrial &middot; impact camera at 591 fps &middot; iPhone via PinPoint Capture</span></div>
-      <div class="specrow"><span class="k">IMUs</span><span class="v">Witmotion WT901BLE67 &middot; BLE &middot; up to 200 Hz</span></div>
+      <div class="specrow"><span class="k">IMUs</span><span class="v">Witmotion WT901BLE67 &middot; BLE &middot; up to 200 Hz &middot; lead arm, hips &amp; chest</span></div>
       <div class="specrow"><span class="k">Wrist sensor</span><span class="v">HackMotion wG3 &middot; BLE &middot; ISB convention &middot; via <a class="ulink" href="https://github.com/PinPoint-Golf/libwrist" target="_blank" rel="noopener">libwrist</a> (MIT)</span></div>
       <div class="specrow"><span class="k">Pose</span><span class="v">MoveNet (live) &middot; ViTPose 133-keypoint whole-body (analysis)</span></div>
       <div class="specrow"><span class="k">Wrist kinematics</span><span class="v">IMU-quaternion joint angles, per P-position</span></div>
       <div class="specrow"><span class="k">Swing timing</span><span class="v">P-position ladder, P1&ndash;P8 and P10 (P9 deferred)</span></div>
-      <div class="specrow"><span class="k">Metrics</span><span class="v">126-metric catalogue &middot; 88 produced today</span></div>
-      <div class="specrow"><span class="k">Diagnostics</span><span class="v">182 conditions &middot; 622 causal edges &middot; 46 cited sources</span></div>
+      <div class="specrow"><span class="k">Metrics</span><span class="v">133-metric catalogue &middot; 95 produced today</span></div>
+      <div class="specrow"><span class="k">Diagnostics</span><span class="v">186 conditions &middot; 639 causal edges &middot; 49 cited sources</span></div>
       <div class="specrow"><span class="k">Swing file</span><span class="v">.ppsw &mdash; chunked binary, lossless, ~3 MB a swing &middot; open spec &middot; C++ &amp; Python readers via <a class="ulink" href="https://github.com/PinPoint-Golf/libppswing" target="_blank" rel="noopener">libppswing</a> (MIT)</span></div>
-      <div class="specrow"><span class="k">Launch monitor</span><span class="v">GSPro Open Connect &mdash; R10, MLM2PRO, SkyTrak+, PiTrac &mdash; via <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a> (MIT) &middot; Foresight GCQuad via FSX2020</span></div>
+      <div class="specrow"><span class="k">Launch monitor</span><span class="v">GSPro Open Connect &mdash; R10, MLM2PRO, SkyTrak+, PiTrac &mdash; via <a class="ulink" href="https://github.com/PinPoint-Golf/libgspro" target="_blank" rel="noopener">libgspro</a> (MIT) &middot; Foresight GCQuad via FSX2020 or Foresight Premier</span></div>
       <div class="specrow"><span class="k">Companion app</span><span class="v">PinPoint Capture &middot; iPhone, iOS 18+ &middot; App Store with 1.0, late 2026 &middot; MIT <span class="soon">&middot; Android planned, not soon</span></span></div>
       <div class="specrow"><span class="k">Phone capture</span><span class="v">1080p at 120&ndash;240 fps &middot; HEVC &middot; 10 s rolling buffer &middot; 30 fps live preview</span></div>
       <div class="specrow"><span class="k">Phone link</span><span class="v">PPCP over WiFi or USB &middot; clock &sigma; 1.2 ms WiFi, 0.3 ms cable &middot; open spec, MIT reference library</span></div>
@@ -894,7 +914,7 @@
     <span id="register" aria-hidden="true"></span>
     <span class="eyebrow reveal">Pre-release &middot; nothing to sign</span>
     <h2 class="reveal" style="--d:1">It's in beta — and it's yours.</h2>
-    <p class="reveal" style="--d:2">PinPoint Studio reached its fourth beta in October 2026, with a 1.0 targeted for late in the year — once we're confident the measurements can be relied upon. There's no form to fill in and no list to join: take the build, run it, keep it. It's GPL&nbsp;v2 and built in the open — for golfers, coaches and researchers alike. Watch the repo if you want to hear when something lands, and bring questions to the issue tracker.</p>
+    <p class="reveal" style="--d:2">PinPoint Studio reached its sixth beta on 1 November 2026, with a 1.0 targeted for late in the year — once we're confident the measurements can be relied upon. There's no form to fill in and no list to join: take the build, run it, keep it. It's GPL&nbsp;v2 and built in the open — for golfers, coaches and researchers alike. Watch the repo if you want to hear when something lands, and bring questions to the issue tracker.</p>
     <div class="cta-row reveal" style="--d:3">
       <a class="btn solid" href="https://github.com/PinPoint-Golf/PinPointStudio/releases/latest" target="_blank" rel="noopener">Download the latest beta &#8599;</a>
       <a class="btn" href="https://github.com/PinPoint-Golf/PinPointStudio" target="_blank" rel="noopener">View on GitHub</a>
