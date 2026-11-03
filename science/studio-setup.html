@@ -64,6 +64,7 @@
         <ul class="points">
           <li class="point"><span class="pi cyan">1</span><div><h4>Face-on</h4><p>Set square to the target line, looking straight at the golfer. This is the view that reads sway, lateral weight shift and spine tilt &mdash; the side-to-side story of the swing.</p></div></li>
           <li class="point"><span class="pi cyan">2</span><div><h4>Down-the-line</h4><p>Set along the target line, behind the hands. This is the view for swing plane and shaft angle &mdash; the geometry a coach draws lines on.</p></div></li>
+          <li class="point"><span class="pi amber">!</span><div><h4>Leave room above the top</h4><p>Frame for the top of the swing, not the address. If the hands at the top come within a club length of the frame's top edge, the down-the-line view loses the club exactly where swing plane is decided. PinPoint's session setup has a <strong>Framing</strong> step that watches the golfer hold the top and passes the camera once the highest wrist sits at least a third of the way down the frame.</p></div></li>
           <li class="point"><span class="pi green">&#43;</span><div><h4>More views help in 3D</h4><p>For markerless 3D reconstruction, extra calibrated cameras cut occlusion and depth ambiguity. Two calibrated cameras is the low-cost baseline; add more where a limb keeps hiding the club.</p></div></li>
         </ul>
       </div>
@@ -373,7 +374,7 @@
         <p class="xlede">The rotational quantities golf cares about come from small inertial sensors &mdash; and they validate surprisingly well (upper-torso and pelvic rotation agree with optical at ICC 0.91&ndash;1.00) if you mount and calibrate them right.</p>
         <ul class="points">
           <li class="point"><span class="pi green">&#10003;</span><div><h4>Mount over bone, strap firmly</h4><p>Site sensors over bony landmarks &mdash; sternum or thoracic spine for the upper torso, sacrum for the pelvis &mdash; with firm strapping to cut the soft-tissue wobble that blurs the reading.</p></div></li>
-          <li class="point"><span class="pi cyan">1</span><div><h4>Calibrate every session</h4><p>Run a defined static or functional pose each session to fix each segment's frame before the first swing &mdash; a second of stillness that anchors everything after it.</p></div></li>
+          <li class="point"><span class="pi cyan">1</span><div><h4>Calibrate every session</h4><p>Run a defined static or functional pose each session to fix each segment's frame before the first swing &mdash; a second of stillness that anchors everything after it. PinPoint's session setup does this hands-free for sensors on the hips and chest: it starts once both are upright and still, and talks the golfer through standing tall and one turn each way.</p></div></li>
           <li class="point"><span class="pi amber">!</span><div><h4>Distrust the magnetometer indoors</h4><p>Studios are magnetically dirty &mdash; steel structure, screens, motors. Prefer gyro-dominant yaw with periodic correction, or a magnetometer-free fusion, and check heading stays stable across a session.</p></div></li>
           <li class="point"><span class="pi cyan">&#9679;</span><div><h4>A purpose-built wrist sensor is an option</h4><p>Generic IMUs strapped to the forearm and hand will give you the wrist, but a device built for it &mdash; PinPoint Studio supports the <strong>HackMotion wG3</strong> &mdash; applies its own calibration and streams angles in its own anatomical frame, which removes a mounting variable rather than adding one. Its readings are kept beside the strap-on estimates, not in place of them, so the two can be compared.</p></div></li>
           <li class="point"><span class="pi green">&#10003;</span><div><h4>Fuse fast, don't integrate</h4><p>Use an orientation filter, not raw gyro integration, which drifts. Run the sensors fast (commonly 100&ndash;200+&nbsp;Hz) so peak-angular-velocity timing &mdash; the substance of the kinematic sequence &mdash; is well resolved.</p></div></li>
@@ -460,6 +461,7 @@
     <p class="xlede">Everything above, distilled to a pre-session run-down you can check off before the first swing.</p>
     <ul class="checklist">
       <li><span class="ck">&#10003;</span><span>Two square-on views &mdash; <strong>face-on</strong> plus <strong>down-the-line</strong> (more cameras for 3D markerless).</span></li>
+      <li><span class="ck">&#10003;</span><span>Framed for the <strong>top of the swing</strong> &mdash; the hands well clear of the frame's top edge.</span></li>
       <li><span class="ck">&#10003;</span><span><strong>Global-shutter</strong> sensors &mdash; never rolling shutter.</span></li>
       <li><span class="ck">&#10003;</span><span>Shutter <strong>&le; 1/1000 s</strong>; frame rate <strong>&ge; 240 fps</strong> for body and club.</span></li>
       <li><span class="ck">&#10003;</span><span>Bright, <strong>flicker-free</strong>, diffuse lighting matched to the fast shutter.</span></li>
